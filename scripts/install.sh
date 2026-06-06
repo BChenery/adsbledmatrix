@@ -98,6 +98,8 @@ cp systemd/*.timer /etc/systemd/system/ 2>/dev/null || true
 systemctl daemon-reload
 systemctl enable readsb.service
 systemctl enable adsbledmatrix.service
+systemctl enable adsbledmatrix-update.timer
+systemctl enable adsbledmatrix-sync.timer
 
 # Set permissions
 echo "[8/8] Setting permissions..."
@@ -107,6 +109,8 @@ chmod +x scripts/*.sh
 # Start services
 systemctl start readsb
 systemctl start adsbledmatrix
+systemctl start adsbledmatrix-update.timer
+systemctl start adsbledmatrix-sync.timer
 
 echo ""
 echo "============================================"
