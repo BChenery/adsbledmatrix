@@ -84,10 +84,13 @@ class LogoManager:
         name = self._icao_to_name.get(icao, "")
 
         urls = []
-        # Primary: Google Flights CDN (high-quality, reliable)
+        # Primary: Jxck-S/airline-logos curated repo (GitHub raw, fast & reliable)
+        urls.append(f"https://raw.githubusercontent.com/Jxck-S/airline-logos/main/flightaware_logos/{icao}.png")
+        urls.append(f"https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/{icao}.png")
+        # Secondary: Google Flights CDN (high-quality)
         if iata:
             urls.append(f"https://www.gstatic.com/flights/airline_logos/70px/{iata}.png")
-        # Secondary: FlightAware (uses ICAO directly)
+        # Tertiary: FlightAware direct (uses ICAO directly)
         urls.append(f"https://www.flightaware.com/images/airline_logos/90p/{icao}.png")
 
         for url in urls:
