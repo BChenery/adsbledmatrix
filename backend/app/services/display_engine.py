@@ -278,7 +278,10 @@ class DisplayEngine:
         if not path and ctx.enriched:
             icao = ctx.enriched.get("operator_icao")
             if icao:
-                path = str(settings.logos_dir / f"{icao}.png")
+                logo_path = settings.logos_dir / f"{icao}.png"
+                if not logo_path.exists():
+                    logo_path = settings.logos_dir / "UNKNOWN.png"
+                path = str(logo_path)
 
         if not path:
             return
@@ -476,8 +479,10 @@ class DisplayEngine:
         if condition == "has_logo":
             icao = (ctx.enriched or {}).get("operator_icao")
             if icao:
-                return (settings.logos_dir / f"{icao}.png").exists()
-            return False
+                if (settings.logos_dir / f"{icao}.png").exists():
+                    return True
+            # Fallback logo is always available
+            return (settings.logos_dir / "UNKNOWN.png").exists()
         if condition == "altitude>0":
             return (ctx.aircraft.altitude or 0) > 0 if ctx.aircraft else False
         if condition == "is_idle":

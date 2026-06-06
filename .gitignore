@@ -23,7 +23,9 @@ node_modules/
 # Data
 data/*.sqlite3
 data/*.sqlite3-journal
+# Airline logos are generally ignored, but a starter pack is force-committed
 data/airline_logos/*.png
+!data/airline_logos/UNKNOWN.png
 !data/airline_logos/.gitkeep
 
 # Debug
