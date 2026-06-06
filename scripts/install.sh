@@ -87,9 +87,9 @@ npm install
 npm run build
 cd "$INSTALL_DIR"
 
-# Download airline logo pack for offline use
-echo "[6.6/8] Downloading airline logo pack..."
-python3 scripts/download_logo_pack.py || echo "Logo pack download skipped (will use fallback icons)"
+# Sync all data assets for offline use
+echo "[6.6/8] Syncing data assets (aircraft DB, routes, logos)..."
+python3 scripts/sync_data.py || echo "Data sync incomplete (some assets may be missing)"
 
 # Install systemd services
 echo "[7/8] Installing systemd services..."

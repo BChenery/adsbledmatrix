@@ -117,6 +117,22 @@ class UpdateService:
             logger.error(f"Database update failed: {e}")
         return False
 
+    async def sync_data(self) -> dict:
+        """Trigger a data sync (aircraft DB, routes, logos) via sync_data.py."""
+        import subprocess
+        script = PROJECT_ROOT / "scripts" / "sync_data.py"
+        result = subprocess.run(
+            [str(PROJECT_ROOT / "venv" / "bin" / "python"), str(script)],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_ROOT,
+        )
+        return {
+            "success": result.returncode == 0,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+        }
+
     async def close(self):
         if self._client:
             await self._client.aclose()

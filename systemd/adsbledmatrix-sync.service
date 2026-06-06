@@ -1,0 +1,11 @@
+[Unit]
+Description=ADS-B LED Display Data Sync
+After=network.target
+
+[Service]
+Type=oneshot
+User=adsb
+Group=adsb
+WorkingDirectory=/opt/adsbledmatrix
+Environment=PYTHONPATH=/opt/adsbledmatrix/backend
+ExecStart=/opt/adsbledmatrix/venv/bin/python scripts/sync_data.py

@@ -32,23 +32,10 @@ cd "$INSTALL_DIR/frontend"
 npm install
 npm run build
 
-# Update database if CSV changed
-echo "Checking for database updates..."
+# Sync all data assets
+echo "Syncing data assets..."
 cd "$INSTALL_DIR"
-python3 -c "
-import asyncio
-import sys
-sys.path.insert(0, 'backend')
-from app.services.aircraft_db import db
-from app.database import init_db
-async def update():
-    await init_db()
-    csv = 'data/aircraft_db.csv'
-    import os
-    if os.path.exists(csv):
-        await db.import_csv(csv)
-asyncio.run(update())
-"
+python3 scripts/sync_data.py || echo "Data sync incomplete"
 
 # Restart services
 echo "Restarting services..."
