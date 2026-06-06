@@ -56,8 +56,10 @@ class LogoManager:
         return self._client
 
     async def get_logo(self, icao_code: str) -> Optional[Path]:
-        """Return path to logo, downloading and resizing if necessary.
+        """Return path to logo. Local files are preferred.
 
+        If the logo is not available locally and auto-download is enabled,
+        attempts to download from configured sources.
         Falls back to UNKNOWN.png if no logo can be found.
         """
         if not icao_code:
@@ -68,9 +70,10 @@ class LogoManager:
         if path.exists():
             return path
 
-        downloaded = await self._download_logo(icao, path)
-        if downloaded:
-            return downloaded
+        if settings.auto_download_logos:
+            downloaded = await self._download_logo(icao, path)
+            if downloaded:
+                return downloaded
 
         return self._unknown_path()
 

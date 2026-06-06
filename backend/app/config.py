@@ -48,6 +48,10 @@ class Settings(BaseSettings):
     ap_ssid_prefix: str = "ADSB-Display"
     ap_password: str = "adsbsetup"
 
+    # Logos
+    auto_download_logos: bool = False
+    logos_source_repo: str = "Jxck-S/airline-logos"
+
     # Mock data for development/demo
     mock_aircraft: bool = False
 

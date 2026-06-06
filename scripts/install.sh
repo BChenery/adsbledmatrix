@@ -87,6 +87,10 @@ npm install
 npm run build
 cd "$INSTALL_DIR"
 
+# Download airline logo pack for offline use
+echo "[6.6/8] Downloading airline logo pack..."
+python3 scripts/download_logo_pack.py || echo "Logo pack download skipped (will use fallback icons)"
+
 # Install systemd services
 echo "[7/8] Installing systemd services..."
 cp systemd/*.service /etc/systemd/system/
