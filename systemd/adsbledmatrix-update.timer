@@ -1,0 +1,10 @@
+[Unit]
+Description=ADS-B LED Display Update Checker Timer
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=3600
+
+[Install]
+WantedBy=timers.target

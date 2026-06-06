@@ -1,0 +1,28 @@
+[Unit]
+Description=ADS-B LED Display Update Checker
+After=network.target
+
+[Service]
+Type=oneshot
+User=adsb
+Group=adsb
+WorkingDirectory=/opt/adsbledmatrix
+Environment=PYTHONPATH=/opt/adsbledmatrix/backend
+ExecStart=/opt/adsbledmatrix/venv/bin/python -c "
+import asyncio
+from app.services.updater import updater
+async def check():
+    result = await updater.check_for_update()
+    if result.get('update_available'):
+        print(f'Update available: {result[\"latest_version\"]}')
+        # Auto-apply if enabled
+        from app.api.config import get_user_config_sync
+        config = get_user_config_sync()
+        if config and config.auto_update:
+            success = await updater.apply_update(result['download_url'])
+            if success:
+                import subprocess
+                subprocess.run(['systemctl', 'restart', 'adsbledmatrix'])
+    await updater.close()
+asyncio.run(check())
+"

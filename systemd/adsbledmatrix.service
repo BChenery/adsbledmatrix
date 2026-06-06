@@ -1,0 +1,19 @@
+[Unit]
+Description=ADS-B LED Display
+After=network.target readsb.service
+Wants=readsb.service
+
+[Service]
+Type=simple
+User=adsb
+Group=adsb
+WorkingDirectory=/opt/adsbledmatrix
+Environment=PYTHONPATH=/opt/adsbledmatrix/backend:/opt/adsbledmatrix
+Environment=ADSB_DEBUG=false
+Environment=ADSB_DATA_DIR=/opt/adsbledmatrix/data
+ExecStart=/opt/adsbledmatrix/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8080
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

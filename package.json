@@ -1,0 +1,10 @@
+{
+  "name": "adsbledmatrix",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "setup": "cd frontend && npm install"
+  }
+}

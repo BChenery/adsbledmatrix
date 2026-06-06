@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Create release archive
+        run: |
+          mkdir -p release/adsbledmatrix
+          cp -r backend release/adsbledmatrix/
+          cp -r data release/adsbledmatrix/
+          cp -r hardware release/adsbledmatrix/
+          cp -r scripts release/adsbledmatrix/
+          cp -r systemd release/adsbledmatrix/
+          cp -r docs release/adsbledmatrix/
+          cp README.md release/adsbledmatrix/
+          cp VERSION release/adsbledmatrix/
+          cd release
+          tar -czf adsbledmatrix-${GITHUB_REF_NAME}.tar.gz adsbledmatrix
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/adsbledmatrix-*.tar.gz
+          generate_release_notes: true

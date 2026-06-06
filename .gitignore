@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data
+data/*.sqlite3
+data/*.sqlite3-journal
+data/airline_logos/*.png
+!data/airline_logos/.gitkeep
+
+# Debug
+/tmp/adsbledmatrix-debug/
+
+# Environment
+.env

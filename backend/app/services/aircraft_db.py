@@ -1,0 +1,99 @@
+import csv
+import logging
+from pathlib import Path
+from typing import Optional, Dict, Any
+from sqlalchemy import select, insert, update
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.models import Aircraft, AirlineLogo
+from app.database import AsyncSessionLocal
+from app.config import settings
+
+logger = logging.getLogger(__name__)
+
+
+class AircraftDatabase:
+    """Manages aircraft metadata lookup and database imports."""
+
+    def __init__(self):
+        self._cache: Dict[str, Dict[str, Any]] = {}
+
+    async def enrich(self, hex_code: str) -> Dict[str, Any]:
+        """Return metadata dict for an aircraft hex code."""
+        if hex_code in self._cache:
+            return self._cache[hex_code]
+
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(
+                select(Aircraft).where(Aircraft.hex_code == hex_code.upper())
+            )
+            aircraft = result.scalar_one_or_none()
+            if aircraft:
+                data = {
+                    "registration": aircraft.registration,
+                    "manufacturer": aircraft.manufacturer,
+                    "model": aircraft.model,
+                    "type_code": aircraft.type_code,
+                    "operator": aircraft.operator,
+                    "operator_icao": aircraft.operator_icao,
+                }
+                self._cache[hex_code] = data
+                return data
+            return {}
+
+    async def get_logo_path(self, icao_code: str) -> Optional[str]:
+        """Return local path to airline logo if cached."""
+        if not icao_code:
+            return None
+        icao = icao_code.upper()
+        path = settings.logos_dir / f"{icao}.png"
+        if path.exists():
+            return str(path)
+        return None
+
+    async def import_csv(self, csv_path: Path) -> int:
+        """Import aircraft data from CSV into SQLite."""
+        count = 0
+        async with AsyncSessionLocal() as session:
+            with open(csv_path, "r", encoding="utf-8", errors="ignore") as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    hex_code = row.get("hex_code", "").strip().upper()
+                    if not hex_code:
+                        continue
+
+                    data = {
+                        "registration": row.get("registration", "").strip() or None,
+                        "manufacturer": row.get("manufacturer", "").strip() or None,
+                        "model": row.get("model", "").strip() or None,
+                        "type_code": row.get("type_code", "").strip().upper() or None,
+                        "operator": row.get("operator", "").strip() or None,
+                        "operator_icao": row.get("operator_icao", "").strip().upper() or None,
+                    }
+
+                    result = await session.execute(
+                        select(Aircraft).where(Aircraft.hex_code == hex_code)
+                    )
+                    existing = result.scalar_one_or_none()
+                    if existing:
+                        await session.execute(
+                            update(Aircraft)
+                            .where(Aircraft.hex_code == hex_code)
+                            .values(**data)
+                        )
+                    else:
+                        await session.execute(
+                            insert(Aircraft).values(hex_code=hex_code, **data)
+                        )
+                    count += 1
+
+                    if count % 1000 == 0:
+                        await session.commit()
+                        logger.info(f"Imported {count} aircraft records...")
+
+            await session.commit()
+        logger.info(f"Aircraft database import complete: {count} records")
+        return count
+
+
+# Global singleton
+db = AircraftDatabase()
