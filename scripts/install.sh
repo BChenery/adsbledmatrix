@@ -41,6 +41,7 @@ apt-get install -y \
   libffi-dev \
   libssl-dev \
   libz-dev \
+  libzstd-dev \
   rtl-sdr \
   librtlsdr-dev \
   hostapd \
