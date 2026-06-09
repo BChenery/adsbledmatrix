@@ -19,13 +19,16 @@
 5. Attach antenna to RTL-SDR
 
 ### Panel Arrangement
-For 512×256 using four 128×64 panels:
+For 512×256 using sixteen 128×64 panels (4 wide × 4 tall):
 ```
 Panel 0 ──► Panel 1 ──► Panel 2 ──► Panel 3
-(Chain: 4, Parallel: 1)
+Panel 4 ──► Panel 5 ──► Panel 6 ──► Panel 7
+Panel 8 ──► Panel 9 ──► Panel 10 ──► Panel 11
+Panel 12 ──► Panel 13 ──► Panel 14 ──► Panel 15
+(Chain: 4, Parallel: 4)
 ```
 
-For 256×128 using four 64×64 panels:
+For 256×128 using four 64×64 panels (2 wide × 2 tall):
 ```
 Panel 0 ──► Panel 1   (Chain 1)
 Panel 2 ──► Panel 3   (Chain 2, Parallel)
@@ -67,7 +70,20 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
    cd readsb && make && sudo make install
    ```
 
-5. **Clone and install application**
+5. **Install rpi-rgb-led-matrix**
+   The LED matrix Python bindings must be built from source:
+   ```bash
+   sudo apt install -y libgraphicsmagick++-dev libwebp-dev
+   git clone https://github.com/hzeller/rpi-rgb-led-matrix.git /tmp/rpi-rgb-led-matrix
+   cd /tmp/rpi-rgb-led-matrix
+   make -C utils
+   cd bindings/python
+   make build-python PYTHON=$(command -v python3)
+   sudo make install-python PYTHON=$(command -v python3)
+   cd /opt/adsbledmatrix
+   ```
+
+6. **Clone and install application**
    ```bash
    git clone https://github.com/BChenery/adsbledmatrix.git /opt/adsbledmatrix
    cd /opt/adsbledmatrix

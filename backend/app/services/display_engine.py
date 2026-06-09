@@ -13,38 +13,6 @@ from app.services.route_service import route_service
 logger = logging.getLogger(__name__)
 
 
-class _InlineMockLEDMatrix:
-    """Fallback mock LED matrix when hardware.mock_led is also unavailable."""
-
-    def __init__(self, width: int, height: int):
-        self.width = width
-        self.height = height
-        self._frame_count = 0
-        self._last_frame: Optional[Image.Image] = None
-        logger.info(f"Inline mock LED matrix: {self.width}x{self.height}")
-
-    def SetImage(self, image: Image.Image):
-        self._last_frame = image.copy()
-        self._frame_count += 1
-        if self._frame_count % 300 == 0:  # Every ~10 seconds at 30fps
-            from pathlib import Path
-            debug_dir = Path("/tmp/adsbledmatrix-debug")
-            debug_dir.mkdir(exist_ok=True)
-            path = debug_dir / f"frame_{self._frame_count:06d}.png"
-            image.save(path)
-            logger.debug(f"Saved debug frame to {path}")
-
-    def set_brightness(self, brightness: int):
-        logger.debug(f"Mock brightness set to {brightness}")
-
-    def clear(self):
-        self._last_frame = Image.new("RGB", (self.width, self.height), (0, 0, 0))
-        logger.debug("Mock matrix cleared")
-
-    def get_last_frame(self) -> Optional[Image.Image]:
-        return self._last_frame
-
-
 @dataclass
 class RenderContext:
     aircraft: Optional[Any] = None
@@ -75,33 +43,10 @@ class DisplayEngine:
         self._last_render = datetime.utcnow()
         self._cycle_index = 0
         self._cycle_time = datetime.utcnow()
+        self._test_color: Optional[Tuple[int, int, int]] = None
 
-        # Try to import real LED matrix library
-        try:
-            from rgbmatrix import RGBMatrix, RGBMatrixOptions
-            options = RGBMatrixOptions()
-            options.rows = settings.led_matrix_rows
-            options.cols = settings.led_matrix_cols
-            options.chain_length = settings.led_matrix_chain
-            options.parallel = settings.led_matrix_parallel
-            options.hardware_mapping = settings.led_matrix_hardware_mapping
-            options.pwm_bits = settings.led_matrix_pwm_bits
-            options.brightness = settings.led_matrix_brightness
-            options.gpio_slowdown = settings.led_matrix_gpio_slowdown
-            if settings.led_matrix_limit_refresh > 0:
-                options.limit_refresh_rate_hz = settings.led_matrix_limit_refresh
-            self._matrix = RGBMatrix(options=options)
-            logger.info("LED matrix initialized")
-        except ImportError:
-            logger.warning("rpi-rgb-led-matrix not available, using mock output")
-            # Try to import the standalone mock from hardware/; fall back to inline mock
-            try:
-                from hardware.mock_led import MockLEDMatrix
-                self._matrix = MockLEDMatrix(width=self.width, height=self.height)
-                logger.info("Using hardware.mock_led MockLEDMatrix")
-            except Exception as e:
-                logger.warning(f"Could not import hardware.mock_led ({e}), using inline mock")
-                self._matrix = _InlineMockLEDMatrix(width=self.width, height=self.height)
+        from hardware import create_matrix
+        self._matrix = create_matrix(self.width, self.height)
 
     async def start(self):
         if self._running:
@@ -138,6 +83,12 @@ class DisplayEngine:
         from app.services.adsb_receiver import receiver
         from app.services.aircraft_db import db
         from app.api.config import get_user_config_sync
+
+        # Test pattern takes precedence over normal rendering
+        if self._test_color is not None:
+            img = Image.new("RGB", (self.width, self.height), self._test_color)
+            self._output_to_matrix(img)
+            return
 
         user_config = get_user_config_sync()
 
@@ -509,9 +460,69 @@ class DisplayEngine:
             if self._matrix:
                 self._matrix.SetImage(img)
 
+    def is_hardware_mode(self) -> bool:
+        return getattr(self._matrix, "is_hardware", False)
+
+    def get_brightness(self) -> int:
+        # Real matrix stores brightness on the object; mock ignores it
+        if self.is_hardware_mode() and hasattr(self._matrix, "matrix") and self._matrix.matrix:
+            return getattr(self._matrix.matrix, "brightness", settings.led_matrix_brightness)
+        return settings.led_matrix_brightness
+
     def get_framebuffer(self) -> Optional[Image.Image]:
         with self._lock:
             return self._framebuffer.copy() if self._framebuffer else None
+
+    async def run_test_pattern(self):
+        """Flash red, green, blue on the LED matrix to verify hardware."""
+        if not self.is_hardware_mode():
+            logger.warning("Test pattern requested but not in hardware mode")
+            return False
+        logger.info("Running LED matrix test pattern")
+        for color, name in [((255, 0, 0), "red"), ((0, 255, 0), "green"), ((0, 0, 255), "blue")]:
+            self._test_color = color
+            await asyncio.sleep(1)
+        self._test_color = None
+        logger.info("LED matrix test pattern complete")
+        return True
+
+    def get_diagnostics(self) -> Dict[str, Any]:
+        """Return diagnostics about the LED matrix interface."""
+        import os
+        import getpass
+        import grp
+
+        spi_devices = [f for f in os.listdir("/dev") if f.startswith("spi")]
+        gpio_access = os.access("/dev/gpiomem", os.R_OK | os.W_OK)
+        if not gpio_access and os.path.exists("/dev/gpiochip0"):
+            gpio_access = os.access("/dev/gpiochip0", os.R_OK | os.W_OK)
+
+        user = getpass.getuser()
+        groups = []
+        try:
+            for g in grp.getgrall():
+                if user in g.gr_mem:
+                    groups.append(g.gr_name)
+        except Exception:
+            pass
+
+        return {
+            "hardware_mode": self.is_hardware_mode(),
+            "matrix_type": type(self._matrix).__name__,
+            "width": self.width,
+            "height": self.height,
+            "brightness": self.get_brightness(),
+            "hardware_mapping": settings.led_matrix_hardware_mapping,
+            "rows": settings.led_matrix_rows,
+            "cols": settings.led_matrix_cols,
+            "chain": settings.led_matrix_chain,
+            "parallel": settings.led_matrix_parallel,
+            "spi_enabled": len(spi_devices) > 0,
+            "spi_devices": spi_devices,
+            "gpio_access": gpio_access,
+            "user": user,
+            "groups": groups,
+        }
 
 
 # Global singleton

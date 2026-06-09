@@ -1,13 +1,13 @@
 """LED matrix hardware configuration for Raspberry Pi."""
 
-# Panel arrangement: 4 panels in a chain = 512x64 (or 256x128 depending on wiring)
-# For 512x256: typically 2 chains of 2 panels each, or 4 panels in a 2x2 arrangement
+# Panel arrangement for 512x256 using sixteen 128x64 panels (4 wide x 4 tall)
+# For other arrangements see the alternative configs below
 
 LED_MATRIX_CONFIG = {
     "rows": 64,
     "cols": 128,
-    "chain_length": 4,  # 4 panels chained
-    "parallel": 1,
+    "chain_length": 4,  # 4 panels wide
+    "parallel": 4,       # 4 panels tall
     "hardware_mapping": "regular",  # or "adafruit-hat", "adafruit-hat-pwm"
     "pwm_bits": 11,
     "brightness": 100,

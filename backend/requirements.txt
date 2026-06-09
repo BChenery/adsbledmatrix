@@ -11,3 +11,10 @@ aiofiles>=23.2.0
 aiosqlite>=0.19.0
 pytest>=8.0.0
 pytest-asyncio>=0.23.0
+
+# Hardware dependency (must be built from source on Raspberry Pi):
+#   git clone https://github.com/hzeller/rpi-rgb-led-matrix.git
+#   cd rpi-rgb-led-matrix/bindings/python
+#   make build-python PYTHON=$(command -v python3)
+#   make install-python PYTHON=$(command -v python3)
+# See docs/SETUP.md for full instructions.

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Plane, MapPin, Layout, Wifi, Check, Search, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Props {
   onComplete: (config: UserConfig) => void;
@@ -93,8 +94,9 @@ export default function OnboardingWizard({ onComplete }: Props) {
         onboarding_complete: true,
       });
       onComplete(config);
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      toast.error(e?.message || 'Failed to save setup. Is the backend running?');
     } finally {
       setLoading(false);
     }

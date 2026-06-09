@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     led_matrix_rows: int = 64
     led_matrix_cols: int = 128
     led_matrix_chain: int = 4
-    led_matrix_parallel: int = 1
+    led_matrix_parallel: int = 4
     led_matrix_hardware_mapping: str = "regular"
     led_matrix_pwm_bits: int = 11
     led_matrix_brightness: int = 100

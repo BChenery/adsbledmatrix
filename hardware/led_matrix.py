@@ -18,6 +18,8 @@ logger = logging.getLogger(__name__)
 class LEDMatrix:
     """Wrapper for the RGB LED matrix."""
 
+    is_hardware = True
+
     def __init__(self):
         self.matrix: Optional[RGBMatrix] = None
         self.width = settings.led_matrix_cols * settings.led_matrix_chain
@@ -57,6 +59,15 @@ class LEDMatrix:
         if image.size != (self.width, self.height):
             image = image.resize((self.width, self.height), Image.LANCZOS)
         self.matrix.SetImage(image)
+        self._last_frame = image.copy()
+
+    def SetImage(self, image: Image.Image):
+        """Alias for display() — matches rpi-rgb-led-matrix API."""
+        self.display(image)
+
+    def get_last_frame(self) -> Optional[Image.Image]:
+        """Return the last frame displayed (for preview endpoints)."""
+        return self._last_frame.copy() if self._last_frame is not None else None
 
     def set_brightness(self, brightness: int):
         """Set matrix brightness (0-100)."""
@@ -69,5 +80,5 @@ class LEDMatrix:
             self.matrix.Clear()
 
 
-# Singleton instance
+# Singleton instance (kept for backward compat, but prefer create_matrix)
 led_matrix = LEDMatrix()

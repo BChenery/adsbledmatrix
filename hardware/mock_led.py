@@ -8,11 +8,13 @@ logger = logging.getLogger(__name__)
 
 # Default dimensions match the backend config defaults
 DEFAULT_WIDTH = 512   # 128 cols * 4 chain
-DEFAULT_HEIGHT = 64   # 64 rows * 1 parallel
+DEFAULT_HEIGHT = 256  # 64 rows * 4 parallel
 
 
 class MockLEDMatrix:
     """Software-only mock of the LED matrix. Saves frames to disk for inspection."""
+
+    is_hardware = False
 
     def __init__(self, width: int = DEFAULT_WIDTH, height: int = DEFAULT_HEIGHT):
         self.width = width

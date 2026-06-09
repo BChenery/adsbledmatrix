@@ -141,7 +141,7 @@ Environment variables (all prefixed with `ADSB_`):
 | `ADSB_LED_MATRIX_ROWS` | `64` | LED panel rows |
 | `ADSB_LED_MATRIX_COLS` | `128` | LED panel columns |
 | `ADSB_LED_MATRIX_CHAIN` | `4` | Panels chained |
-| `ADSB_LED_MATRIX_PARALLEL` | `1` | Parallel chains |
+| `ADSB_LED_MATRIX_PARALLEL` | `4` | Parallel chains |
 | `ADSB_LED_MATRIX_BRIGHTNESS` | `100` | Brightness (0–100) |
 | `ADSB_GITHUB_REPO` | `BChenery/adsbledmatrix` | Update source repo |
 

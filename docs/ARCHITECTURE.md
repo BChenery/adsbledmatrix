@@ -122,12 +122,12 @@ The system uses `rpi-rgb-led-matrix` Python bindings. Configuration via environm
 ADSB_LED_MATRIX_ROWS=64
 ADSB_LED_MATRIX_COLS=128
 ADSB_LED_MATRIX_CHAIN=4
-ADSB_LED_MATRIX_PARALLEL=1
+ADSB_LED_MATRIX_PARALLEL=4
 ADSB_LED_MATRIX_HARDWARE_MAPPING=regular
 ADSB_LED_MATRIX_BRIGHTNESS=100
 ```
 
-For a 512×256 display (4 panels in 2×2 grid with 2 parallel chains):
+For a 256×128 display (4 panels in 2×2 grid with 2 parallel chains):
 ```bash
 ADSB_LED_MATRIX_ROWS=64
 ADSB_LED_MATRIX_COLS=128

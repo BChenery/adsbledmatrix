@@ -8,6 +8,7 @@ import Settings from '@/components/Settings/Settings';
 import LiveAircraft from '@/components/LiveAircraft/LiveAircraft';
 import { Plane, Layout, Settings as SettingsIcon, Radio } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 
 function Nav() {
   const links = [
@@ -15,6 +16,7 @@ function Nav() {
     { href: '/designer', icon: Layout, label: 'Designer' },
     { href: '/settings', icon: SettingsIcon, label: 'Settings' },
   ];
+  const displayStatus = useDisplayStatus();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-led-panel border-t border-white/10 px-6 py-3 flex justify-around z-50">
@@ -23,7 +25,7 @@ function Nav() {
           key={link.href}
           href={link.href}
           className={cn(
-            'flex flex-col items-center gap-1 transition-colors',
+            'flex flex-col items-center gap-1 transition-colors relative',
             location.pathname === link.href
               ? 'text-led-accent'
               : 'text-white/60 hover:text-white'
@@ -31,6 +33,15 @@ function Nav() {
         >
           <link.icon size={20} />
           <span className="text-[10px]">{link.label}</span>
+          {link.href === '/settings' && displayStatus && (
+            <span
+              className={cn(
+                'absolute -top-1 -right-1 w-2 h-2 rounded-full border border-led-panel',
+                displayStatus.hardware_mode ? 'bg-green-400' : 'bg-amber-400'
+              )}
+              title={displayStatus.hardware_mode ? 'LED Matrix Connected' : 'LED Matrix Mock Mode'}
+            />
+          )}
         </a>
       ))}
     </nav>

@@ -20,12 +20,12 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Update system
-echo "[1/8] Updating system packages..."
+echo "[1/9] Updating system packages..."
 apt-get update
 apt-get upgrade -y
 
 # Install dependencies
-echo "[2/8] Installing dependencies..."
+echo "[2/9] Installing dependencies..."
 apt-get install -y \
   git \
   python3 \
@@ -42,7 +42,7 @@ apt-get install -y \
   dnsmasq
 
 # Install readsb (ADS-B decoder)
-echo "[3/8] Installing readsb..."
+echo "[3/9] Installing readsb..."
 if ! command -v readsb &> /dev/null; then
   apt-get install -y readsb || {
     echo "readsb not in apt, building from source..."
@@ -56,14 +56,14 @@ if ! command -v readsb &> /dev/null; then
 fi
 
 # Create service user
-echo "[4/8] Creating service user..."
+echo "[4/9] Creating service user..."
 if ! id "$SERVICE_USER" &>/dev/null; then
   useradd -r -s /bin/false -d "$INSTALL_DIR" "$SERVICE_USER"
 fi
 usermod -a -G gpio,spi,i2c,plugdev "$SERVICE_USER"
 
 # Clone repository
-echo "[5/8] Installing application..."
+echo "[5/9] Installing application..."
 if [ -d "$INSTALL_DIR" ]; then
   echo "Existing installation found. Updating..."
   cd "$INSTALL_DIR"
@@ -74,25 +74,38 @@ else
 fi
 
 # Set up Python environment
-echo "[6/8] Setting up Python environment..."
+echo "[6/9] Setting up Python environment..."
 python3 -m venv "$INSTALL_DIR/venv"
 source "$INSTALL_DIR/venv/bin/activate"
 pip install --upgrade pip
 pip install -r backend/requirements.txt
 
+# Build rpi-rgb-led-matrix Python bindings
+echo "[7/9] Building LED matrix library..."
+apt-get install -y libgraphicsmagick++-dev libwebp-dev || true
+if [ ! -d /tmp/rpi-rgb-led-matrix ]; then
+  git clone https://github.com/hzeller/rpi-rgb-led-matrix.git /tmp/rpi-rgb-led-matrix
+fi
+cd /tmp/rpi-rgb-led-matrix
+make -C utils || true
+cd bindings/python
+make build-python PYTHON="$INSTALL_DIR/venv/bin/python"
+make install-python PYTHON="$INSTALL_DIR/venv/bin/python"
+cd "$INSTALL_DIR"
+
 # Build frontend
-echo "[6.5/8] Building frontend..."
+echo "[8/9] Building frontend..."
 cd "$INSTALL_DIR/frontend"
 npm install
 npm run build
 cd "$INSTALL_DIR"
 
 # Sync all data assets for offline use
-echo "[6.6/8] Syncing data assets (aircraft DB, routes, logos)..."
+echo "[8.5/9] Syncing data assets (aircraft DB, routes, logos)..."
 python3 scripts/sync_data.py || echo "Data sync incomplete (some assets may be missing)"
 
 # Install systemd services
-echo "[7/8] Installing systemd services..."
+echo "[9/9] Installing systemd services..."
 cp systemd/*.service /etc/systemd/system/
 cp systemd/*.timer /etc/systemd/system/ 2>/dev/null || true
 systemctl daemon-reload
@@ -102,7 +115,7 @@ systemctl enable adsbledmatrix-update.timer
 systemctl enable adsbledmatrix-sync.timer
 
 # Set permissions
-echo "[8/8] Setting permissions..."
+echo "[9.5/9] Setting permissions..."
 chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
 chmod +x scripts/*.sh
 
