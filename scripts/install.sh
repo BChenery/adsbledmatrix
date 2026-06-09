@@ -31,6 +31,8 @@ apt-get upgrade -y
 echo "[2/8] Installing dependencies..."
 apt-get install -y \
   git \
+  nodejs \
+  npm \
   python3 \
   python3-pip \
   python3-venv \
