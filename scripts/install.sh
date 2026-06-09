@@ -50,17 +50,22 @@ apt-get install -y \
 
 # Install readsb (ADS-B decoder)
 echo "[3/8] Installing readsb..."
-if ! command -v readsb &> /dev/null; then
-  apt-get install -y readsb || {
-    echo "readsb not in apt, building from source..."
-    apt-get install -y libncurses5-dev
-    git clone https://github.com/wiedehopf/readsb.git /tmp/readsb
-    cd /tmp/readsb
-    make
-    make install
-    cd -
-  }
+# Always build from source so RTL-SDR support is guaranteed.
+# The apt package is often compiled without it.
+apt-get install -y libncurses5-dev
+if [ -d "/tmp/readsb" ]; then
+  rm -rf /tmp/readsb
 fi
+git clone https://github.com/wiedehopf/readsb.git /tmp/readsb
+cd /tmp/readsb
+make
+make install
+cd -
+
+# Blacklist the DVB-T TV driver so it doesn't steal the RTL-SDR dongle
+echo "blacklist dvb_usb_rtl28xxu" > /etc/modprobe.d/blacklist-rtl-sdr.conf
+# Unload it now if it's already loaded
+rmmod dvb_usb_rtl28xxu 2>/dev/null || true
 
 # Create service user
 echo "[4/8] Creating service user..."
@@ -135,12 +140,12 @@ echo "[8/8] Setting permissions..."
 chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
 chmod +x scripts/*.sh
 
-# Start services
-systemctl start readsb
-systemctl start adsbledmatrix
-systemctl start adsbledmatrix-update.timer
-systemctl start adsbledmatrix-sync.timer
-systemctl start avahi-daemon
+# Start services (don't fail the whole install if one service can't start yet)
+systemctl start readsb || true
+systemctl start adsbledmatrix || true
+systemctl start adsbledmatrix-update.timer || true
+systemctl start adsbledmatrix-sync.timer || true
+systemctl start avahi-daemon || true
 
 echo ""
 echo "============================================"
