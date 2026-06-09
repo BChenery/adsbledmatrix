@@ -116,6 +116,7 @@ def nm_connect_home(ssid, password):
     ])
 
     run(["nmcli", "connection", "up", "adsb-home"])
+    setup_port_redirect()
     logger.info("Home WiFi connection started (NetworkManager): SSID=%s", ssid)
 
 
@@ -327,6 +328,7 @@ network={{
     run(["systemctl", "enable", f"wpa_supplicant@{iface}"], check=False)
     run(["systemctl", "restart", f"wpa_supplicant@{iface}"], check=False)
     run(["systemctl", "restart", "dhcpcd"], check=False)
+    setup_port_redirect()
     logger.info("Home WiFi connection started (legacy): SSID=%s", ssid)
 
 

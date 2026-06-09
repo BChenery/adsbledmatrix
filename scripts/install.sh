@@ -44,7 +44,6 @@ apt-get install -y \
   hostapd \
   dnsmasq \
   network-manager \
-  iptables-persistent \
   avahi-daemon
 
 # Install readsb (ADS-B decoder)
