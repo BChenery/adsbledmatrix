@@ -19,6 +19,9 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+# Prevent interactive prompts from packages like iptables-persistent
+export DEBIAN_FRONTEND=noninteractive
+
 # Update system
 echo "[1/8] Updating system packages..."
 apt-get update
