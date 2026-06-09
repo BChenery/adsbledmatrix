@@ -89,6 +89,11 @@ pip install -r backend/requirements.txt
 
 # Build frontend
 echo "[6.5/8] Building frontend..."
+# Ensure Node.js and npm are actually available (defensive fallback)
+if ! command -v npm &> /dev/null; then
+  echo "npm not found. Installing nodejs and npm..."
+  apt-get install -y nodejs npm
+fi
 cd "$INSTALL_DIR/frontend"
 npm install
 npm run build
