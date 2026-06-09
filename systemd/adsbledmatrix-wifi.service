@@ -1,0 +1,15 @@
+[Unit]
+Description=ADS-B LED Display WiFi Manager
+After=network.target
+Before=adsbledmatrix.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/adsbledmatrix/venv/bin/python3 /opt/adsbledmatrix/scripts/wifi_manager.py auto
+RemainAfterExit=yes
+Environment=ADSB_DATA_DIR=/opt/adsbledmatrix/data
+Environment=ADSB_AP_SSID_PREFIX=ADSB-Display
+Environment=ADSB_AP_PASSWORD=adsbsetup
+
+[Install]
+WantedBy=multi-user.target

@@ -69,3 +69,22 @@ async def restart_system():
     import subprocess
     subprocess.Popen(["systemctl", "restart", "adsbledmatrix"])
     return {"message": "Restarting..."}
+
+
+class WiFiApplyRequest(BaseModel):
+    ssid: str
+    password: str
+
+
+@router.post("/wifi/apply")
+async def apply_wifi(req: WiFiApplyRequest):
+    """Save WiFi credentials and trigger a switch to home-network mode + reboot."""
+    import subprocess
+    subprocess.Popen([
+        "sudo", "/opt/adsbledmatrix/venv/bin/python3",
+        "/opt/adsbledmatrix/scripts/wifi_manager.py",
+        "connect-home", "--ssid", req.ssid, "--password", req.password,
+    ])
+    # Reboot after a short delay so the HTTP response can be sent.
+    subprocess.Popen(["bash", "-c", "sleep 5 && sudo reboot"])
+    return {"message": "WiFi configured. The device will reboot and connect to your network."}

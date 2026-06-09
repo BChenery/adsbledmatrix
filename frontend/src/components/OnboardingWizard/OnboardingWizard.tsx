@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Plane, MapPin, Layout, Wifi, Check, Search, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface Props {
   onComplete: (config: UserConfig) => void;
@@ -19,13 +18,15 @@ interface NominatimResult {
   lon: string;
 }
 
-export default function OnboardingWizard({ onComplete }: Props) {
+export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
   const [step, setStep] = useState(0);
   const [lat, setLat] = useState('');
   const [lon, setLon] = useState('');
   const [wifiSsid, setWifiSsid] = useState('');
   const [wifiPassword, setWifiPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [rebooting, setRebooting] = useState(false);
+  const [rebootError, setRebootError] = useState('');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<NominatimResult[]>([]);
@@ -86,17 +87,26 @@ export default function OnboardingWizard({ onComplete }: Props) {
 
   const handleFinish = async () => {
     setLoading(true);
+    setRebootError('');
     try {
-      const config = await api.put<UserConfig>('/api/config', {
+      // Save user configuration
+      await api.put<UserConfig>('/api/config', {
         latitude: parseFloat(lat),
         longitude: parseFloat(lon),
         wifi_ssid: wifiSsid || undefined,
+        wifi_password: wifiPassword || undefined,
         onboarding_complete: true,
       });
-      onComplete(config);
-    } catch (e: any) {
+
+      // Trigger WiFi switch and reboot
+      setRebooting(true);
+      await api.post('/api/system/wifi/apply', {
+        ssid: wifiSsid,
+        password: wifiPassword,
+      });
+    } catch (e) {
       console.error(e);
-      toast.error(e?.message || 'Failed to save setup. Is the backend running?');
+      setRebootError('Failed to apply WiFi settings. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -251,7 +261,7 @@ export default function OnboardingWizard({ onComplete }: Props) {
               </div>
             )}
 
-            {step === 3 && (
+            {step === 3 && !rebooting && (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
                   <Wifi size={20} className="text-led-accent" />
@@ -280,11 +290,32 @@ export default function OnboardingWizard({ onComplete }: Props) {
                     />
                   </div>
                 </div>
+                {rebootError && (
+                  <p className="text-sm text-red-400">{rebootError}</p>
+                )}
                 <div className="flex gap-2">
                   <Button variant="secondary" onClick={() => setStep(2)} className="flex-1">Back</Button>
-                  <Button onClick={handleFinish} disabled={loading} className="flex-1">
+                  <Button onClick={handleFinish} disabled={loading || !wifiSsid} className="flex-1">
                     {loading ? 'Saving...' : 'Finish Setup'}
                   </Button>
+                </div>
+              </div>
+            )}
+
+            {rebooting && (
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-led-green/10 flex items-center justify-center mx-auto">
+                  <Check size={32} className="text-led-green" />
+                </div>
+                <h2 className="text-2xl font-bold">All Set!</h2>
+                <p className="text-white/50 text-sm">
+                  Your device is restarting and will join <strong>{wifiSsid}</strong>.
+                </p>
+                <p className="text-white/50 text-sm">
+                  Once it&apos;s back online, visit <strong>http://adsb-display.local</strong> (or check your router for its IP).
+                </p>
+                <div className="flex justify-center">
+                  <Loader2 size={24} className="animate-spin text-led-accent" />
                 </div>
               </div>
             )}
