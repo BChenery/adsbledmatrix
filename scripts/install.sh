@@ -60,7 +60,8 @@ fi
 git clone https://github.com/wiedehopf/readsb.git /tmp/readsb
 cd /tmp/readsb
 make
-make install
+cp readsb /usr/local/bin/readsb
+chmod +x /usr/local/bin/readsb
 cd -
 
 # Blacklist the DVB-T TV driver so it doesn't steal the RTL-SDR dongle
