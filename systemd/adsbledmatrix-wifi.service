@@ -1,8 +1,7 @@
 [Unit]
 Description=ADS-B LED Display WiFi Manager
-After=network-pre.target
-Before=network.target network-online.target adsbledmatrix.service
-Wants=network.target
+After=network.target
+Before=adsbledmatrix.service
 
 [Service]
 Type=oneshot

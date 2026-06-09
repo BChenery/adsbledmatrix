@@ -222,9 +222,8 @@ def legacy_setup_ap():
     ssid = get_ap_ssid()
     iface = get_wlan_interface()
 
-    # Install dependencies if missing
-    run(["apt-get", "update"], check=False)
-    run(["apt-get", "install", "-y", "hostapd", "dnsmasq", "iptables-persistent"], check=False)
+    # Packages should already be installed by install.sh; do NOT apt-get here
+    # because this script may run during boot before the network is fully up.
 
     # Stop competing services
     run(["systemctl", "stop", "hostapd"], check=False)
