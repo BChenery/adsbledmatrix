@@ -51,14 +51,87 @@ The installer will:
 - Import the aircraft database
 - Install and start the systemd services
 
-### First Boot / Onboarding
+### First Boot / Onboarding (Super Simple Steps)
 
-1. After installation and reboot, the Pi creates a WiFi access point: **`ADSB-Display-XXXX`**
-2. Connect to it with password: **`adsbsetup`**
-3. Open **http://192.168.4.1** in your browser
-4. Follow the wizard to set your latitude/longitude, choose a layout, and enter your home WiFi credentials
-5. The Pi will restart and join your home network
-6. Access the web UI at **http://adsb-display.local** (or your router's assigned IP)
+This is the part where you tell the little computer in the box where you live and how to get on your internet. It only takes a few minutes.
+
+#### What you need before you start
+- A phone, tablet, or computer that can connect to WiFi
+- The name of your home WiFi network (often called the **SSID**)
+- The password for your home WiFi network
+- Your address or your latitude/longitude (the wizard can look this up for you)
+
+#### Step 1: Install the software
+Copy this one line, paste it into the Pi's terminal, and press Enter. It does all the hard work for you.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts/install.sh | sudo bash
+```
+
+This command downloads the aeroplane-tracker program and sets everything up. It will take a few minutes. When it is done, the Pi will restart itself.
+
+#### Step 2: Wait for the new WiFi network to appear
+After the Pi restarts, it creates its own little WiFi network so you can talk to it. This network is called something like:
+
+**`ADSB-Display-XXXX`**
+
+The `XXXX` part is the last few letters from the Pi's network card, so every box has a slightly different name.
+
+Go to the WiFi settings on your phone or computer. You will see `ADSB-Display-XXXX` in the list of networks. Tap it and type this password:
+
+**`adsbsetup`**
+
+> 💡 **Tip:** While you are connected to this network, your phone will say "No internet." That is normal. The Pi is not giving you internet — it is just giving you a direct line to talk to it.
+
+#### Step 3: The setup page should pop up by itself
+Because the Pi is acting like a WiFi hotspot, your phone or computer will notice and show a window that says something like "Sign in to network" or "Captive portal." Tap that window.
+
+If the window does **not** pop up, open your web browser (Safari, Chrome, Edge, etc.) and type this exact address:
+
+**`http://192.168.4.1`**
+
+Then press Enter. The setup wizard will appear.
+
+#### Step 4: Tell the wizard about your home
+The wizard has four little steps:
+
+1. **Welcome** — Tap "Get Started."
+2. **Location** — Type your town, suburb, or address into the search box. Pick the right result, or type your latitude and longitude if you know them. This tells the box where it is so it can work out how far away the aeroplanes are.
+3. **Layout** — Pick how you want the information to look on the LED screen. You can change this later.
+4. **WiFi** — Type the name of your home WiFi network and its password. This is so the Pi can leave its temporary hotspot and join your real internet.
+
+When you tap **Finish Setup**, the Pi saves everything, switches to your home WiFi, and restarts.
+
+#### Step 5: Connect back to your home WiFi
+The Pi will turn off its temporary `ADSB-Display-XXXX` network and join your home WiFi instead. On your phone or computer, go back to your WiFi settings and reconnect to your normal home network.
+
+#### Step 6: Open the display any time you want
+Now that the Pi is on your home network, you can visit it in your browser using this easy address:
+
+**`http://adsb-display.local`**
+
+If that does not work, you can also look at your router's list of connected devices to find the Pi's new IP address.
+
+---
+
+#### What if something goes wrong?
+
+- **I cannot see `ADSB-Display-XXXX` in my WiFi list.**
+  - Make sure the Pi has finished starting up. It can take 1–2 minutes after the green light stops blinking.
+  - Try turning the Pi off and on again.
+
+- **The setup page does not open.**
+  - Make sure you are connected to `ADSB-Display-XXXX`.
+  - Open your browser and type `http://192.168.4.1` manually.
+  - Try a different browser or device.
+
+- **The Pi does not connect to my home WiFi after setup.**
+  - Check that you typed the WiFi name and password correctly.
+  - The Pi will automatically fall back to the `ADSB-Display-XXXX` hotspot if it cannot connect, so you can try again.
+  - Make sure your home WiFi is a normal 2.4 GHz or 5 GHz network with a password (not a special office or hotel login page).
+
+- **I typed the wrong WiFi password.**
+  - Connect to `ADSB-Display-XXXX` again, open `http://192.168.4.1`, and go through the wizard once more.
 
 ---
 

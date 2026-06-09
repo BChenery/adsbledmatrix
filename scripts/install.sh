@@ -39,7 +39,10 @@ apt-get install -y \
   rtl-sdr \
   librtlsdr-dev \
   hostapd \
-  dnsmasq
+  dnsmasq \
+  network-manager \
+  iptables-persistent \
+  avahi-daemon
 
 # Install readsb (ADS-B decoder)
 echo "[3/8] Installing readsb..."
@@ -91,15 +94,32 @@ cd "$INSTALL_DIR"
 echo "[6.6/8] Syncing data assets (aircraft DB, routes, logos)..."
 python3 scripts/sync_data.py || echo "Data sync incomplete (some assets may be missing)"
 
+# Set up WiFi access point for onboarding
+echo "[7/8] Setting up WiFi access point..."
+# Generate unique SSID suffix from MAC
+WLAN_IFACE=$(iw dev | awk '$1=="Interface"{print $2}')
+MAC_SUFFIX=$(cat /sys/class/net/${WLAN_IFACE:-wlan0}/address 2>/dev/null | tr -d ':' | tail -c 5 | tr '[:lower:]' '[:upper:]')
+AP_SSID="ADSB-Display-${MAC_SUFFIX:-0000}"
+
+# Run wifi manager to establish AP mode and port redirect
+python3 scripts/wifi_manager.py setup-ap || echo "WiFi manager failed, continuing anyway"
+
 # Install systemd services
-echo "[7/8] Installing systemd services..."
+echo "[7.5/8] Installing systemd services..."
 cp systemd/*.service /etc/systemd/system/
 cp systemd/*.timer /etc/systemd/system/ 2>/dev/null || true
 systemctl daemon-reload
 systemctl enable readsb.service
+systemctl enable adsbledmatrix-wifi.service
 systemctl enable adsbledmatrix.service
 systemctl enable adsbledmatrix-update.timer
 systemctl enable adsbledmatrix-sync.timer
+systemctl enable avahi-daemon.service
+
+# Allow the adsb service user to manage WiFi and reboot without a password
+echo "adsb ALL=(ALL) NOPASSWD: /opt/adsbledmatrix/venv/bin/python3 /opt/adsbledmatrix/scripts/wifi_manager.py *" > /etc/sudoers.d/adsbledmatrix
+echo "adsb ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/reboot, /sbin/shutdown, /usr/sbin/shutdown, /usr/sbin/nmcli, /usr/sbin/iptables, /usr/sbin/netfilter-persistent" >> /etc/sudoers.d/adsbledmatrix
+chmod 440 /etc/sudoers.d/adsbledmatrix
 
 # Set permissions
 echo "[8/8] Setting permissions..."
@@ -111,6 +131,7 @@ systemctl start readsb
 systemctl start adsbledmatrix
 systemctl start adsbledmatrix-update.timer
 systemctl start adsbledmatrix-sync.timer
+systemctl start avahi-daemon
 
 echo ""
 echo "============================================"
@@ -118,7 +139,7 @@ echo "  Installation Complete!"
 echo "============================================"
 echo ""
 echo "The device is now running in AP mode."
-echo "Connect to WiFi: ADSB-Display-XXXX"
+echo "Connect to WiFi: ${AP_SSID}"
 echo "Then open: http://192.168.4.1"
 echo ""
 echo "To check status: sudo systemctl status adsbledmatrix"
