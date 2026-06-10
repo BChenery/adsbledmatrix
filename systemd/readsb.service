@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=adsb
 Group=adsb
-ExecStart=/usr/bin/readsb \
+ExecStart=/usr/local/bin/readsb \
   --device-type rtlsdr \
   --gain -10 \
   --ppm 0 \

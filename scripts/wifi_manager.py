@@ -281,6 +281,12 @@ address=/#/{AP_IP}
     except Exception as exc:
         logger.warning("Could not update /etc/dhcpcd.conf: %s", exc)
 
+    # Ensure the interface has the static IP (dhcpcd may not be active on Bookworm)
+    run(["ip", "link", "set", iface, "up"], check=False)
+    run(["ip", "addr", "flush", "dev", iface], check=False)
+    run(["ip", "addr", "add", f"{AP_IP}/24", "dev", iface], check=False)
+    logger.info("Assigned static IP %s/24 to %s", AP_IP, iface)
+
     # Enable and start services
     run(["systemctl", "unmask", "hostapd"], check=False)
     run(["systemctl", "enable", "hostapd"], check=False)
