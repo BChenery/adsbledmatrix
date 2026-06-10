@@ -138,9 +138,12 @@ def nm_wait_for_connection(timeout=60):
 
 
 def _is_iptables_rule_present():
-    result = run(["iptables", "-t", "nat", "-S", "PREROUTING"], check=False)
-    target = "-p tcp --dport 80 -j REDIRECT --to-ports 8080"
-    return target in result.stdout
+    try:
+        result = run(["iptables", "-t", "nat", "-S", "PREROUTING"], check=False)
+        target = "-p tcp --dport 80 -j REDIRECT --to-ports 8080"
+        return target in result.stdout
+    except FileNotFoundError:
+        return False
 
 
 def setup_port_redirect():
@@ -150,15 +153,16 @@ def setup_port_redirect():
         return
     run(["iptables", "-t", "nat", "-A", "PREROUTING", "-p", "tcp", "--dport", "80", "-j", "REDIRECT", "--to-ports", "8080"])
     logger.info("Added port 80 -> 8080 redirect")
-    # Attempt to persist rules if netfilter-persistent is available
-    if os.path.exists("/usr/sbin/netfilter-persistent"):
-        run(["netfilter-persistent", "save"], check=False)
-    elif os.path.exists("/usr/sbin/iptables-save"):
-        try:
-            with open("/etc/iptables.ipv4.nat", "w") as f:
-                subprocess.run(["iptables-save"], stdout=f, check=True)
-        except Exception as exc:
-            logger.warning("Could not persist iptables rules: %s", exc)
+    # Persist rules so they survive reboots
+    os.makedirs("/etc/iptables", exist_ok=True)
+    try:
+        with open("/etc/iptables/rules.v4", "w") as f:
+            subprocess.run(["iptables-save"], stdout=f, check=True)
+        logger.info("Saved iptables rules to /etc/iptables/rules.v4")
+    except Exception as exc:
+        logger.warning("Could not persist iptables rules: %s", exc)
+    # Ensure netfilter-persistent is enabled to restore rules on boot
+    run(["systemctl", "enable", "netfilter-persistent"], check=False)
 
 
 def _backup_file(path):

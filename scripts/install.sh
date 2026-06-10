@@ -46,6 +46,8 @@ apt-get install -y \
   librtlsdr-dev \
   hostapd \
   dnsmasq \
+  iptables \
+  iptables-persistent \
   network-manager \
   avahi-daemon
 
@@ -63,6 +65,10 @@ make
 cp readsb /usr/local/bin/readsb
 chmod +x /usr/local/bin/readsb
 cd -
+if [ ! -f "/usr/local/bin/readsb" ]; then
+  echo "ERROR: readsb binary not found at /usr/local/bin/readsb"
+  exit 1
+fi
 
 # Blacklist the DVB-T TV driver so it doesn't steal the RTL-SDR dongle
 echo "blacklist dvb_usb_rtl28xxu" > /etc/modprobe.d/blacklist-rtl-sdr.conf
@@ -142,6 +148,9 @@ echo "[8/8] Setting permissions..."
 chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
 chmod +x scripts/*.sh
 
+# Ensure netfilter-persistent is enabled so iptables rules survive reboots
+systemctl enable netfilter-persistent || true
+
 # Start services (don't fail the whole install if one service can't start yet)
 systemctl start readsb || true
 systemctl start adsbledmatrix || true
@@ -160,3 +169,7 @@ echo "Then open: http://192.168.4.1"
 echo ""
 echo "To check status: sudo systemctl status adsbledmatrix"
 echo "To view logs: sudo journalctl -u adsbledmatrix -f"
+echo ""
+echo "Rebooting in 10 seconds..."
+sleep 10
+reboot
