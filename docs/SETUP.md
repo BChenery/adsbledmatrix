@@ -59,7 +59,7 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
 3. **Install dependencies**
    ```bash
    sudo apt update
-   sudo apt install -y git python3-pip rtl-sdr librtlsdr-dev hostapd dnsmasq
+   sudo apt install -y git python3-pip rtl-sdr librtlsdr-dev hostapd dnsmasq sqlite3 rfkill
    ```
 
 4. **Install readsb**

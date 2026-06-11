@@ -49,7 +49,9 @@ apt-get install -y \
   iptables \
   iptables-persistent \
   network-manager \
-  avahi-daemon
+  avahi-daemon \
+  sqlite3 \
+  rfkill
 
 # Install readsb (ADS-B decoder)
 echo "[3/8] Installing readsb..."
@@ -115,7 +117,7 @@ cd "$INSTALL_DIR"
 
 # Sync all data assets for offline use
 echo "[6.6/8] Syncing data assets (aircraft DB, routes, logos)..."
-python3 scripts/sync_data.py || echo "Data sync incomplete (some assets may be missing)"
+python3 scripts/sync_data.py --force || echo "Data sync incomplete (some assets may be missing)"
 
 # Set up WiFi access point for onboarding
 echo "[7/8] Setting up WiFi access point..."
