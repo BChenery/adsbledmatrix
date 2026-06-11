@@ -420,8 +420,8 @@ def cmd_setup_ap(_args):
 
 def cmd_connect_home(args):
     config = read_config_from_db()
-    ssid = args.ssid or config.get("wifi_ssid")
-    password = args.password or config.get("wifi_password")
+    ssid = getattr(args, "ssid", None) or config.get("wifi_ssid")
+    password = getattr(args, "password", None) or config.get("wifi_password")
     if not ssid or not password:
         logger.error("No WiFi credentials provided. Pass --ssid / --password or store them in the DB.")
         sys.exit(1)
