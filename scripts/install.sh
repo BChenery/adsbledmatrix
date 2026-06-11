@@ -61,7 +61,8 @@ if [ -d "/tmp/readsb" ]; then
 fi
 git clone https://github.com/wiedehopf/readsb.git /tmp/readsb
 cd /tmp/readsb
-make
+make clean
+make RTLSDR=yes
 cp readsb /usr/local/bin/readsb
 chmod +x /usr/local/bin/readsb
 cd -

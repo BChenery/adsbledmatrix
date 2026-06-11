@@ -242,10 +242,14 @@ def legacy_setup_ap():
         run(["systemctl", "stop", "systemd-resolved"], check=False)
         run(["systemctl", "disable", "systemd-resolved"], check=False)
 
+    # Ensure WiFi radio is not blocked (common after some reboots / factory resets)
+    run(["rfkill", "unblock", "wifi"], check=False)
+
     # Configure hostapd
     hostapd_conf = f"""interface={iface}
 driver=nl80211
 ssid={ssid}
+country_code=GB
 hw_mode=g
 channel=7
 wmm_enabled=0
@@ -291,11 +295,36 @@ address=/#/{AP_IP}
     run(["ip", "addr", "add", f"{AP_IP}/24", "dev", iface], check=False)
     logger.info("Assigned static IP %s/24 to %s", AP_IP, iface)
 
+    # Force a down/up cycle to clear any lingering managed-mode / 5 GHz state
+    # that can prevent hostapd from taking over the interface at boot.
+    run(["ip", "link", "set", iface, "down"], check=False)
+    time.sleep(0.5)
+    run(["ip", "link", "set", iface, "up"], check=False)
+    time.sleep(0.5)
+
     # Enable and start services
     run(["systemctl", "unmask", "hostapd"], check=False)
     run(["systemctl", "enable", "hostapd"], check=False)
     run(["systemctl", "enable", "dnsmasq"], check=False)
-    run(["systemctl", "start", "hostapd"], check=False)
+
+    # Retry hostapd start — at boot it can race with NetworkManager or
+    # fail if the interface hasn't fully settled after the down/up cycle.
+    hostapd_ok = False
+    for attempt in range(1, 4):
+        run(["systemctl", "restart", "hostapd"], check=False)
+        time.sleep(2)
+        status = run(["systemctl", "is-active", "hostapd"], check=False)
+        if status.returncode == 0:
+            hostapd_ok = True
+            logger.info("hostapd started successfully on attempt %d", attempt)
+            break
+        logger.warning("hostapd not active after attempt %d, retrying...", attempt)
+    if not hostapd_ok:
+        logger.error("hostapd failed to start after 3 attempts")
+        # Dump last few lines of hostapd log to help debugging
+        log = run(["journalctl", "-u", "hostapd", "--no-pager", "-n", "10"], check=False)
+        logger.error("hostapd log:\n%s", log.stdout)
+
     run(["systemctl", "start", "dnsmasq"], check=False)
     logger.info("AP mode active: SSID=%s Password=%s IP=%s", ssid, AP_PASSWORD, AP_IP)
 

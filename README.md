@@ -119,6 +119,11 @@ If that does not work, you can also look at your router's list of connected devi
 - **I cannot see `ADSB-Display-XXXX` in my WiFi list.**
   - Make sure the Pi has finished starting up. It can take 1–2 minutes after the green light stops blinking.
   - Try turning the Pi off and on again.
+  - If you still cannot see it, connect a keyboard/monitor or SSH in and run:
+    ```bash
+    sudo /opt/adsbledmatrix/venv/bin/python3 /opt/adsbledmatrix/scripts/wifi_manager.py setup-ap
+    ```
+    The hotspot should appear within a few seconds.
 
 - **The setup page does not open.**
   - Make sure you are connected to `ADSB-Display-XXXX`.
@@ -231,6 +236,20 @@ sudo bash /opt/adsbledmatrix/scripts/update.sh
 Or via the web UI: **Settings → Updates → Check Now**
 
 Rollback copies are preserved in `/opt/adsbledmatrix-backup/`.
+
+---
+
+## 🔄 Factory Reset
+
+To erase all settings and start the onboarding wizard again:
+
+```bash
+sudo systemctl stop adsbledmatrix
+sudo rm /opt/adsbledmatrix/data/aircraft_db.sqlite3
+sudo reboot
+```
+
+After reboot the `ADSB-Display-XXXX` hotspot will reappear. Connect to it and run through the setup wizard again.
 
 ---
 

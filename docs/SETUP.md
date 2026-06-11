@@ -66,8 +66,11 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
    ```bash
    sudo apt install -y readsb
    # OR build from source:
-   git clone https://github.com/wiedehopf/readsb.git
-   cd readsb && make && sudo make install
+   git clone https://github.com/wiedehopf/readsb.git /tmp/readsb
+   cd /tmp/readsb
+   make clean
+   make RTLSDR=yes
+   sudo cp readsb /usr/local/bin/readsb
    ```
 
 5. **Install rpi-rgb-led-matrix**
@@ -203,6 +206,14 @@ sudo bash /opt/adsbledmatrix/scripts/update.sh
 ```bash
 sudo systemctl stop adsbledmatrix
 sudo rm /opt/adsbledmatrix/data/aircraft_db.sqlite3
+sudo reboot
+# After reboot the AP will reappear so you can re-run onboarding
+```
+
+Or without rebooting:
+```bash
+sudo systemctl stop adsbledmatrix
+sudo rm /opt/adsbledmatrix/data/aircraft_db.sqlite3
+sudo /opt/adsbledmatrix/venv/bin/python3 /opt/adsbledmatrix/scripts/wifi_manager.py setup-ap
 sudo systemctl start adsbledmatrix
-# Then re-run onboarding
 ```
