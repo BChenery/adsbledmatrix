@@ -402,6 +402,7 @@ class DisplayEngine:
             "manufacturer": enriched.get("manufacturer") or "---",
             "model": enriched.get("model") or "---",
             "type_code": enriched.get("type_code") or "---",
+            "type_name": enriched.get("type_name") or "---",
             "operator": enriched.get("operator") or "---",
             "operator_icao": enriched.get("operator_icao") or "---",
             "cycle_index": str(ctx.cycle_index + 1),

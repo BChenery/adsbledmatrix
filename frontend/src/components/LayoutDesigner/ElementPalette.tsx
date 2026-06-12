@@ -70,6 +70,12 @@ export const QUICK_ADD_PRESETS: PalettePreset[] = [
     template: { element_type: 'data_field', x: 10, y: 10, width: 200, height: 28, color: '#aaaaaa', font_size: 18, data_field: 'type_code', format_str: '{type_code}' },
   },
   {
+    key: 'type_name',
+    label: 'Aircraft Name',
+    icon: <Database size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 300, height: 28, color: '#aaaaaa', font_size: 18, data_field: 'type_name', format_str: '{type_name}' },
+  },
+  {
     key: 'altitude',
     label: 'Altitude',
     icon: <Thermometer size={18} />,

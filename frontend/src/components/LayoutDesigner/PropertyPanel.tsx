@@ -195,6 +195,7 @@ export default function PropertyPanel({ element, onChange, onDelete }: PropertyP
                 <SelectItem value="operator">Operator</SelectItem>
                 <SelectItem value="operator_icao">Operator ICAO</SelectItem>
                 <SelectItem value="type_code">Type Code</SelectItem>
+                <SelectItem value="type_name">Type Name</SelectItem>
                 <SelectItem value="manufacturer">Manufacturer</SelectItem>
                 <SelectItem value="hex_code">Hex Code</SelectItem>
                 <SelectItem value="squawk">Squawk</SelectItem>

@@ -17,6 +17,7 @@ export interface Aircraft {
   manufacturer?: string;
   model?: string;
   type_code?: string;
+  type_name?: string;
   operator?: string;
   operator_icao?: string;
   route?: string;

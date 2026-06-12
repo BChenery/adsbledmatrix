@@ -27,6 +27,7 @@ class AircraftResponse(BaseModel):
     manufacturer: Optional[str]
     model: Optional[str]
     type_code: Optional[str]
+    type_name: Optional[str]
     operator: Optional[str]
     operator_icao: Optional[str]
 
@@ -56,6 +57,7 @@ async def get_live_aircraft():
             manufacturer=enriched.get("manufacturer"),
             model=enriched.get("model"),
             type_code=enriched.get("type_code"),
+            type_name=enriched.get("type_name"),
             operator=enriched.get("operator"),
             operator_icao=enriched.get("operator_icao"),
         ))
@@ -88,6 +90,7 @@ async def get_closest_aircraft():
         manufacturer=enriched.get("manufacturer"),
         model=enriched.get("model"),
         type_code=enriched.get("type_code"),
+        type_name=enriched.get("type_name"),
         operator=enriched.get("operator"),
         operator_icao=enriched.get("operator_icao"),
     )

@@ -1,4 +1,5 @@
 import csv
+import json
 import logging
 from pathlib import Path
 from typing import Optional, Dict, Any
@@ -10,12 +11,25 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Project-root lookup table: ICAO type designator -> human-readable aircraft name
+_TYPE_NAMES_PATH = Path(__file__).resolve().parents[3] / "aircraft_type_names.json"
+
+
+def _load_type_names() -> Dict[str, str]:
+    try:
+        with open(_TYPE_NAMES_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        logger.warning(f"Could not load aircraft type names from {_TYPE_NAMES_PATH}: {e}")
+        return {}
+
 
 class AircraftDatabase:
     """Manages aircraft metadata lookup and database imports."""
 
     def __init__(self):
         self._cache: Dict[str, Dict[str, Any]] = {}
+        self._type_names: Dict[str, str] = _load_type_names()
 
     async def enrich(self, hex_code: str) -> Dict[str, Any]:
         """Return metadata dict for an aircraft hex code."""
@@ -28,11 +42,13 @@ class AircraftDatabase:
             )
             aircraft = result.scalar_one_or_none()
             if aircraft:
+                type_code = aircraft.type_code
                 data = {
                     "registration": aircraft.registration,
                     "manufacturer": aircraft.manufacturer,
                     "model": aircraft.model,
-                    "type_code": aircraft.type_code,
+                    "type_code": type_code,
+                    "type_name": self._type_names.get(type_code) if type_code else None,
                     "operator": aircraft.operator,
                     "operator_icao": aircraft.operator_icao,
                 }
