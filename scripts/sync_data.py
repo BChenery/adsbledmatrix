@@ -164,6 +164,21 @@ async def main():
         print()
         print("[4/4] Skipping logo refresh (--skip-logos)")
 
+    # Import richer localadsb aircraft/route databases if present
+    localadsb_script = Path(__file__).resolve().parent / "import_localadsb.py"
+    if localadsb_script.exists():
+        print()
+        print("[5/4] Importing localadsb databases...")
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, str(localadsb_script)],
+            capture_output=True,
+            text=True,
+        )
+        print(result.stdout)
+        if result.returncode != 0:
+            print(f"  ⚠ localadsb import warning: {result.stderr.strip() or 'unknown'}")
+
     # Write sync timestamp
     sync_file = settings.data_dir / ".last_sync"
     sync_file.write_text(datetime.now(timezone.utc).isoformat())

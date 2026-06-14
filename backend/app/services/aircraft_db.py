@@ -11,17 +11,22 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Project-root lookup table: ICAO type designator -> human-readable aircraft name
-_TYPE_NAMES_PATH = Path(__file__).resolve().parents[3] / "aircraft_type_names.json"
+# Prefer the richer localadsb lookup table, fall back to project root.
+_TYPE_NAMES_PATHS = [
+    Path(__file__).resolve().parents[3] / "data" / "localadsb" / "aircraft_type_names.json",
+    Path(__file__).resolve().parents[3] / "aircraft_type_names.json",
+]
 
 
 def _load_type_names() -> Dict[str, str]:
-    try:
-        with open(_TYPE_NAMES_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        logger.warning(f"Could not load aircraft type names from {_TYPE_NAMES_PATH}: {e}")
-        return {}
+    for path in _TYPE_NAMES_PATHS:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            continue
+    logger.warning("Could not load aircraft type names from any known path")
+    return {}
 
 
 class AircraftDatabase:

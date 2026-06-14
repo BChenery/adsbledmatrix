@@ -119,6 +119,10 @@ cd "$INSTALL_DIR"
 echo "[6.6/8] Syncing data assets (aircraft DB, routes, logos)..."
 python3 scripts/sync_data.py --force || echo "Data sync incomplete (some assets may be missing)"
 
+# Import localadsb databases if present
+echo "[6.7/8] Importing localadsb aircraft and route databases..."
+python3 scripts/import_localadsb.py || echo "localadsb import skipped or failed"
+
 # Set up WiFi access point for onboarding
 echo "[7/8] Setting up WiFi access point..."
 # Generate unique SSID suffix from MAC
