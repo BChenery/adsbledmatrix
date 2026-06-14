@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { api } from '@/api/client';
 import { UserConfig } from '@/types/config';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,16 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { Plane, MapPin, Layout, Wifi, Check, Search, Loader2 } from 'lucide-react';
+import { Plane, MapPin, Layout, Wifi, Check, Loader2 } from 'lucide-react';
 
 interface Props {
   onComplete: (config: UserConfig) => void;
-}
-
-interface NominatimResult {
-  display_name: string;
-  lat: string;
-  lon: string;
 }
 
 export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
@@ -27,56 +21,6 @@ export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
   const [loading, setLoading] = useState(false);
   const [rebooting, setRebooting] = useState(false);
   const [rebootError, setRebootError] = useState('');
-
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<NominatimResult[]>([]);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const resultsRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (resultsRef.current && !resultsRef.current.contains(e.target as Node)) {
-        setShowResults(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    if (searchQuery.trim().length < 3) {
-      setSearchResults([]);
-      setShowResults(false);
-      return;
-    }
-    setSearchLoading(true);
-    searchTimeout.current = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=5`,
-          { headers: { 'Accept-Language': 'en' } }
-        );
-        const data = await res.json();
-        setSearchResults(data);
-        setShowResults(true);
-      } catch {
-        setSearchResults([]);
-      } finally {
-        setSearchLoading(false);
-      }
-    }, 500);
-  }, [searchQuery]);
-
-  const handleSelectLocation = (result: NominatimResult) => {
-    setLat(result.lat);
-    setLon(result.lon);
-    setSearchQuery(result.display_name.split(',')[0]);
-    setShowResults(false);
-    setSearchResults([]);
-  };
 
   const handleLocationSubmit = async () => {
     const latitude = parseFloat(lat);
@@ -161,46 +105,8 @@ export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
                   Set Your Location
                 </h2>
                 <p className="text-sm text-white/50">
-                  Search for your location or enter coordinates manually so the display can calculate distances to aircraft.
+                  Enter your latitude and longitude so the display can calculate distances to aircraft.
                 </p>
-
-                {/* OSM Search */}
-                <div className="relative" ref={resultsRef}>
-                  <div className="relative">
-                    <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
-                    <Input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search city, airport, address..."
-                      className="pl-9"
-                    />
-                  </div>
-                  {searchLoading && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Loader2 size={16} className="animate-spin text-led-accent" />
-                    </div>
-                  )}
-                  {showResults && searchResults.length > 0 && (
-                    <div className="absolute z-20 w-full mt-1 bg-led-panel border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto">
-                      {searchResults.map((result, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleSelectLocation(result)}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-white/5 transition-colors border-b border-white/5 last:border-0"
-                        >
-                          <div className="truncate text-white/80">{result.display_name}</div>
-                          <div className="text-xs text-white/30">{parseFloat(result.lat).toFixed(4)}, {parseFloat(result.lon).toFixed(4)}</div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  {showResults && searchResults.length === 0 && !searchLoading && (
-                    <div className="absolute z-20 w-full mt-1 bg-led-panel border border-white/10 rounded-lg shadow-xl p-3 text-sm text-white/40">
-                      No results found
-                    </div>
-                  )}
-                </div>
 
                 <div className="space-y-3">
                   <div className="space-y-2">
