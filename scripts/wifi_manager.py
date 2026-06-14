@@ -309,9 +309,10 @@ address=/#/{AP_IP}
 
     # Retry hostapd start — at boot it can race with NetworkManager or
     # fail if the interface hasn't fully settled after the down/up cycle.
+    # Use `timeout` so a stuck hostapd job can't hang the whole WiFi manager.
     hostapd_ok = False
     for attempt in range(1, 4):
-        run(["systemctl", "restart", "hostapd"], check=False)
+        run(["timeout", "15", "systemctl", "restart", "hostapd"], check=False)
         time.sleep(2)
         status = run(["systemctl", "is-active", "hostapd"], check=False)
         if status.returncode == 0:
