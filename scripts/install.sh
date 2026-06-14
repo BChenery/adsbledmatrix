@@ -58,6 +58,8 @@ echo "[3/8] Installing readsb..."
 # Always build from source so RTL-SDR support is guaranteed.
 # The apt package is often compiled without it.
 apt-get install -y libncurses5-dev
+# Stop the service before overwriting the binary so the copy doesn't fail
+systemctl stop readsb || true
 if [ -d "/tmp/readsb" ]; then
   rm -rf /tmp/readsb
 fi
