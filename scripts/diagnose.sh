@@ -31,7 +31,7 @@ sudo journalctl -u adsbledmatrix --no-pager -n 30 || true
 echo ""
 
 echo "--- API Health Check ---"
-curl -s http://localhost:8080/api/health 2>/dev/null || echo "API not responding"
+curl -s http://localhost:8080/api/system/health 2>/dev/null || echo "API not responding"
 echo ""
 
 echo "--- Network Interfaces ---"
