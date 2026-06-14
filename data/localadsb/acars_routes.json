@@ -1,0 +1,1600 @@
+[
+  {
+    "tail": "VH-EBN",
+    "flight": "QF0016",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "LAVIN",
+        "type": "named",
+        "lat": -27.5,
+        "lon": 153.0,
+        "source": "known"
+      },
+      {
+        "name": "OSOKO",
+        "type": "named",
+        "lat": -28.0,
+        "lon": 153.5,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -27.1283,
+      "lon": 153.255
+    },
+    "altitude": 4400,
+    "timestamp": "2026-06-07T19:00:00Z",
+    "next_waypoint": "PILIG",
+    "eta_next": "190000",
+    "wind": "P08",
+    "temp": 11323,
+    "fuel": 166
+  },
+  {
+    "tail": "VH-QPE",
+    "flight": "QF0052",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "LAVIN",
+        "type": "named",
+        "lat": -27.5,
+        "lon": 153.0,
+        "source": "known"
+      },
+      {
+        "name": "OSOKO",
+        "type": "named",
+        "lat": -28.0,
+        "lon": 153.5,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -27.105,
+      "lon": 153.225
+    },
+    "altitude": 3700,
+    "timestamp": "2026-06-07T19:23:46Z",
+    "next_waypoint": "ATRAX",
+    "eta_next": "192346",
+    "wind": "P10",
+    "temp": 10821,
+    "fuel": 148
+  },
+  {
+    "tail": "N17963",
+    "flight": "UA0839",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "ATROP",
+        "type": "named",
+        "lat": -25.2,
+        "lon": 154.5,
+        "source": "approximate"
+      },
+      {
+        "name": "MUDDL",
+        "type": "named",
+        "lat": -27.4,
+        "lon": 153.3,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -25.415,
+      "lon": 154.8867
+    },
+    "altitude": 40000,
+    "timestamp": null,
+    "next_waypoint": "FLATY",
+    "eta_next": "200624",
+    "wind": "M53",
+    "temp": 283123,
+    "fuel": 3295516
+  },
+  {
+    "tail": "VH-YIY",
+    "flight": "VA0082",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "DAYBO",
+        "type": "named",
+        "lat": -26.85,
+        "lon": 152.35,
+        "source": "approximate"
+      },
+      {
+        "name": "BN",
+        "type": "unknown",
+        "lat": null,
+        "lon": null
+      }
+    ],
+    "current_position": {
+      "lat": -26.8783,
+      "lon": 152.6333
+    },
+    "altitude": 28100,
+    "timestamp": null,
+    "next_waypoint": "SMOKA",
+    "eta_next": "202323",
+    "wind": "M35",
+    "temp": 276072,
+    "fuel": null
+  },
+  {
+    "tail": "VH-YIY",
+    "flight": "VA0082",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "BN",
+        "type": "unknown",
+        "lat": null,
+        "lon": null
+      },
+      {
+        "name": "DUNNI",
+        "type": "named",
+        "lat": -27.3,
+        "lon": 152.6,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.1217,
+      "lon": 152.8867
+    },
+    "altitude": 23300,
+    "timestamp": null,
+    "next_waypoint": "DAYBO",
+    "eta_next": "202558",
+    "wind": "M27",
+    "temp": 282033,
+    "fuel": null
+  },
+  {
+    "tail": "VH-YIY",
+    "flight": "VA0082",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "DUNNI",
+        "type": "named",
+        "lat": -27.3,
+        "lon": 152.6,
+        "source": "approximate"
+      },
+      {
+        "name": "IDRIL",
+        "type": "named",
+        "lat": -28.2,
+        "lon": 153.4,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.365,
+      "lon": 153.1417
+    },
+    "altitude": 17800,
+    "timestamp": null,
+    "next_waypoint": "BN",
+    "eta_next": "202854",
+    "wind": "M16",
+    "temp": 311011,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBQ",
+    "flight": "QF0098",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "BURPA",
+        "type": "named",
+        "lat": -27.9,
+        "lon": 153.6,
+        "source": "approximate"
+      },
+      {
+        "name": "IGBON",
+        "type": "named",
+        "lat": -28.5,
+        "lon": 153.5,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.015,
+      "lon": 152.8033
+    },
+    "altitude": 9400,
+    "timestamp": "2026-06-07T20:39:06Z",
+    "next_waypoint": "GARTH",
+    "eta_next": "203906",
+    "wind": "P03",
+    "temp": 6520,
+    "fuel": 139
+  },
+  {
+    "tail": "VH-XZK",
+    "flight": "QF0750",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "GLA",
+        "type": "named",
+        "lat": -3.0,
+        "lon": 153.0,
+        "source": "known"
+      },
+      {
+        "name": "RUNLA",
+        "type": "named",
+        "lat": -30.3,
+        "lon": 154.2,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -26.1483,
+      "lon": 152.6733
+    },
+    "altitude": 33200,
+    "timestamp": null,
+    "next_waypoint": "DEBAY",
+    "eta_next": "210023",
+    "wind": "M41",
+    "temp": 283130,
+    "fuel": null
+  },
+  {
+    "tail": "N24974",
+    "flight": "UA0060",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "SANEG",
+        "type": "named",
+        "lat": -27.3,
+        "lon": 153.0,
+        "source": "approximate"
+      },
+      {
+        "name": "ISKIM",
+        "type": "named",
+        "lat": -28.8,
+        "lon": 153.6,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.37,
+      "lon": 153.3433
+    },
+    "altitude": 40000,
+    "timestamp": null,
+    "next_waypoint": "MUDDL",
+    "eta_next": "210421",
+    "wind": "M53",
+    "temp": 286116,
+    "fuel": null
+  },
+  {
+    "tail": "N24974",
+    "flight": "UA0060",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "ISKIM",
+        "type": "named",
+        "lat": -28.8,
+        "lon": 153.6,
+        "source": "approximate"
+      },
+      {
+        "name": "OSOTI",
+        "type": "named",
+        "lat": -29.2,
+        "lon": 153.8,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.8183,
+      "lon": 153.0433
+    },
+    "altitude": 40000,
+    "timestamp": null,
+    "next_waypoint": "SANEG",
+    "eta_next": "210832",
+    "wind": "M54",
+    "temp": 284109,
+    "fuel": null
+  },
+  {
+    "tail": "VH-QPD",
+    "flight": "QF0062",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "SAKBO",
+        "type": "named",
+        "lat": -30.5,
+        "lon": 154.3,
+        "source": "approximate"
+      },
+      {
+        "name": "YBBN19R",
+        "type": "unknown",
+        "lat": null,
+        "lon": null
+      }
+    ],
+    "current_position": {
+      "lat": -27.2283,
+      "lon": 153.195
+    },
+    "altitude": 2900,
+    "timestamp": "2026-06-07T21:18:42Z",
+    "next_waypoint": "CF19R",
+    "eta_next": "211842",
+    "wind": "P12",
+    "temp": 10724,
+    "fuel": 156
+  },
+  {
+    "tail": "VH-QPD",
+    "flight": "QF0062",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "SAKBO",
+        "type": "named",
+        "lat": -30.5,
+        "lon": 154.3,
+        "source": "approximate"
+      },
+      {
+        "name": "YBBN19R",
+        "type": "unknown",
+        "lat": null,
+        "lon": null
+      }
+    ],
+    "current_position": {
+      "lat": -27.2283,
+      "lon": 153.195
+    },
+    "altitude": 2900,
+    "timestamp": "2026-06-07T21:18:42Z",
+    "next_waypoint": "CF19R",
+    "eta_next": "211842",
+    "wind": "P12",
+    "temp": 10724,
+    "fuel": 156
+  },
+  {
+    "tail": "VH-EBN",
+    "flight": "QF0507",
+    "msg_type": "REQPWI",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "HUUGO",
+        "type": "named",
+        "lat": -33.5,
+        "lon": 151.0,
+        "source": "known"
+      },
+      {
+        "name": "APAGI",
+        "type": "named",
+        "lat": -34.0,
+        "lon": 150.5,
+        "source": "known"
+      },
+      {
+        "name": "CLIFF",
+        "type": "named",
+        "lat": -34.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "ADMAR",
+        "type": "named",
+        "lat": -35.0,
+        "lon": 149.5,
+        "source": "known"
+      },
+      {
+        "name": "SANAD",
+        "type": "named",
+        "lat": -35.5,
+        "lon": 149.0,
+        "source": "known"
+      },
+      {
+        "name": "MESIM",
+        "type": "named",
+        "lat": -36.0,
+        "lon": 148.5,
+        "source": "known"
+      },
+      {
+        "name": "IGDAM",
+        "type": "named",
+        "lat": -36.5,
+        "lon": 148.0,
+        "source": "known"
+      },
+      {
+        "name": "SADLO",
+        "type": "named",
+        "lat": -37.0,
+        "lon": 147.5,
+        "source": "known"
+      },
+      {
+        "name": "BOREE",
+        "type": "named",
+        "lat": -37.5,
+        "lon": 147.0,
+        "source": "known"
+      }
+    ],
+    "current_position": null,
+    "altitude": null,
+    "timestamp": "2026-06-07T21:21:53Z",
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBN",
+    "flight": "QF0507",
+    "msg_type": "REQPWI",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "HUUGO",
+        "type": "named",
+        "lat": -33.5,
+        "lon": 151.0,
+        "source": "known"
+      },
+      {
+        "name": "APAGI",
+        "type": "named",
+        "lat": -34.0,
+        "lon": 150.5,
+        "source": "known"
+      },
+      {
+        "name": "CLIFF",
+        "type": "named",
+        "lat": -34.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "ADMAR",
+        "type": "named",
+        "lat": -35.0,
+        "lon": 149.5,
+        "source": "known"
+      },
+      {
+        "name": "SANAD",
+        "type": "named",
+        "lat": -35.5,
+        "lon": 149.0,
+        "source": "known"
+      },
+      {
+        "name": "MESIM",
+        "type": "named",
+        "lat": -36.0,
+        "lon": 148.5,
+        "source": "known"
+      },
+      {
+        "name": "IGDAM",
+        "type": "named",
+        "lat": -36.5,
+        "lon": 148.0,
+        "source": "known"
+      },
+      {
+        "name": "SADLO",
+        "type": "named",
+        "lat": -37.0,
+        "lon": 147.5,
+        "source": "known"
+      },
+      {
+        "name": "BOREE",
+        "type": "named",
+        "lat": -37.5,
+        "lon": 147.0,
+        "source": "known"
+      }
+    ],
+    "current_position": null,
+    "altitude": null,
+    "timestamp": "2026-06-07T21:26:34Z",
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBN",
+    "flight": "QF0507",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "BOSVU",
+        "type": "named",
+        "lat": -27.7,
+        "lon": 153.5,
+        "source": "approximate"
+      },
+      {
+        "name": "DADAN",
+        "type": "named",
+        "lat": -28.0,
+        "lon": 153.7,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.3833,
+      "lon": 153.1233
+    },
+    "altitude": 0,
+    "timestamp": "2026-06-07T21:28:05Z",
+    "next_waypoint": "YBBN19L",
+    "eta_next": "212805",
+    "wind": "P16",
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-YFZ",
+    "flight": "VA1273",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "LEBIT",
+        "type": "named",
+        "lat": -29.0,
+        "lon": 153.7,
+        "source": "approximate"
+      },
+      {
+        "name": "ATVIL",
+        "type": "named",
+        "lat": -30.8,
+        "lon": 154.4,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.0567,
+      "lon": 152.4733
+    },
+    "altitude": 21300,
+    "timestamp": null,
+    "next_waypoint": "IBUNA",
+    "eta_next": "214458",
+    "wind": "M21",
+    "temp": 265026,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0054",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "BURPA",
+        "type": "named",
+        "lat": -27.9,
+        "lon": 153.6,
+        "source": "approximate"
+      },
+      {
+        "name": "IGBON",
+        "type": "named",
+        "lat": -28.5,
+        "lon": 153.5,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.0117,
+      "lon": 152.7967
+    },
+    "altitude": 8600,
+    "timestamp": "2026-06-07T21:54:53Z",
+    "next_waypoint": "GARTH",
+    "eta_next": "215453",
+    "wind": "P04",
+    "temp": 8421,
+    "fuel": 166
+  },
+  {
+    "tail": "VH-YIY",
+    "flight": "VA0508",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "CLIFF",
+        "type": "named",
+        "lat": -34.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "ADMAR",
+        "type": "named",
+        "lat": -35.0,
+        "lon": 149.5,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -28.8533,
+      "lon": 152.59
+    },
+    "altitude": 28700,
+    "timestamp": null,
+    "next_waypoint": "APAGI",
+    "eta_next": "223546",
+    "wind": "M38",
+    "temp": 273054,
+    "fuel": null
+  },
+  {
+    "tail": "VH-YIY",
+    "flight": "VA0508",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "ADMAR",
+        "type": "named",
+        "lat": -35.0,
+        "lon": 149.5,
+        "source": "known"
+      },
+      {
+        "name": "SANAD",
+        "type": "named",
+        "lat": -35.5,
+        "lon": 149.0,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -29.7033,
+      "lon": 152.0767
+    },
+    "altitude": 36000,
+    "timestamp": null,
+    "next_waypoint": "CLIFF",
+    "eta_next": "224358",
+    "wind": "M49",
+    "temp": 286074,
+    "fuel": null
+  },
+  {
+    "tail": "VH-YQO",
+    "flight": "VA0736",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "AKPAL",
+        "type": "named",
+        "lat": -31.0,
+        "lon": 154.5,
+        "source": "approximate"
+      },
+      {
+        "name": "PKS",
+        "type": "named",
+        "lat": -30.0,
+        "lon": 154.1,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -28.8517,
+      "lon": 152.5867
+    },
+    "altitude": 27400,
+    "timestamp": null,
+    "next_waypoint": "APAGI",
+    "eta_next": "023812",
+    "wind": "M36",
+    "temp": 279044,
+    "fuel": null
+  },
+  {
+    "tail": "VH-8VE",
+    "flight": "VA1036",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "EKA01",
+        "type": "named",
+        "lat": -27.6,
+        "lon": 153.2,
+        "source": "approximate"
+      },
+      {
+        "name": "OSR01",
+        "type": "named",
+        "lat": -29.5,
+        "lon": 153.9,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -29.9633,
+      "lon": 151.2817
+    },
+    "altitude": 36000,
+    "timestamp": null,
+    "next_waypoint": "OSO01",
+    "eta_next": "034410",
+    "wind": "M49",
+    "temp": 286071,
+    "fuel": null
+  },
+  {
+    "tail": "VH-YIE",
+    "flight": "VA0738",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "ISKIM",
+        "type": "named",
+        "lat": -28.8,
+        "lon": 153.6,
+        "source": "approximate"
+      },
+      {
+        "name": "OSOTI",
+        "type": "named",
+        "lat": -29.2,
+        "lon": 153.8,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -28.85,
+      "lon": 152.585
+    },
+    "altitude": 27400,
+    "timestamp": null,
+    "next_waypoint": "APAGI",
+    "eta_next": "034508",
+    "wind": "M35",
+    "temp": 280051,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "ARAN",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "PALOS",
+        "type": "named",
+        "lat": 14.3,
+        "lon": 121.3,
+        "source": "approximate"
+      },
+      {
+        "name": "TOKON",
+        "type": "named",
+        "lat": -7.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "LUBAN",
+        "type": "named",
+        "lat": -6.0,
+        "lon": 151.0,
+        "source": "known"
+      }
+    ],
+    "current_position": null,
+    "altitude": null,
+    "timestamp": null,
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "ASUN",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "KALAH",
+        "type": "named",
+        "lat": 14.0,
+        "lon": 121.0,
+        "source": "approximate"
+      },
+      {
+        "name": "MARAN",
+        "type": "named",
+        "lat": 14.2,
+        "lon": 121.2,
+        "source": "approximate"
+      },
+      {
+        "name": "PALOS",
+        "type": "named",
+        "lat": 14.3,
+        "lon": 121.3,
+        "source": "approximate"
+      },
+      {
+        "name": "TOKON",
+        "type": "named",
+        "lat": -7.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "LUBAN",
+        "type": "named",
+        "lat": -6.0,
+        "lon": 151.0,
+        "source": "known"
+      }
+    ],
+    "current_position": null,
+    "altitude": null,
+    "timestamp": null,
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-IJU",
+    "flight": "VA1040",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "MUDDL",
+        "type": "named",
+        "lat": -27.4,
+        "lon": 153.3,
+        "source": "approximate"
+      },
+      {
+        "name": "SANEG",
+        "type": "named",
+        "lat": -27.3,
+        "lon": 153.0,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -26.83,
+      "lon": 153.355
+    },
+    "altitude": 11600,
+    "timestamp": null,
+    "next_waypoint": "MOOLO",
+    "eta_next": "043926",
+    "wind": "M2",
+    "temp": 51012,
+    "fuel": null
+  },
+  {
+    "tail": "VH-YVD",
+    "flight": "VA1448",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "ISKIM",
+        "type": "named",
+        "lat": -28.8,
+        "lon": 153.6,
+        "source": "approximate"
+      },
+      {
+        "name": "PAVBI",
+        "type": "named",
+        "lat": -29.8,
+        "lon": 154.0,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -28.85,
+      "lon": 152.585
+    },
+    "altitude": 27200,
+    "timestamp": null,
+    "next_waypoint": "APAGI",
+    "eta_next": "044035",
+    "wind": "M35",
+    "temp": 277051,
+    "fuel": null
+  },
+  {
+    "tail": "VH-VUQ",
+    "flight": "VA0740",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "ISKIM",
+        "type": "named",
+        "lat": -28.8,
+        "lon": 153.6,
+        "source": "approximate"
+      },
+      {
+        "name": "OSOTI",
+        "type": "named",
+        "lat": -29.2,
+        "lon": 153.8,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -28.85,
+      "lon": 152.585
+    },
+    "altitude": 28000,
+    "timestamp": null,
+    "next_waypoint": "APAGI",
+    "eta_next": "044422",
+    "wind": "M36",
+    "temp": 279065,
+    "fuel": null
+  },
+  {
+    "tail": "VH-IJU",
+    "flight": "VA1040",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "AKPAL",
+        "type": "named",
+        "lat": -31.0,
+        "lon": 154.5,
+        "source": "approximate"
+      },
+      {
+        "name": "PKS",
+        "type": "named",
+        "lat": -30.0,
+        "lon": 154.1,
+        "source": "approximate"
+      }
+    ],
+    "current_position": {
+      "lat": -27.37,
+      "lon": 153.34
+    },
+    "altitude": 24100,
+    "timestamp": null,
+    "next_waypoint": "MUDDL",
+    "eta_next": "044431",
+    "wind": "M29",
+    "temp": 270049,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "GUDSO",
+        "type": "named",
+        "lat": -27.8,
+        "lon": 153.3,
+        "source": "approximate"
+      },
+      {
+        "name": "TAPET",
+        "type": "named",
+        "lat": -4.5,
+        "lon": 152.0,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -26.4217,
+      "lon": 153.1533
+    },
+    "altitude": 29400,
+    "timestamp": "2026-06-08T04:58:47Z",
+    "next_waypoint": "BIXAD",
+    "eta_next": "045847",
+    "wind": "M36",
+    "temp": 28187,
+    "fuel": 1069
+  },
+  {
+    "tail": "VH-YFJ",
+    "flight": "VA0526",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "CLIFF",
+        "type": "named",
+        "lat": -34.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "ADMAR",
+        "type": "named",
+        "lat": -35.0,
+        "lon": 149.5,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -28.8533,
+      "lon": 152.59
+    },
+    "altitude": 28700,
+    "timestamp": null,
+    "next_waypoint": "APAGI",
+    "eta_next": "045858",
+    "wind": "M38",
+    "temp": 279065,
+    "fuel": 1067458
+  },
+  {
+    "tail": "VH-YFJ",
+    "flight": "VA0526",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "ADMAR",
+        "type": "named",
+        "lat": -35.0,
+        "lon": 149.5,
+        "source": "known"
+      },
+      {
+        "name": "SANAD",
+        "type": "named",
+        "lat": -35.5,
+        "lon": 149.0,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -29.7033,
+      "lon": 152.0783
+    },
+    "altitude": 38000,
+    "timestamp": null,
+    "next_waypoint": "CLIFF",
+    "eta_next": "050658",
+    "wind": "M50",
+    "temp": 285075,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "POS",
+    "departure": "YBBN",
+    "arrival": "RPLL",
+    "waypoints": [
+      {
+        "name": "LOAFA",
+        "type": "named",
+        "lat": -15.0,
+        "lon": 145.0,
+        "source": "known"
+      },
+      {
+        "name": "UPOLO",
+        "type": "named",
+        "lat": -13.5,
+        "lon": 146.0,
+        "source": "known"
+      },
+      {
+        "name": "MEMOS",
+        "type": "named",
+        "lat": -12.0,
+        "lon": 147.0,
+        "source": "known"
+      },
+      {
+        "name": "S12130E141140",
+        "type": "coordinate",
+        "lat": -121.5,
+        "lon": 141.2333
+      },
+      {
+        "name": "S08380E137210",
+        "type": "coordinate",
+        "lat": -84.3333,
+        "lon": 137.35
+      },
+      {
+        "name": "S08000E136380",
+        "type": "coordinate",
+        "lat": -80.0,
+        "lon": 136.6333
+      },
+      {
+        "name": "S05440E134050",
+        "type": "coordinate",
+        "lat": -54.6667,
+        "lon": 134.0833
+      },
+      {
+        "name": "S02530E130520",
+        "type": "coordinate",
+        "lat": -25.5,
+        "lon": 130.8667
+      },
+      {
+        "name": "N00320E127090",
+        "type": "coordinate",
+        "lat": 3.3333,
+        "lon": 127.15
+      },
+      {
+        "name": "NITIP",
+        "type": "named",
+        "lat": -10.5,
+        "lon": 148.0,
+        "source": "known"
+      },
+      {
+        "name": "NIT",
+        "type": "named",
+        "lat": 37.628033,
+        "lon": 42.177299,
+        "source": "nominatim"
+      }
+    ],
+    "current_position": null,
+    "altitude": null,
+    "timestamp": "2026-06-08T05:07:06Z",
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "IP",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "380",
+        "type": "unknown",
+        "lat": null,
+        "lon": null
+      },
+      {
+        "name": "ZAM",
+        "type": "named",
+        "lat": -9.0,
+        "lon": 149.0,
+        "source": "known"
+      },
+      {
+        "name": "TOKON",
+        "type": "named",
+        "lat": -7.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "LUBAN",
+        "type": "named",
+        "lat": -6.0,
+        "lon": 151.0,
+        "source": "known"
+      }
+    ],
+    "current_position": null,
+    "altitude": 360,
+    "timestamp": null,
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "IP",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "380",
+        "type": "unknown",
+        "lat": null,
+        "lon": null
+      },
+      {
+        "name": "ZAM",
+        "type": "named",
+        "lat": -9.0,
+        "lon": 149.0,
+        "source": "known"
+      },
+      {
+        "name": "TOKON",
+        "type": "named",
+        "lat": -7.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "LUBAN",
+        "type": "named",
+        "lat": -6.0,
+        "lon": 151.0,
+        "source": "known"
+      }
+    ],
+    "current_position": null,
+    "altitude": 360,
+    "timestamp": null,
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "LOAFA",
+        "type": "named",
+        "lat": -15.0,
+        "lon": 145.0,
+        "source": "known"
+      },
+      {
+        "name": "GLA",
+        "type": "named",
+        "lat": -3.0,
+        "lon": 153.0,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -25.6533,
+      "lon": 152.6
+    },
+    "altitude": 36000,
+    "timestamp": "2026-06-08T05:07:49Z",
+    "next_waypoint": "TAPET",
+    "eta_next": "050749",
+    "wind": "M48",
+    "temp": 290133,
+    "fuel": 1040
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "ALOS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "TOKON",
+        "type": "named",
+        "lat": -7.5,
+        "lon": 150.0,
+        "source": "known"
+      }
+    ],
+    "current_position": null,
+    "altitude": null,
+    "timestamp": null,
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "POS",
+    "departure": "YBBN",
+    "arrival": "RPLL",
+    "waypoints": [
+      {
+        "name": "LOAFA",
+        "type": "named",
+        "lat": -15.0,
+        "lon": 145.0,
+        "source": "known"
+      },
+      {
+        "name": "UPOLO",
+        "type": "named",
+        "lat": -13.5,
+        "lon": 146.0,
+        "source": "known"
+      },
+      {
+        "name": "MEMOS",
+        "type": "named",
+        "lat": -12.0,
+        "lon": 147.0,
+        "source": "known"
+      },
+      {
+        "name": "S12130E141140",
+        "type": "coordinate",
+        "lat": -121.5,
+        "lon": 141.2333
+      },
+      {
+        "name": "S08380E137210",
+        "type": "coordinate",
+        "lat": -84.3333,
+        "lon": 137.35
+      },
+      {
+        "name": "S08000E136380",
+        "type": "coordinate",
+        "lat": -80.0,
+        "lon": 136.6333
+      },
+      {
+        "name": "S05440E134050",
+        "type": "coordinate",
+        "lat": -54.6667,
+        "lon": 134.0833
+      },
+      {
+        "name": "S02530E130520",
+        "type": "coordinate",
+        "lat": -25.5,
+        "lon": 130.8667
+      },
+      {
+        "name": "N00320E127090",
+        "type": "coordinate",
+        "lat": 3.3333,
+        "lon": 127.15
+      },
+      {
+        "name": "NITIP",
+        "type": "named",
+        "lat": -10.5,
+        "lon": 148.0,
+        "source": "known"
+      },
+      {
+        "name": "NIT",
+        "type": "named",
+        "lat": 37.628033,
+        "lon": 42.177299,
+        "source": "nominatim"
+      }
+    ],
+    "current_position": null,
+    "altitude": null,
+    "timestamp": "2026-06-08T05:09:36Z",
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "IP",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "380",
+        "type": "unknown",
+        "lat": null,
+        "lon": null
+      },
+      {
+        "name": "ZAM",
+        "type": "named",
+        "lat": -9.0,
+        "lon": 149.0,
+        "source": "known"
+      },
+      {
+        "name": "TOKON",
+        "type": "named",
+        "lat": -7.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "LUBAN",
+        "type": "named",
+        "lat": -6.0,
+        "lon": 151.0,
+        "source": "known"
+      }
+    ],
+    "current_position": null,
+    "altitude": 360,
+    "timestamp": null,
+    "next_waypoint": null,
+    "eta_next": null,
+    "wind": null,
+    "temp": null,
+    "fuel": null
+  },
+  {
+    "tail": "VH-EBA",
+    "flight": "QF0097",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "LOAFA",
+        "type": "named",
+        "lat": -15.0,
+        "lon": 145.0,
+        "source": "known"
+      },
+      {
+        "name": "GLA",
+        "type": "named",
+        "lat": -3.0,
+        "lon": 153.0,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -25.48,
+      "lon": 152.4617
+    },
+    "altitude": 36000,
+    "timestamp": "2026-06-08T05:09:58Z",
+    "next_waypoint": "TAPET",
+    "eta_next": "050958",
+    "wind": "M48",
+    "temp": 291133,
+    "fuel": 1034
+  },
+  {
+    "tail": "VH-8VG",
+    "flight": "VA0530",
+    "msg_type": "POSS",
+    "departure": null,
+    "arrival": null,
+    "waypoints": [
+      {
+        "name": "CLIFF",
+        "type": "named",
+        "lat": -34.5,
+        "lon": 150.0,
+        "source": "known"
+      },
+      {
+        "name": "ADMAR",
+        "type": "named",
+        "lat": -35.0,
+        "lon": 149.5,
+        "source": "known"
+      }
+    ],
+    "current_position": {
+      "lat": -28.8533,
+      "lon": 152.5883
+    },
+    "altitude": 29300,
+    "timestamp": null,
+    "next_waypoint": "APAGI",
+    "eta_next": "054709",
+    "wind": "M39",
+    "temp": 279061,
+    "fuel": null
+  }
+]
