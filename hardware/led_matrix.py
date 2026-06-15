@@ -1,6 +1,7 @@
 """LED matrix hardware wrapper using rpi-rgb-led-matrix."""
 
 import logging
+import os
 from typing import Optional
 from PIL import Image
 
@@ -38,6 +39,14 @@ class LEDMatrix:
                 options.gpio_slowdown = settings.led_matrix_gpio_slowdown
                 if settings.led_matrix_limit_refresh > 0:
                     options.limit_refresh_rate_hz = settings.led_matrix_limit_refresh
+
+                # rpi-rgb-led-matrix needs root to initialise GPIO timing, then
+                # drops privileges. Make sure it drops back to the service user
+                # so file permissions remain correct.
+                if os.geteuid() == 0:
+                    options.drop_privileges = True
+                    options.drop_priv_user = "adsb"
+                    options.drop_priv_group = "adsb"
 
                 self.matrix = RGBMatrix(options=options)
                 logger.info(
@@ -78,7 +87,3 @@ class LEDMatrix:
         """Clear the matrix."""
         if self.matrix:
             self.matrix.Clear()
-
-
-# Singleton instance (kept for backward compat, but prefer create_matrix)
-led_matrix = LEDMatrix()

@@ -5,8 +5,10 @@ Wants=readsb.service
 
 [Service]
 Type=simple
-User=adsb
-Group=adsb
+# rpi-rgb-led-matrix needs root to initialise GPIO timing hardware.
+# It drops privileges after init (see hardware/led_matrix.py).
+User=root
+Group=root
 WorkingDirectory=/opt/adsbledmatrix
 Environment=PYTHONPATH=/opt/adsbledmatrix/backend:/opt/adsbledmatrix
 Environment=ADSB_DEBUG=false

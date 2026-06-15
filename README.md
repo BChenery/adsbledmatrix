@@ -46,6 +46,8 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
 
 The installer will:
 - Install system dependencies (`readsb`, SPI drivers, etc.)
+- Enable SPI and disable the onboard audio device (both required for the LED matrix)
+- Build and install the `rpi-rgb-led-matrix` Python bindings
 - Clone this repository to `/opt/adsbledmatrix`
 - Build the frontend and install Python dependencies
 - Import the aircraft database

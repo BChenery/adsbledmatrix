@@ -8,6 +8,47 @@ REPO_URL="https://github.com/BChenery/adsbledmatrix"
 INSTALL_DIR="/opt/adsbledmatrix"
 SERVICE_USER="adsb"
 
+# Helper: enable SPI (required by rpi-rgb-led-matrix)
+enable_spi() {
+  echo "[3.5/8] Enabling SPI interface..."
+  if command -v raspi-config >/dev/null 2>&1; then
+    raspi-config nonint do_spi 0 || true
+  fi
+  # Belt-and-suspenders: make sure the overlay is set in config.txt
+  local config_file="/boot/config.txt"
+  [ -f /boot/firmware/config.txt ] && config_file="/boot/firmware/config.txt"
+  if [ -f "$config_file" ] && ! grep -q "^dtparam=spi=on" "$config_file"; then
+    echo "dtparam=spi=on" >> "$config_file"
+  fi
+}
+
+# Helper: disable onboard audio (it shares timing hardware with the LED matrix)
+disable_onboard_audio() {
+  echo "[3.6/8] Disabling onboard audio (shares hardware with LED matrix)..."
+  local config_file="/boot/config.txt"
+  [ -f /boot/firmware/config.txt ] && config_file="/boot/firmware/config.txt"
+  if [ -f "$config_file" ] && ! grep -q "^dtparam=audio=off" "$config_file"; then
+    echo "dtparam=audio=off" >> "$config_file"
+  fi
+  if [ ! -f /etc/modprobe.d/blacklist-rgb-matrix.conf ]; then
+    echo "blacklist snd_bcm2835" > /etc/modprobe.d/blacklist-rgb-matrix.conf
+    update-initramfs -u || true
+  fi
+}
+
+# Helper: build and install the rpi-rgb-led-matrix Python bindings into the venv
+install_led_matrix_library() {
+  echo "[6.1/8] Building rpi-rgb-led-matrix Python bindings..."
+  local build_dir="/tmp/rpi-rgb-led-matrix"
+  rm -rf "$build_dir"
+  git clone --depth 1 https://github.com/hzeller/rpi-rgb-led-matrix.git "$build_dir"
+  cd "$build_dir/bindings/python"
+  make build-python PYTHON="$(command -v python3)"
+  make install-python PYTHON="$(command -v python3)"
+  cd "$INSTALL_DIR"
+  python3 -c "import rgbmatrix; print('rgbmatrix OK')"
+}
+
 echo "============================================"
 echo "  ADS-B LED Display Installer"
 echo "============================================"
@@ -37,11 +78,15 @@ apt-get install -y \
   python3-pip \
   python3-venv \
   python3-dev \
+  python3-setuptools \
   build-essential \
+  cython3 \
   libffi-dev \
   libssl-dev \
   libz-dev \
   libzstd-dev \
+  libgraphicsmagick++-dev \
+  libwebp-dev \
   rtl-sdr \
   librtlsdr-dev \
   hostapd \
@@ -50,6 +95,7 @@ apt-get install -y \
   iptables-persistent \
   network-manager \
   avahi-daemon \
+  raspi-config \
   sqlite3 \
   rfkill
 
@@ -80,6 +126,10 @@ echo "blacklist dvb_usb_rtl28xxu" > /etc/modprobe.d/blacklist-rtl-sdr.conf
 # Unload it now if it's already loaded
 rmmod dvb_usb_rtl28xxu 2>/dev/null || true
 
+# Enable SPI and disable onboard audio for the LED matrix
+enable_spi
+disable_onboard_audio
+
 # Create service user
 echo "[4/8] Creating service user..."
 if ! id "$SERVICE_USER" &>/dev/null; then
@@ -104,6 +154,9 @@ python3 -m venv "$INSTALL_DIR/venv"
 source "$INSTALL_DIR/venv/bin/activate"
 pip install --upgrade pip
 pip install -r backend/requirements.txt
+
+# Build and install the LED matrix library
+install_led_matrix_library
 
 # Build frontend
 echo "[6.5/8] Building frontend..."

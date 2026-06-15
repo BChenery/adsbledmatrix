@@ -26,6 +26,18 @@ echo "Updating dependencies..."
 source "$INSTALL_DIR/venv/bin/activate"
 pip install -r backend/requirements.txt
 
+# Ensure the LED matrix Python bindings are still present (rebuild if missing)
+echo "Checking LED matrix bindings..."
+if ! python3 -c "import rgbmatrix" 2>/dev/null; then
+  echo "LED matrix bindings missing; rebuilding..."
+  rm -rf /tmp/rpi-rgb-led-matrix
+  git clone --depth 1 https://github.com/hzeller/rpi-rgb-led-matrix.git /tmp/rpi-rgb-led-matrix
+  cd /tmp/rpi-rgb-led-matrix/bindings/python
+  make build-python PYTHON="$(command -v python3)"
+  make install-python PYTHON="$(command -v python3)"
+  cd "$INSTALL_DIR"
+fi
+
 # Rebuild frontend
 echo "Rebuilding frontend..."
 cd "$INSTALL_DIR/frontend"
@@ -36,6 +48,12 @@ npm run build
 echo "Syncing data assets..."
 cd "$INSTALL_DIR"
 python3 scripts/sync_data.py || echo "Data sync incomplete"
+
+# Install any updated systemd units and reload
+echo "Updating systemd units..."
+cp "$INSTALL_DIR"/systemd/*.service /etc/systemd/system/
+cp "$INSTALL_DIR"/systemd/*.timer /etc/systemd/system/ 2>/dev/null || true
+systemctl daemon-reload
 
 # Restart services
 echo "Restarting services..."
