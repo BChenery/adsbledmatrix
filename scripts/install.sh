@@ -42,9 +42,9 @@ install_led_matrix_library() {
   local build_dir="/tmp/rpi-rgb-led-matrix"
   rm -rf "$build_dir"
   git clone --depth 1 https://github.com/hzeller/rpi-rgb-led-matrix.git "$build_dir"
-  cd "$build_dir/bindings/python"
-  make build-python PYTHON="$(command -v python3)"
-  make install-python PYTHON="$(command -v python3)"
+  cd "$build_dir"
+  # Modern rpi-rgb-led-matrix uses scikit-build-core + pyproject.toml
+  python3 -m pip install .
   cd "$INSTALL_DIR"
   python3 -c "import rgbmatrix; print('rgbmatrix OK')"
 }
@@ -80,6 +80,8 @@ apt-get install -y \
   python3-dev \
   python3-setuptools \
   build-essential \
+  cmake \
+  ninja-build \
   cython3 \
   libffi-dev \
   libssl-dev \

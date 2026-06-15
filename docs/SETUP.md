@@ -77,12 +77,11 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
    This step is handled automatically by the installer in step 1. It enables SPI, disables the conflicting onboard audio device, and builds the `rpi-rgb-led-matrix` Python bindings into the project virtualenv.
    If you are installing manually, run the same commands that the installer uses:
    ```bash
-   sudo apt install -y libgraphicsmagick++-dev libwebp-dev cython3
+   sudo apt install -y libgraphicsmagick++-dev libwebp-dev cython3 cmake ninja-build
    sudo raspi-config nonint do_spi 0
    git clone https://github.com/hzeller/rpi-rgb-led-matrix.git /tmp/rpi-rgb-led-matrix
-   cd /tmp/rpi-rgb-led-matrix/bindings/python
-   make build-python PYTHON=$(command -v python3)
-   sudo make install-python PYTHON=$(command -v python3)
+   cd /tmp/rpi-rgb-led-matrix
+   python3 -m pip install .
    cd /opt/adsbledmatrix
    ```
 

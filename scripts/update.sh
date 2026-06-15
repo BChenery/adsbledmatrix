@@ -32,9 +32,8 @@ if ! python3 -c "import rgbmatrix" 2>/dev/null; then
   echo "LED matrix bindings missing; rebuilding..."
   rm -rf /tmp/rpi-rgb-led-matrix
   git clone --depth 1 https://github.com/hzeller/rpi-rgb-led-matrix.git /tmp/rpi-rgb-led-matrix
-  cd /tmp/rpi-rgb-led-matrix/bindings/python
-  make build-python PYTHON="$(command -v python3)"
-  make install-python PYTHON="$(command -v python3)"
+  cd /tmp/rpi-rgb-led-matrix
+  python3 -m pip install .
   cd "$INSTALL_DIR"
 fi
 
