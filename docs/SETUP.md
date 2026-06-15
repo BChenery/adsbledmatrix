@@ -19,19 +19,19 @@
 5. Attach antenna to RTL-SDR
 
 ### Panel Arrangement
-For 512×256 using sixteen 128×64 panels (4 wide × 4 tall):
-```
-Panel 0 ──► Panel 1 ──► Panel 2 ──► Panel 3
-Panel 4 ──► Panel 5 ──► Panel 6 ──► Panel 7
-Panel 8 ──► Panel 9 ──► Panel 10 ──► Panel 11
-Panel 12 ──► Panel 13 ──► Panel 14 ──► Panel 15
-(Chain: 4, Parallel: 4)
-```
-
-For 256×128 using four 64×64 panels (2 wide × 2 tall):
+Default configuration is **256×128** using four 64×64 panels (2 wide × 2 tall):
 ```
 Panel 0 ──► Panel 1   (Chain 1)
 Panel 2 ──► Panel 3   (Chain 2, Parallel)
+(Chain: 2, Parallel: 2)
+```
+
+> ⚠️ `rpi-rgb-led-matrix` supports a maximum of **3 parallel chains** on a standard 40-pin Raspberry Pi. A 512×256 arrangement using sixteen 128×64 panels (4 wide × 4 tall) requires a Raspberry Pi Compute Module or an active adapter board that provides 4+ parallel chains. It will not work on a Pi 4 with direct HUB75 wiring.
+
+For 512×64 using four 128×64 panels in one chain:
+```
+Panel 0 ──► Panel 1 ──► Panel 2 ──► Panel 3
+(Chain: 4, Parallel: 1)
 ```
 
 ## Software Installation
@@ -150,15 +150,16 @@ sudo journalctl -u adsbledmatrix -f
 ls /dev/spi*
 # Should show /dev/spi0.0 and /dev/spi0.1
 
-# Test LED matrix directly
+# Test LED matrix directly (uses the default 2x2 64x64 panel config)
 cd /opt/adsbledmatrix
 source venv/bin/activate
 python3 -c "
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 options = RGBMatrixOptions()
 options.rows = 64
-options.cols = 128
-options.chain_length = 4
+options.cols = 64
+options.chain_length = 2
+options.parallel = 2
 matrix = RGBMatrix(options=options)
 matrix.Fill(255, 0, 0)
 "

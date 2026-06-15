@@ -29,10 +29,13 @@ class Settings(BaseSettings):
     aircraft_timeout_seconds: int = 60
 
     # Display
+    # Default is a 256x128 display made of four 64x64 panels (2 wide x 2 tall).
+    # rpi-rgb-led-matrix supports up to 3 parallel chains on a standard Pi;
+    # larger arrangements need a Compute Module or an active adapter board.
     led_matrix_rows: int = 64
-    led_matrix_cols: int = 128
-    led_matrix_chain: int = 4
-    led_matrix_parallel: int = 4
+    led_matrix_cols: int = 64
+    led_matrix_chain: int = 2
+    led_matrix_parallel: int = 2
     led_matrix_hardware_mapping: str = "regular"
     led_matrix_pwm_bits: int = 11
     led_matrix_brightness: int = 100

@@ -25,7 +25,7 @@ A complete, consumer-ready ADS-B aircraft display system for Raspberry Pi 4. Rec
 | **Computer** | Raspberry Pi 4 (2 GB, 4 GB, or 8 GB) |
 | **Storage** | MicroSD card (16 GB+, Class 10) |
 | **Receiver** | RTL-SDR USB dongle with 1090 MHz antenna |
-| **Display** | RGB LED Matrix panels totalling 512×256 (e.g., four 128×64 panels) |
+| **Display** | RGB LED Matrix panels (default config is 256×128; larger arrangements need a Compute Module or active adapter) |
 | **Driver** | LED Matrix HAT or Bonnet (e.g., Adafruit RGB Matrix Bonnet) |
 | **Power** | 5 V power supply (10 A+ recommended for 4 panels) |
 | **Cooling** | Heatsinks and/or fan for the Pi 4 |
@@ -219,9 +219,9 @@ Environment variables (all prefixed with `ADSB_`):
 | `ADSB_READSB_HOST` | `127.0.0.1` | `readsb` TCP host |
 | `ADSB_READSB_PORT` | `30003` | `readsb` SBS/BaseStation port |
 | `ADSB_LED_MATRIX_ROWS` | `64` | LED panel rows |
-| `ADSB_LED_MATRIX_COLS` | `128` | LED panel columns |
-| `ADSB_LED_MATRIX_CHAIN` | `4` | Panels chained |
-| `ADSB_LED_MATRIX_PARALLEL` | `4` | Parallel chains |
+| `ADSB_LED_MATRIX_COLS` | `64` | LED panel columns |
+| `ADSB_LED_MATRIX_CHAIN` | `2` | Panels chained |
+| `ADSB_LED_MATRIX_PARALLEL` | `2` | Parallel chains (max 3 on a standard Pi) |
 | `ADSB_LED_MATRIX_BRIGHTNESS` | `100` | Brightness (0–100) |
 | `ADSB_GITHUB_REPO` | `BChenery/adsbledmatrix` | Update source repo |
 
@@ -278,11 +278,11 @@ sudo journalctl -u adsbledmatrix -f
 ls /dev/spi*
 # Expected: /dev/spi0.0 and /dev/spi0.1
 
-# Test matrix directly
+# Test matrix directly (uses the default 2x2 64x64 panel config)
 python3 -c "
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 opts = RGBMatrixOptions()
-opts.rows = 64; opts.cols = 128; opts.chain_length = 4
+opts.rows = 64; opts.cols = 64; opts.chain_length = 2; opts.parallel = 2
 RGBMatrix(options=opts).Fill(255, 0, 0)
 "
 ```
