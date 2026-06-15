@@ -38,17 +38,12 @@ source venv/bin/activate
 python3 -c "from rgbmatrix import RGBMatrix, RGBMatrixOptions" 2>/dev/null
 check $? "rpi-rgb-led-matrix Python bindings installed"
 
-# Service running as root
-UVICORN_PID=$(pgrep -f "uvicorn app.main:app" | head -n1)
-if [ -n "$UVICORN_PID" ]; then
-  UVICORN_USER=$(ps -o user= -p "$UVICORN_PID" | tr -d ' ')
-  if [ "$UVICORN_USER" = "root" ]; then
-    check 0 "adsbledmatrix service running as root"
-  else
-    check 1 "adsbledmatrix service running as root (found user=$UVICORN_USER)"
-  fi
+# Service configured to run as root (rpi-rgb-led-matrix drops privileges after init)
+SERVICE_USER=$(systemctl show -p User --value adsbledmatrix 2>/dev/null)
+if [ "$SERVICE_USER" = "root" ]; then
+  check 0 "adsbledmatrix service configured to run as root"
 else
-  check 1 "adsbledmatrix service running"
+  check 1 "adsbledmatrix service configured to run as root (found User=$SERVICE_USER)"
 fi
 
 # API health
@@ -60,7 +55,8 @@ DIAG=$(curl -sf http://localhost:8080/api/display/diagnostics 2>/dev/null)
 if [ -n "$DIAG" ]; then
   echo "--- Display diagnostics ---"
   echo "$DIAG"
-  echo "$DIAG" | grep -q '"hardware_mode": true' && check 0 "Hardware mode enabled" || check 1 "Hardware mode enabled"
+  echo "$DIAG" | python3 -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if d.get('hardware_mode') else 1)" 2>/dev/null
+  check $? "Hardware mode enabled"
 else
   check 1 "Display diagnostics endpoint responding"
 fi
@@ -70,7 +66,8 @@ TEST=$(curl -sf -X POST http://localhost:8080/api/display/test 2>/dev/null)
 if [ -n "$TEST" ]; then
   echo "--- Test pattern result ---"
   echo "$TEST"
-  echo "$TEST" | grep -q '"success": true' && check 0 "Test pattern triggered" || check 1 "Test pattern triggered"
+  echo "$TEST" | python3 -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if d.get('success') else 1)" 2>/dev/null
+  check $? "Test pattern triggered"
 else
   check 1 "Test pattern endpoint responding"
 fi
