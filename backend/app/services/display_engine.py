@@ -148,7 +148,9 @@ class DisplayEngine:
 
         if layout:
             img = self._render_layout(layout, ctx)
-            self._output_to_matrix(img)
+            # Offload the matrix output to a thread so a slow/blocking panel
+            # (or no panel connected) doesn't starve the asyncio event loop.
+            await asyncio.to_thread(self._output_to_matrix, img)
 
     def _render_layout(self, layout: Any, ctx: RenderContext) -> Image.Image:
         img = Image.new("RGB", (layout.width, layout.height), (0, 0, 0))
