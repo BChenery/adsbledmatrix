@@ -215,9 +215,10 @@ chmod +x scripts/*.sh
 # Ensure netfilter-persistent is enabled so iptables rules survive reboots
 systemctl enable netfilter-persistent || true
 
-# Start services (don't fail the whole install if one service can't start yet)
+# Start/restart services so the new code and systemd units take effect.
+# (Don't fail the whole install if one service can't start yet.)
 systemctl start readsb || true
-systemctl start adsbledmatrix || true
+systemctl restart adsbledmatrix || true
 systemctl start adsbledmatrix-update.timer || true
 systemctl start adsbledmatrix-sync.timer || true
 systemctl start avahi-daemon || true
