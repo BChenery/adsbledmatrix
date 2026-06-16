@@ -34,6 +34,14 @@ class LEDMatrix:
                 options.chain_length = settings.led_matrix_chain
                 options.parallel = settings.led_matrix_parallel
                 options.hardware_mapping = settings.led_matrix_hardware_mapping
+                if settings.led_matrix_pixel_mapper:
+                    options.pixel_mapper_config = settings.led_matrix_pixel_mapper
+                if settings.led_matrix_row_address_type != 0:
+                    options.row_address_type = settings.led_matrix_row_address_type
+                if settings.led_matrix_multiplexing != 0:
+                    options.multiplexing = settings.led_matrix_multiplexing
+                if settings.led_matrix_panel_type:
+                    options.panel_type = settings.led_matrix_panel_type
                 options.pwm_bits = settings.led_matrix_pwm_bits
                 options.brightness = settings.led_matrix_brightness
                 options.gpio_slowdown = settings.led_matrix_gpio_slowdown

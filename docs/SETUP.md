@@ -26,7 +26,27 @@ Panel 2 ──► Panel 3   (Chain 2, Parallel)
 (Chain: 2, Parallel: 2)
 ```
 
-> ⚠️ `rpi-rgb-led-matrix` supports a maximum of **3 parallel chains** on a standard 40-pin Raspberry Pi. A 512×256 arrangement using sixteen 128×64 panels (4 wide × 4 tall) requires a Raspberry Pi Compute Module or an active adapter board that provides 4+ parallel chains. It will not work on a Pi 4 with direct HUB75 wiring.
+> ⚠️ `rpi-rgb-led-matrix` supports a maximum of **3 parallel chains** on a standard 40-pin Raspberry Pi. A 512×256 arrangement using sixteen 128×64 panels (4 wide × 4 tall) requires a Raspberry Pi Compute Module or an active adapter board that provides 4+ parallel chains. It will not work on a Pi 4 with direct HUB75 wiring using `parallel=4`.
+>
+> On a standard Pi you can still drive 512×256 by wiring all sixteen 128×64 panels in **one chain** and using the `U-mapper`. Set `chain=16`, `parallel=1`, and `pixel_mapper=U-mapper`.
+
+For 512×256 using sixteen 128×64 panels in a single chain with U-mapper:
+```
+Panel 0  ──► Panel 1  ──► Panel 2  ──► Panel 3
+Panel 7  ◄── Panel 6  ◄── Panel 5  ◄── Panel 4
+Panel 8  ──► Panel 9  ──► Panel 10 ──► Panel 11
+Panel 15 ◄── Panel 14 ◄── Panel 13 ◄── Panel 12
+(Chain: 16, Parallel: 1, Pixel mapper: U-mapper)
+```
+
+Set these environment variables in `/opt/adsbledmatrix/.env`:
+```bash
+ADSB_LED_MATRIX_ROWS=64
+ADSB_LED_MATRIX_COLS=128
+ADSB_LED_MATRIX_CHAIN=16
+ADSB_LED_MATRIX_PARALLEL=1
+ADSB_LED_MATRIX_PIXEL_MAPPER=U-mapper
+```
 
 For 512×64 using four 128×64 panels in one chain:
 ```

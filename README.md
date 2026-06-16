@@ -222,6 +222,11 @@ Environment variables (all prefixed with `ADSB_`):
 | `ADSB_LED_MATRIX_COLS` | `64` | LED panel columns |
 | `ADSB_LED_MATRIX_CHAIN` | `2` | Panels chained |
 | `ADSB_LED_MATRIX_PARALLEL` | `2` | Parallel chains (max 3 on a standard Pi) |
+| `ADSB_LED_MATRIX_HARDWARE_MAPPING` | `regular` | HUB75 mapping (`regular`, `adafruit-hat`, `adafruit-hat-pwm`) |
+| `ADSB_LED_MATRIX_PIXEL_MAPPER` | `""` | Pixel mapper, e.g. `U-mapper` for chained grids |
+| `ADSB_LED_MATRIX_ROW_ADDRESS_TYPE` | `0` | Row address type (0–5) |
+| `ADSB_LED_MATRIX_MULTIPLEXING` | `0` | Multiplexing type (0–17) |
+| `ADSB_LED_MATRIX_PANEL_TYPE` | `""` | Panel type, e.g. `FM6126A` |
 | `ADSB_LED_MATRIX_BRIGHTNESS` | `100` | Brightness (0–100) |
 | `ADSB_GITHUB_REPO` | `BChenery/adsbledmatrix` | Update source repo |
 

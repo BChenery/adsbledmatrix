@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     led_matrix_chain: int = 2
     led_matrix_parallel: int = 2
     led_matrix_hardware_mapping: str = "regular"
+    led_matrix_pixel_mapper: str = ""  # e.g. "U-mapper" or "U-mapper;Rotate:180"
+    led_matrix_row_address_type: int = 0
+    led_matrix_multiplexing: int = 0
+    led_matrix_panel_type: str = ""  # e.g. "FM6126A"
     led_matrix_pwm_bits: int = 11
     led_matrix_brightness: int = 100
     led_matrix_gpio_slowdown: int = 2
