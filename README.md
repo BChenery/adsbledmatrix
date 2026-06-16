@@ -53,6 +53,20 @@ The installer will:
 - Import the aircraft database
 - Install and start the systemd services
 
+### Verify the LED matrix is working
+
+After the installer finishes and the Pi reboots, you can make sure the LED panels are wired correctly by running this one-liner on the Pi:
+
+```bash
+curl -X POST http://localhost:8080/api/display/test
+```
+
+The matrix should flash a quick **red → green → blue** test pattern. If you want a full system health check instead, run:
+
+```bash
+sudo bash /opt/adsbledmatrix/scripts/verify.sh
+```
+
 ### First Boot / Onboarding (Super Simple Steps)
 
 This is the part where you tell the little computer in the box where you live and how to get on your internet. It only takes a few minutes.
