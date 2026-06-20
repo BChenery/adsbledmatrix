@@ -1,0 +1,23 @@
+import pytest
+
+from hardware.led_config import calculate_matrix_dimensions
+
+
+def test_u_mapper_default_dimensions():
+    """Four 128x64 panels in a U-mapper chain produce 256x128."""
+    assert calculate_matrix_dimensions(64, 128, 4, 1, "U-mapper") == (256, 128)
+
+
+def test_u_mapper_with_rotate():
+    """U-mapper may be chained with Rotate; dimensions stay the same."""
+    assert calculate_matrix_dimensions(64, 128, 4, 1, "U-mapper;Rotate:180") == (256, 128)
+
+
+def test_no_mapper_dimensions():
+    """Without a mapper the logical size is the raw chain size."""
+    assert calculate_matrix_dimensions(64, 128, 4, 1, "") == (512, 64)
+
+
+def test_u_mapper_empty_string_is_no_mapper():
+    """An empty or whitespace mapper is treated as no mapper."""
+    assert calculate_matrix_dimensions(64, 128, 4, 1, "   ") == (512, 64)
