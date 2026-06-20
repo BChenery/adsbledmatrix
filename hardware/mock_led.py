@@ -7,8 +7,8 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 # Default dimensions match the backend config defaults
-DEFAULT_WIDTH = 512   # 128 cols * 4 chain
-DEFAULT_HEIGHT = 256  # 64 rows * 4 parallel
+DEFAULT_WIDTH = 256   # 128 cols * 2 panels wide after U-mapper
+DEFAULT_HEIGHT = 128  # 64 rows * 2 panels tall after U-mapper
 
 
 class MockLEDMatrix:
