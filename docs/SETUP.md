@@ -113,7 +113,7 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
    pip install -r backend/requirements.txt
    ```
 
-6. **Build frontend**
+7. **Build frontend**
    ```bash
    cd frontend
    npm install
@@ -121,12 +121,12 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
    cd ..
    ```
 
-7. **Import aircraft database**
+8. **Import aircraft database**
    ```bash
    python3 scripts/import_aircraft_db.py data/aircraft_db.csv
    ```
 
-8. **Install systemd services**
+9. **Install systemd services**
    ```bash
    sudo cp systemd/*.service /etc/systemd/system/
    sudo systemctl daemon-reload
@@ -214,7 +214,7 @@ curl http://localhost:8080/api/health
 ### Custom Layouts
 1. Open http://adsb-display.local/designer
 2. Create a new layout or edit existing
-3. Drag elements onto the 512×256 canvas
+3. Drag elements onto the 256×128 canvas
 4. Set colors, fonts, data bindings
 5. Save and activate
 
