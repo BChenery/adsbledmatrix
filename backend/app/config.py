@@ -29,21 +29,25 @@ class Settings(BaseSettings):
     aircraft_timeout_seconds: int = 60
 
     # Display
-    # Default is a 256x128 display made of four 64x64 panels (2 wide x 2 tall).
-    # rpi-rgb-led-matrix supports up to 3 parallel chains on a standard Pi;
-    # larger arrangements need a Compute Module or an active adapter board.
+    # Default is a 256x128 display made of four 128x64 P2 panels wired in a
+    # single HUB75 chain with a serpentine (U-mapper) bottom row:
+    #
+    #   Panel 1 (UL) -> Panel 2 (UR) -> Panel 3 (BR) -> Panel 4 (BL)
+    #
+    # Total logical display: 256x128 pixels.
+    # This requires a single-channel HUB75 adapter board and an external 5V PSU.
     led_matrix_rows: int = 64
-    led_matrix_cols: int = 64
-    led_matrix_chain: int = 2
-    led_matrix_parallel: int = 2
+    led_matrix_cols: int = 128
+    led_matrix_chain: int = 4
+    led_matrix_parallel: int = 1
     led_matrix_hardware_mapping: str = "regular"
-    led_matrix_pixel_mapper: str = ""  # e.g. "U-mapper" or "U-mapper;Rotate:180"
-    led_matrix_row_address_type: int = 0
+    led_matrix_pixel_mapper: str = "U-mapper"
+    led_matrix_row_address_type: int = 3
     led_matrix_multiplexing: int = 0
     led_matrix_panel_type: str = ""  # e.g. "FM6126A"
-    led_matrix_pwm_bits: int = 11
-    led_matrix_brightness: int = 100
-    led_matrix_gpio_slowdown: int = 2
+    led_matrix_pwm_bits: int = 7
+    led_matrix_brightness: int = 70
+    led_matrix_gpio_slowdown: int = 4
     led_matrix_limit_refresh: int = 0
 
     # Update
