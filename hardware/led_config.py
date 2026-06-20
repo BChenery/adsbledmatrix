@@ -13,6 +13,8 @@ def calculate_matrix_dimensions(
     This assumes the standard single-chain U-mapper layout used by this
     project: the chain is folded in half vertically, forming a 2-row grid.
     """
+    if rows <= 0 or cols <= 0 or chain <= 0 or parallel <= 0:
+        raise ValueError("rows, cols, chain, and parallel must be positive")
     mapper = (pixel_mapper or "").strip()
     if mapper.startswith("U-mapper"):
         if chain % 2 != 0:

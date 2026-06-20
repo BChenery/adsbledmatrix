@@ -30,6 +30,12 @@ def test_u_mapper_requires_even_chain():
         calculate_matrix_dimensions(64, 128, 3, 1, "U-mapper")
 
 
+def test_calculate_dimensions_rejects_non_positive_inputs():
+    """Non-positive rows, cols, chain, or parallel are rejected."""
+    with pytest.raises(ValueError, match="must be positive"):
+        calculate_matrix_dimensions(0, 128, 4, 1, "U-mapper")
+
+
 def test_default_led_settings_match_pdf():
     """Default settings must match the PDF wiring diagram."""
     settings = Settings()

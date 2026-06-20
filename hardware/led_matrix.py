@@ -24,6 +24,7 @@ class LEDMatrix:
 
     def __init__(self):
         self.matrix: Optional[RGBMatrix] = None
+        self._last_frame: Optional[Image.Image] = None
         self.width, self.height = calculate_matrix_dimensions(
             settings.led_matrix_rows,
             settings.led_matrix_cols,

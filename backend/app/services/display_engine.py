@@ -37,13 +37,21 @@ class DisplayEngine:
         self._framebuffer: Optional[Image.Image] = None
         self._font_cache: Dict[Tuple[str, int], ImageFont.FreeTypeFont] = {}
         self._image_cache: Dict[str, Image.Image] = {}
-        self.width, self.height = calculate_matrix_dimensions(
-            settings.led_matrix_rows,
-            settings.led_matrix_cols,
-            settings.led_matrix_chain,
-            settings.led_matrix_parallel,
-            settings.led_matrix_pixel_mapper,
-        )
+        try:
+            self.width, self.height = calculate_matrix_dimensions(
+                settings.led_matrix_rows,
+                settings.led_matrix_cols,
+                settings.led_matrix_chain,
+                settings.led_matrix_parallel,
+                settings.led_matrix_pixel_mapper,
+            )
+        except ValueError as exc:
+            logger.warning(
+                "Invalid LED matrix dimension config (%s). Falling back to raw chain size.",
+                exc,
+            )
+            self.width = settings.led_matrix_cols * settings.led_matrix_chain
+            self.height = settings.led_matrix_rows * settings.led_matrix_parallel
         self._matrix = None
         self._lock = threading.Lock()
         self._last_render = datetime.utcnow()
@@ -531,6 +539,7 @@ class DisplayEngine:
             "pixel_mapper": settings.led_matrix_pixel_mapper,
             "row_address_type": settings.led_matrix_row_address_type,
             "multiplexing": settings.led_matrix_multiplexing,
+            "panel_type": settings.led_matrix_panel_type,
             "pwm_bits": settings.led_matrix_pwm_bits,
             "gpio_slowdown": settings.led_matrix_gpio_slowdown,
             "spi_enabled": len(spi_devices) > 0,
