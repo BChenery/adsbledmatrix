@@ -15,6 +15,8 @@ def calculate_matrix_dimensions(
     """
     mapper = (pixel_mapper or "").strip()
     if mapper.startswith("U-mapper"):
+        if chain % 2 != 0:
+            raise ValueError("U-mapper requires an even chain length")
         return cols * (chain // 2), rows * 2 * parallel
     return cols * chain, rows * parallel
 
@@ -34,9 +36,11 @@ LED_MATRIX_CONFIG = {
     "parallel": 1,
     "hardware_mapping": "regular",
     "pixel_mapper": "U-mapper",
+    "row_address_type": 3,
     "pwm_bits": 7,
     "brightness": 70,
     "gpio_slowdown": 4,
+    "limit_refresh": 0,
 }
 
 # 128x64 panels in a single 1x4 chain (512x64)

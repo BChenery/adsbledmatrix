@@ -24,6 +24,12 @@ def test_u_mapper_empty_string_is_no_mapper():
     assert calculate_matrix_dimensions(64, 128, 4, 1, "   ") == (512, 64)
 
 
+def test_u_mapper_requires_even_chain():
+    """U-mapper cannot fold an odd-length chain in half."""
+    with pytest.raises(ValueError, match="even chain length"):
+        calculate_matrix_dimensions(64, 128, 3, 1, "U-mapper")
+
+
 def test_default_led_settings_match_pdf():
     """Default settings must match the PDF wiring diagram."""
     settings = Settings()
