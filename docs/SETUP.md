@@ -6,53 +6,52 @@
 - Raspberry Pi 4 (2GB, 4GB, or 8GB)
 - MicroSD card (16GB+, Class 10)
 - RTL-SDR USB dongle with antenna
-- RGB LED Matrix panels (512×256 total)
-- LED matrix HAT/bonnet for Pi
-- 5V power supply (10A+ recommended for 4 panels)
+- 4× P2 128×64 RGB LED Matrix panels (256×128 mm each)
+- Single-channel HUB75 adapter board for Raspberry Pi (e.g. AliExpress "Conversion board for Raspberry Pi to HUB75")
+- External 5 V power supply (10 A+ recommended for 4 panels)
 - Cooling: heatsinks and/or fan for Pi 4
 
 ### Wiring
-1. Install LED matrix HAT onto Pi GPIO header
-2. Connect LED panels to HAT using ribbon cables
-3. Connect 5V power to HAT (do NOT power panels from Pi USB)
-4. Insert RTL-SDR into USB port
-5. Attach antenna to RTL-SDR
+1. Install the HUB75 adapter board onto the Pi GPIO header
+2. Connect Panel 1 to the adapter board using a ribbon cable
+3. Chain Panel 1 → Panel 2 → Panel 3 → Panel 4 with ribbon cables
+4. Connect the external 5 V supply to the adapter board/power injection terminals (do NOT power panels from Pi USB)
+5. Insert RTL-SDR into a USB port
+6. Attach the antenna to the RTL-SDR
 
 ### Panel Arrangement
-Default configuration is **256×128** using four 64×64 panels (2 wide × 2 tall):
+
+Default configuration is **256×128** using four 128×64 panels wired in a single
+serpentine HUB75 chain:
+
 ```
-Panel 0 ──► Panel 1   (Chain 1)
-Panel 2 ──► Panel 3   (Chain 2, Parallel)
-(Chain: 2, Parallel: 2)
+Panel 1 (UL) ──► Panel 2 (UR)
+                       │
+                       ▼
+Panel 4 (BL) ◄── Panel 3 (BR)
 ```
 
-> ⚠️ `rpi-rgb-led-matrix` supports a maximum of **3 parallel chains** on a standard 40-pin Raspberry Pi. A 512×256 arrangement using sixteen 128×64 panels (4 wide × 4 tall) requires a Raspberry Pi Compute Module or an active adapter board that provides 4+ parallel chains. It will not work on a Pi 4 with direct HUB75 wiring using `parallel=4`.
->
-> On a standard Pi you can still drive 512×256 by wiring all sixteen 128×64 panels in **one chain** and using the `U-mapper`. Set `chain=16`, `parallel=1`, and `pixel_mapper=U-mapper`.
-
-For 512×256 using sixteen 128×64 panels in a single chain with U-mapper:
-```
-Panel 0  ──► Panel 1  ──► Panel 2  ──► Panel 3
-Panel 7  ◄── Panel 6  ◄── Panel 5  ◄── Panel 4
-Panel 8  ──► Panel 9  ──► Panel 10 ──► Panel 11
-Panel 15 ◄── Panel 14 ◄── Panel 13 ◄── Panel 12
-(Chain: 16, Parallel: 1, Pixel mapper: U-mapper)
-```
+- `rows=64`, `cols=128`, `chain=4`, `parallel=1`
+- `pixel_mapper=U-mapper` (handles the right-to-left bottom row)
+- `row_address_type=3` for ABC-addressed 1/32-scan panels
 
 Set these environment variables in `/opt/adsbledmatrix/.env`:
+
 ```bash
 ADSB_LED_MATRIX_ROWS=64
 ADSB_LED_MATRIX_COLS=128
-ADSB_LED_MATRIX_CHAIN=16
+ADSB_LED_MATRIX_CHAIN=4
 ADSB_LED_MATRIX_PARALLEL=1
 ADSB_LED_MATRIX_PIXEL_MAPPER=U-mapper
+ADSB_LED_MATRIX_ROW_ADDRESS_TYPE=3
+ADSB_LED_MATRIX_PWM_BITS=7
+ADSB_LED_MATRIX_BRIGHTNESS=70
+ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
 ```
 
-For 512×64 using four 128×64 panels in one chain:
-```
-Panel 0 ──► Panel 1 ──► Panel 2 ──► Panel 3
-(Chain: 4, Parallel: 1)
-```
+> Note: some guides mention `--led-sba=1` for serpentine wiring. The standard
+> `hzeller/rpi-rgb-led-matrix` library does not have this flag; the `U-mapper`
+> option performs the same function.
 
 ## Software Installation
 
@@ -114,7 +113,7 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
    pip install -r backend/requirements.txt
    ```
 
-6. **Build frontend**
+7. **Build frontend**
    ```bash
    cd frontend
    npm install
@@ -122,12 +121,12 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
    cd ..
    ```
 
-7. **Import aircraft database**
+8. **Import aircraft database**
    ```bash
    python3 scripts/import_aircraft_db.py data/aircraft_db.csv
    ```
 
-8. **Install systemd services**
+9. **Install systemd services**
    ```bash
    sudo cp systemd/*.service /etc/systemd/system/
    sudo systemctl daemon-reload
@@ -170,18 +169,25 @@ sudo journalctl -u adsbledmatrix -f
 ls /dev/spi*
 # Should show /dev/spi0.0 and /dev/spi0.1
 
-# Test LED matrix directly (uses the default 2x2 64x64 panel config)
+# Test LED matrix directly (uses the default P2 4-panel serpentine config)
 cd /opt/adsbledmatrix
 source venv/bin/activate
 python3 -c "
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 options = RGBMatrixOptions()
 options.rows = 64
-options.cols = 64
-options.chain_length = 2
-options.parallel = 2
+options.cols = 128
+options.chain_length = 4
+options.parallel = 1
+options.hardware_mapping = 'regular'
+options.pixel_mapper_config = 'U-mapper'
+options.row_address_type = 3
+options.pwm_bits = 7
+options.brightness = 70
+options.gpio_slowdown = 4
 matrix = RGBMatrix(options=options)
 matrix.Fill(255, 0, 0)
+print(f'Matrix size: {matrix.width}x{matrix.height}')
 "
 ```
 
@@ -208,7 +214,7 @@ curl http://localhost:8080/api/health
 ### Custom Layouts
 1. Open http://adsb-display.local/designer
 2. Create a new layout or edit existing
-3. Drag elements onto the 512×256 canvas
+3. Drag elements onto the 256×128 canvas
 4. Set colors, fonts, data bindings
 5. Save and activate
 

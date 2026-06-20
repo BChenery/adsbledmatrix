@@ -2,13 +2,14 @@
 
 import logging
 from pathlib import Path
+from typing import Optional
 from PIL import Image
 
 logger = logging.getLogger(__name__)
 
 # Default dimensions match the backend config defaults
-DEFAULT_WIDTH = 512   # 128 cols * 4 chain
-DEFAULT_HEIGHT = 256  # 64 rows * 4 parallel
+DEFAULT_WIDTH = 256   # 128 cols * 2 panels wide after U-mapper
+DEFAULT_HEIGHT = 128  # 64 rows * 2 panels tall after U-mapper
 
 
 class MockLEDMatrix:
@@ -20,7 +21,7 @@ class MockLEDMatrix:
         self.width = width
         self.height = height
         self._frame_count = 0
-        self._last_frame: Image.Image | None = None
+        self._last_frame: Optional[Image.Image] = None
         logger.info(f"Mock LED matrix: {self.width}x{self.height}")
 
     def SetImage(self, image: Image.Image):
@@ -46,5 +47,5 @@ class MockLEDMatrix:
         self._last_frame = Image.new("RGB", (self.width, self.height), (0, 0, 0))
         logger.debug("Mock matrix cleared")
 
-    def get_last_frame(self) -> Image.Image | None:
-        return self._last_frame
+    def get_last_frame(self) -> Optional[Image.Image]:
+        return self._last_frame.copy() if self._last_frame is not None else None

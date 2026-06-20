@@ -12,6 +12,7 @@ except ImportError:
     HAS_MATRIX = False
 
 from app.config import settings
+from hardware.led_config import calculate_matrix_dimensions
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +24,14 @@ class LEDMatrix:
 
     def __init__(self):
         self.matrix: Optional[RGBMatrix] = None
-        self.width = settings.led_matrix_cols * settings.led_matrix_chain
-        self.height = settings.led_matrix_rows * settings.led_matrix_parallel
+        self._last_frame: Optional[Image.Image] = None
+        self.width, self.height = calculate_matrix_dimensions(
+            settings.led_matrix_rows,
+            settings.led_matrix_cols,
+            settings.led_matrix_chain,
+            settings.led_matrix_parallel,
+            settings.led_matrix_pixel_mapper,
+        )
 
         if HAS_MATRIX:
             try:
@@ -57,6 +64,8 @@ class LEDMatrix:
                     options.drop_priv_group = "adsb"
 
                 self.matrix = RGBMatrix(options=options)
+                self.width = self.matrix.width
+                self.height = self.matrix.height
                 logger.info(
                     f"LED matrix initialized: {self.width}x{self.height}"
                 )
