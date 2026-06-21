@@ -19,7 +19,12 @@ cp -r "$INSTALL_DIR" "$BACKUP_DIR"
 # Pull latest code
 echo "Pulling latest code..."
 cd "$INSTALL_DIR"
-git pull origin main
+repo_owner=$(stat -c '%U' "$INSTALL_DIR")
+if [ "$repo_owner" = "$(whoami)" ]; then
+  git pull origin main
+else
+  sudo -u "$repo_owner" git pull origin main
+fi
 
 # Update Python dependencies
 echo "Updating dependencies..."
