@@ -280,6 +280,12 @@ class ADSBReceiver:
         valid.sort(key=lambda ac: ac.distance_km or float("inf"))
         return valid[:n]
 
+    def get_recent(self, n: int = 20) -> List[LiveAircraft]:
+        """Return the N most recently seen aircraft, regardless of position."""
+        valid = [ac for ac in self.aircraft.values() if not ac.is_stale()]
+        valid.sort(key=lambda ac: ac.last_seen, reverse=True)
+        return valid[:n]
+
     def get_all(self) -> List[LiveAircraft]:
         return list(self.aircraft.values())
 
