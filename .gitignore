@@ -39,7 +39,7 @@ data/.last_sync
 .worktrees/
 
 # Windows alternate data streams
-*.Zone.Identifier
+*Zone.Identifier
 
 # Local wiring diagrams / manuals (not committed)
 *.pdf
