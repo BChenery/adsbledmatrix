@@ -42,8 +42,19 @@ export default function LocationLookup({
       setResult(res);
       onChange(res.latitude, res.longitude);
     } catch (e: unknown) {
-      const message =
-        e instanceof Error ? e.message : 'Lookup failed. Please try again.';
+      const errStatus =
+        e && typeof e === 'object' && 'status' in e
+          ? (e as { status?: number }).status
+          : undefined;
+      let message: string;
+      if (errStatus === 404) {
+        message = 'No results found. Try a nearby town or city.';
+      } else if (errStatus === 502 || errStatus === 503) {
+        message =
+          'Address lookup is temporarily unavailable. Please enter coordinates manually.';
+      } else {
+        message = 'Lookup failed. Please try again.';
+      }
       setError(message);
     } finally {
       setLoading(false);
