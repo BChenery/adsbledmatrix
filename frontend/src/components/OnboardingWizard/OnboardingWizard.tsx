@@ -35,25 +35,41 @@ export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
     };
   }, []);
 
-  const handleLocationSubmit = async () => {
+  const handleLocationSubmit = () => {
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lon);
     if (isNaN(latitude) || isNaN(longitude)) return;
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return;
     setStep(2);
   };
 
   const handleFinish = async () => {
     setLoading(true);
     setRebootError('');
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lon);
+    if (
+      isNaN(latitude) ||
+      isNaN(longitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      setRebootError('Invalid latitude or longitude. Please check your location.');
+      setLoading(false);
+      return;
+    }
     try {
       // Save user configuration
-      await api.put<UserConfig>('/api/config', {
-        latitude: parseFloat(lat),
-        longitude: parseFloat(lon),
+      const savedConfig = await api.put<UserConfig>('/api/config', {
+        latitude,
+        longitude,
         wifi_ssid: wifiSsid || undefined,
         wifi_password: wifiPassword || undefined,
         onboarding_complete: true,
       });
+      _onComplete(savedConfig);
 
       // Trigger WiFi switch and reboot
       setRebooting(true);
