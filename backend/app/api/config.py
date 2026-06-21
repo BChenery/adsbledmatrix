@@ -1,6 +1,7 @@
+import json
 from typing import Optional
 import httpx
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -27,8 +28,7 @@ class ConfigResponse(BaseModel):
     night_mode_start: Optional[str]
     night_mode_end: Optional[str]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ConfigUpdate(BaseModel):
@@ -129,7 +129,7 @@ NOMINATIM_USER_AGENT = "ADS-B LED Display / https://github.com/BChenery/adsbledm
 
 
 @router.get("/geocode", response_model=GeocodeResponse)
-async def geocode_address(q: str = Query(..., min_length=1)):
+async def geocode_address(q: str = Query(..., min_length=1, max_length=200)):
     """Proxy a geocoding request to Nominatim (OpenStreetMap)."""
     async with httpx.AsyncClient(timeout=10.0) as client:
         try:
@@ -150,18 +150,18 @@ async def geocode_address(q: str = Query(..., min_length=1)):
                 detail="Geocoding service is unreachable. Please enter coordinates manually.",
             )
 
-    results = response.json()
-    if not results:
-        raise HTTPException(status_code=404, detail="Address not found.")
-
-    result = results[0]
     try:
+        results = response.json()
+        if not results:
+            raise HTTPException(status_code=404, detail="Address not found.")
+
+        result = results[0]
         return GeocodeResponse(
             display_name=result["display_name"],
             latitude=float(result["lat"]),
             longitude=float(result["lon"]),
         )
-    except (KeyError, ValueError, TypeError) as e:
+    except (KeyError, ValueError, TypeError, json.JSONDecodeError) as e:
         raise HTTPException(
             status_code=502,
             detail=f"Unexpected response from geocoding service: {e}",
