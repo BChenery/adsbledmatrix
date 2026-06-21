@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/api/client';
+import LocationLookup from '@/components/LocationLookup/LocationLookup';
 import { UserConfig } from '@/types/config';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,18 @@ export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
   const [loading, setLoading] = useState(false);
   const [rebooting, setRebooting] = useState(false);
   const [rebootError, setRebootError] = useState('');
+  const [online, setOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setOnline(true);
+    const handleOffline = () => setOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   const handleLocationSubmit = async () => {
     const latitude = parseFloat(lat);
@@ -107,6 +120,15 @@ export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
                 <p className="text-sm text-white/50">
                   Enter your latitude and longitude so the display can calculate distances to aircraft.
                 </p>
+                <LocationLookup
+                  latitude={lat ? parseFloat(lat) : 0}
+                  longitude={lon ? parseFloat(lon) : 0}
+                  disabled={!online}
+                  onChange={(latitude, longitude) => {
+                    setLat(latitude.toString());
+                    setLon(longitude.toString());
+                  }}
+                />
 
                 <div className="space-y-3">
                   <div className="space-y-2">
