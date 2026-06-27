@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     led_matrix_brightness: int = 100
     led_matrix_gpio_slowdown: int = 2
     led_matrix_limit_refresh: int = 0
+    led_matrix_spwm_row_address_type: int = 0
+    led_matrix_spwm_register_config: int = -1
+    led_matrix_spwm_scan_rows: int = 0
 
     # Update
     github_repo: str = "BChenery/adsbledmatrix"
