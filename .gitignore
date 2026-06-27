@@ -34,3 +34,4 @@ data/airline_logos/*.png
 # Environment
 .env
 data/.last_sync
+.worktrees/
