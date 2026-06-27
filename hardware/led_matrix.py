@@ -48,6 +48,10 @@ class LEDMatrix:
                 if settings.led_matrix_limit_refresh > 0:
                     options.limit_refresh_rate_hz = settings.led_matrix_limit_refresh
 
+                options.spwm_row_address_type = settings.led_matrix_spwm_row_address_type
+                options.spwm_register_config = settings.led_matrix_spwm_register_config
+                options.spwm_scan_rows = settings.led_matrix_spwm_scan_rows
+
                 # rpi-rgb-led-matrix needs root to initialise GPIO timing, then
                 # drops privileges. Make sure it drops back to the service user
                 # so file permissions remain correct.
