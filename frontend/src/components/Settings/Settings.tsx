@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity } from 'lucide-react';
+import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, Eraser, Palette } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
@@ -145,6 +145,45 @@ export default function Settings() {
                 <Activity size={14} />
                 Test Matrix (Red → Green → Blue)
               </Button>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-xs"
+                  onClick={async () => {
+                    try {
+                      const res = await api.post<{ success: boolean; message: string }>('/api/display/clear');
+                      toast.success(res.message);
+                    } catch {
+                      toast.error('Failed to clear matrix');
+                    }
+                  }}
+                  disabled={!diagnostics.hardware_mode}
+                >
+                  <Eraser size={14} />
+                  Clear
+                </Button>
+                <SolidColorButton
+                  label="Red"
+                  color={{ r: 255, g: 0, b: 0 }}
+                  disabled={!diagnostics.hardware_mode}
+                />
+                <SolidColorButton
+                  label="Green"
+                  color={{ r: 0, g: 255, b: 0 }}
+                  disabled={!diagnostics.hardware_mode}
+                />
+                <SolidColorButton
+                  label="Blue"
+                  color={{ r: 0, g: 0, b: 255 }}
+                  disabled={!diagnostics.hardware_mode}
+                />
+                <SolidColorButton
+                  label="White"
+                  color={{ r: 255, g: 255, b: 255 }}
+                  disabled={!diagnostics.hardware_mode}
+                />
+              </div>
             </div>
           )}
         </CardContent>
@@ -324,6 +363,36 @@ export default function Settings() {
         Reset Onboarding
       </Button>
     </div>
+  );
+}
+
+function SolidColorButton({
+  label,
+  color,
+  disabled,
+}: {
+  label: string;
+  color: { r: number; g: number; b: number };
+  disabled: boolean;
+}) {
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className="gap-2 text-xs"
+      onClick={async () => {
+        try {
+          const res = await api.post<{ success: boolean; message: string }>('/api/display/solid', color);
+          toast.success(res.message);
+        } catch {
+          toast.error(`Failed to fill ${label}`);
+        }
+      }}
+      disabled={disabled}
+    >
+      <Palette size={14} />
+      {label}
+    </Button>
   );
 }
 
