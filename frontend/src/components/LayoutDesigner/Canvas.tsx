@@ -294,8 +294,8 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
     const { x: mx, y: my } = getMousePos(e);
 
     if (dragging) {
-      const newX = Math.max(0, Math.min(mx - dragging.offsetX, layout.width - (dragging.el.width || 50)));
-      const newY = Math.max(0, Math.min(my - dragging.offsetY, layout.height - (dragging.el.height || 20)));
+      const newX = Math.round(Math.max(0, Math.min(mx - dragging.offsetX, layout.width - (dragging.el.width || 50))));
+      const newY = Math.round(Math.max(0, Math.min(my - dragging.offsetY, layout.height - (dragging.el.height || 20))));
       onUpdateElement({ ...dragging.el, x: newX, y: newY });
     } else if (resizing) {
       const { el, corner } = resizing;
@@ -317,7 +317,13 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         newH = bottom - newY;
       }
 
-      onUpdateElement({ ...el, x: newX, y: newY, width: newW, height: newH });
+      onUpdateElement({
+        ...el,
+        x: Math.round(newX),
+        y: Math.round(newY),
+        width: Math.round(newW),
+        height: Math.round(newH),
+      });
     }
   };
 

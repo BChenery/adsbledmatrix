@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { api } from '@/api/client';
 import { MOCK_AIRCRAFT_FLEET } from '@/lib/mockAircraft';
+import { toast } from 'sonner';
 import Canvas from './Canvas';
 import ElementPalette, { QUICK_ADD_PRESETS, ADVANCED_ELEMENTS } from './ElementPalette';
 import PropertyPanel from './PropertyPanel';
@@ -108,16 +109,27 @@ export default function LayoutDesigner() {
 
   const handleSave = async () => {
     if (!activeLayout) return;
-    if (activeLayout.id) {
-      await update(activeLayout.id, {
-        name: activeLayout.name,
-        width: activeLayout.width,
-        height: activeLayout.height,
-        elements: activeLayout.elements,
-      });
-    } else {
-      const created = await create(activeLayout);
-      setActiveLayout(created);
+    try {
+      if (activeLayout.id) {
+        await update(activeLayout.id, {
+          name: activeLayout.name,
+          width: activeLayout.width,
+          height: activeLayout.height,
+          elements: activeLayout.elements,
+        });
+        toast.success('Layout saved');
+      } else {
+        const created = await create(activeLayout);
+        setActiveLayout(created);
+        toast.success('Layout created');
+      }
+    } catch (err: any) {
+      const message = err?.response?.detail
+        ? JSON.stringify(err.response.detail)
+        : err instanceof Error
+        ? err.message
+        : 'Save failed';
+      toast.error(`Save failed: ${message}`);
     }
   };
 

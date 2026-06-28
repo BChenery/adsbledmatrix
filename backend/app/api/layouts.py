@@ -103,8 +103,11 @@ async def create_layout(layout: LayoutCreate, session: AsyncSession = Depends(ge
         session.add(db_elem)
 
     await session.commit()
-    await session.refresh(db_layout)
-    return db_layout
+
+    result = await session.execute(
+        select(Layout).where(Layout.id == db_layout.id).options(selectinload(Layout.elements))
+    )
+    return result.scalar_one()
 
 
 @router.get("/{layout_id}", response_model=LayoutResponse)
@@ -138,8 +141,11 @@ async def update_layout(layout_id: int, update: LayoutUpdate, session: AsyncSess
             session.add(db_elem)
 
     await session.commit()
-    await session.refresh(layout)
-    return layout
+
+    result = await session.execute(
+        select(Layout).where(Layout.id == layout_id).options(selectinload(Layout.elements))
+    )
+    return result.scalar_one()
 
 
 @router.delete("/{layout_id}", status_code=204)
