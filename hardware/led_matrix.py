@@ -49,6 +49,8 @@ class LEDMatrix:
                     options.multiplexing = settings.led_matrix_multiplexing
                 if settings.led_matrix_panel_type:
                     options.panel_type = settings.led_matrix_panel_type
+                if settings.led_matrix_rgb_sequence:
+                    options.led_rgb_sequence = settings.led_matrix_rgb_sequence
                 options.pwm_bits = settings.led_matrix_pwm_bits
                 options.brightness = settings.led_matrix_brightness
                 options.gpio_slowdown = settings.led_matrix_gpio_slowdown

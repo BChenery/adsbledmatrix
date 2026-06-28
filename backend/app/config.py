@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     led_matrix_gpio_slowdown: int = 4
     led_matrix_limit_refresh: int = 0
     led_matrix_flip_vertical: bool = False
+    led_matrix_rgb_sequence: str = "RGB"  # Use "BGR" if red and blue are swapped
 
     # Update
     github_repo: str = "BChenery/adsbledmatrix"
