@@ -13,10 +13,30 @@ from app.config import settings
 # Operators that should reuse another airline's logo when their own ICAO/logo
 # isn't available. Key: operator name fragment (lowercase), Value: target ICAO.
 _OPERATOR_LOGO_ALIASES: Dict[str, str] = {
+    "qantas": "QFA",
     "qantaslink": "QFA",
     "sunstate": "QFA",
     "network aviation": "QFA",
     "national jet systems": "QFA",
+    "virgin australia": "VA",
+    "virgin blue": "VA",
+    "jetstar": "JQ",
+    "tigerair": "TGW",
+    "rex": "RXA",
+    "regional express": "RXA",
+    "air new zealand": "ANZ",
+    "alliance": "UTY",
+    "fiji airways": "FJI",
+    "singapore airlines": "SIA",
+    "emirates": "UAE",
+    "cathay pacific": "CPA",
+    "malaysia airlines": "MAS",
+    "british airways": "BAW",
+    "united airlines": "UAL",
+    "delta air lines": "DAL",
+    "american airlines": "AAL",
+    "lufthansa": "DLH",
+    "air canada": "ACA",
 }
 
 
