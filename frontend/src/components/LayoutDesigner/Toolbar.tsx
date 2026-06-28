@@ -1,16 +1,19 @@
 import { Layout } from '@/types/layout';
+import { UserConfig } from '@/types/config';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut } from 'lucide-react';
+import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut, Monitor, Moon } from 'lucide-react';
 
 interface ToolbarProps {
   layouts: Layout[];
   activeLayout: Layout | null;
+  config: UserConfig | null;
   onSelectLayout: (layout: Layout | null) => void;
   onNew: () => void;
   onSave: () => void;
@@ -18,11 +21,26 @@ interface ToolbarProps {
   onToggleMockData: () => void;
   zoom: number;
   onZoomChange: (zoom: number) => void;
+  onSetAsActive: () => void;
+  onSetAsIdle: () => void;
 }
 
 const ZOOM_OPTIONS = [1, 2, 3, 4, 5, 6];
 
-export default function Toolbar({ layouts, activeLayout, onSelectLayout, onNew, onSave, useMockData, onToggleMockData, zoom, onZoomChange }: ToolbarProps) {
+export default function Toolbar({
+  layouts,
+  activeLayout,
+  config,
+  onSelectLayout,
+  onNew,
+  onSave,
+  useMockData,
+  onToggleMockData,
+  zoom,
+  onZoomChange,
+  onSetAsActive,
+  onSetAsIdle,
+}: ToolbarProps) {
   return (
     <div className="h-14 bg-led-panel border-b border-white/10 flex items-center px-4 gap-4">
       <DropdownMenu>
@@ -50,6 +68,46 @@ export default function Toolbar({ layouts, activeLayout, onSelectLayout, onNew, 
       <Button variant="secondary" size="icon" onClick={onNew}>
         <Plus size={16} />
       </Button>
+
+      {activeLayout?.id && (
+        <div className="flex items-center gap-2">
+          {activeLayout.id === config?.active_layout_id && (
+            <Badge variant="default" className="bg-green-500/20 text-green-400 hover:bg-green-500/30 gap-1">
+              <Monitor size={12} />
+              Active
+            </Badge>
+          )}
+          {activeLayout.id === config?.idle_layout_id && (
+            <Badge variant="default" className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 gap-1">
+              <Moon size={12} />
+              Idle
+            </Badge>
+          )}
+        </div>
+      )}
+
+      {activeLayout?.id && (
+        <div className="flex items-center gap-1">
+          <Button
+            variant={activeLayout.id === config?.active_layout_id ? 'default' : 'secondary'}
+            size="sm"
+            onClick={onSetAsActive}
+            className="gap-2"
+          >
+            <Monitor size={14} />
+            {activeLayout.id === config?.active_layout_id ? 'Active Layout' : 'Set Active'}
+          </Button>
+          <Button
+            variant={activeLayout.id === config?.idle_layout_id ? 'default' : 'secondary'}
+            size="sm"
+            onClick={onSetAsIdle}
+            className="gap-2"
+          >
+            <Moon size={14} />
+            {activeLayout.id === config?.idle_layout_id ? 'Idle Layout' : 'Set Idle'}
+          </Button>
+        </div>
+      )}
 
       <div className="flex-1" />
 

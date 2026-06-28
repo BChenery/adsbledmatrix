@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLayouts } from '@/hooks/useLayout';
 import { useAircraft } from '@/hooks/useAircraft';
 import { Layout, LayoutElement } from '@/types/layout';
+import { UserConfig } from '@/types/config';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -40,7 +41,29 @@ export default function LayoutDesigner() {
   const [showNewModal, setShowNewModal] = useState(false);
   const [useMockData, setUseMockData] = useState(false);
   const [zoom, setZoom] = useState(3);
+  const [config, setConfig] = useState<UserConfig | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    api.get<UserConfig>('/api/config').then(setConfig);
+  }, []);
+
+  const refreshConfig = async () => {
+    const fresh = await api.get<UserConfig>('/api/config');
+    setConfig(fresh);
+  };
+
+  const setAsActive = async () => {
+    if (!activeLayout?.id) return;
+    await api.put('/api/config', { active_layout_id: activeLayout.id });
+    await refreshConfig();
+  };
+
+  const setAsIdle = async () => {
+    if (!activeLayout?.id) return;
+    await api.put('/api/config', { idle_layout_id: activeLayout.id });
+    await refreshConfig();
+  };
 
   const handleAddElement = (key: string) => {
     if (!activeLayout) return;
@@ -118,6 +141,7 @@ export default function LayoutDesigner() {
       <Toolbar
         layouts={layouts}
         activeLayout={activeLayout}
+        config={config}
         onSelectLayout={handleSelectLayout}
         onNew={() => setShowNewModal(true)}
         onSave={handleSave}
@@ -125,6 +149,8 @@ export default function LayoutDesigner() {
         onToggleMockData={() => setUseMockData((v) => !v)}
         zoom={zoom}
         onZoomChange={setZoom}
+        onSetAsActive={setAsActive}
+        onSetAsIdle={setAsIdle}
       />
 
       <Dialog open={showNewModal} onOpenChange={setShowNewModal}>

@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
 import { useDisplayDiagnostics } from '@/hooks/useDisplayDiagnostics';
+import { useLayouts } from '@/hooks/useLayout';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
 
 export default function Settings() {
@@ -47,6 +48,10 @@ export default function Settings() {
   const displayStatus = useDisplayStatus();
   const preview = useDisplayPreview();
   const diagnostics = useDisplayDiagnostics();
+  const { layouts } = useLayouts();
+
+  const activeLayout = layouts.find((l) => l.id === config?.active_layout_id);
+  const idleLayout = layouts.find((l) => l.id === config?.idle_layout_id);
 
   if (!config) return <div className="p-6 text-white/50">Loading...</div>;
 
@@ -254,6 +259,50 @@ export default function Settings() {
             options={['closest', 'cycle3', 'list']}
             onChange={(v) => update('display_mode', v)}
           />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Active Layout</Label>
+              <Select
+                value={config.active_layout_id?.toString() || 'none'}
+                onValueChange={(v) => update('active_layout_id', v === 'none' ? undefined : parseInt(v))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="None">
+                    {activeLayout?.name || 'None'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {layouts.map((l) => (
+                    <SelectItem key={l.id} value={l.id!.toString()}>
+                      {l.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Idle Layout</Label>
+              <Select
+                value={config.idle_layout_id?.toString() || 'none'}
+                onValueChange={(v) => update('idle_layout_id', v === 'none' ? undefined : parseInt(v))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="None">
+                    {idleLayout?.name || 'None'}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {layouts.map((l) => (
+                    <SelectItem key={l.id} value={l.id!.toString()}>
+                      {l.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <div className="space-y-2">
             <Label>Cycle Interval (seconds)</Label>
             <Input
