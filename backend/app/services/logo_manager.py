@@ -185,8 +185,16 @@ class LogoManager:
         except Exception as e:
             logger.debug(f"Failed to record logo in DB for {icao}: {e}")
 
-    async def bulk_import_from_github(self, repo_url: str = "https://github.com/Jxck-S/airline-logos") -> Dict[str, int]:
-        """Download the airline-logos repo and import all PNG logos locally."""
+    async def bulk_import_from_github(
+        self, repo_url: str = "https://github.com/Jxck-S/airline-logos", overwrite: bool = False
+    ) -> Dict[str, int]:
+        """Download the airline-logos repo and import all PNG logos locally.
+
+        Args:
+            repo_url: URL of the Jxck-S/airline-logos repository.
+            overwrite: If True, replace existing local logos so FlightAware is
+                preferred over Radarbox. If False, skip existing files.
+        """
         import asyncio
 
         zip_url = f"{repo_url.rstrip('/')}/archive/refs/heads/main.zip"
@@ -230,7 +238,7 @@ class LogoManager:
             tasks = []
             for icao, png_file in logo_choices.items():
                 dest = settings.logos_dir / f"{icao}.png"
-                if dest.exists():
+                if dest.exists() and not overwrite:
                     skipped += 1
                     continue
                 tasks.append(self._import_bulk_logo(icao, png_file, dest))
