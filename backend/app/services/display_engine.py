@@ -47,6 +47,10 @@ class DisplayEngine:
 
         from hardware import create_matrix
         self._matrix = create_matrix(self.width, self.height)
+        # Pixel mappers rearrange the physical panels and therefore change the
+        # logical canvas size. Prefer the matrix driver's reported dimensions.
+        self.width = getattr(self._matrix, "width", self.width)
+        self.height = getattr(self._matrix, "height", self.height)
 
     async def start(self):
         if self._running:

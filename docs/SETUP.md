@@ -6,27 +6,44 @@
 - Raspberry Pi 4 (2GB, 4GB, or 8GB)
 - MicroSD card (16GB+, Class 10)
 - RTL-SDR USB dongle with antenna
-- RGB LED Matrix panels (512×256 total)
-- LED matrix HAT/bonnet for Pi
+- RGB LED Matrix panels (256×128 total recommended; see below)
+- Single-channel HUB75 adapter for Raspberry Pi (e.g. AliExpress "Conversion board for Raspberry Pi to HUB75")
 - 5V power supply (10A+ recommended for 4 panels)
 - Cooling: heatsinks and/or fan for Pi 4
 
 ### Wiring
-1. Install LED matrix HAT onto Pi GPIO header
-2. Connect LED panels to HAT using ribbon cables
-3. Connect 5V power to HAT (do NOT power panels from Pi USB)
-4. Insert RTL-SDR into USB port
-5. Attach antenna to RTL-SDR
+1. Plug the HUB75 adapter onto the Pi 40-pin GPIO header
+2. Connect Panel 1 IN to the adapter with a HUB75 ribbon cable
+3. Chain the remaining panels with ribbon cables in serpentine order (see Panel Arrangement)
+4. Connect 5V power directly to the panels (do NOT power panels from the Pi)
+5. Insert RTL-SDR into a USB port and attach the antenna
 
 ### Panel Arrangement
-Default configuration is **256×128** using four 64×64 panels (2 wide × 2 tall):
+The default configuration is a **256×128** display made from four 128×64 panels wired in a single chain with the `U-mapper`:
+
 ```
-Panel 0 ──► Panel 1   (Chain 1)
-Panel 2 ──► Panel 3   (Chain 2, Parallel)
-(Chain: 2, Parallel: 2)
+Panel 1 ──► Panel 2   (top row, left to right)
+             │
+             ▼
+Panel 4 ◄── Panel 3   (bottom row, right to left, serpentine)
+(Chain: 4, Parallel: 1, Pixel mapper: U-mapper)
 ```
 
-> ⚠️ `rpi-rgb-led-matrix` supports a maximum of **3 parallel chains** on a standard 40-pin Raspberry Pi. A 512×256 arrangement using sixteen 128×64 panels (4 wide × 4 tall) requires a Raspberry Pi Compute Module or an active adapter board that provides 4+ parallel chains. It will not work on a Pi 4 with direct HUB75 wiring using `parallel=4`.
+Set these environment variables in `/opt/adsbledmatrix/.env`:
+```bash
+ADSB_LED_MATRIX_ROWS=64
+ADSB_LED_MATRIX_COLS=128
+ADSB_LED_MATRIX_CHAIN=4
+ADSB_LED_MATRIX_PARALLEL=1
+ADSB_LED_MATRIX_PIXEL_MAPPER=U-mapper
+ADSB_LED_MATRIX_HARDWARE_MAPPING=regular
+ADSB_LED_MATRIX_ROW_ADDRESS_TYPE=0
+ADSB_LED_MATRIX_BRIGHTNESS=70
+ADSB_LED_MATRIX_PWM_BITS=7
+ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
+```
+
+> ⚠️ `rpi-rgb-led-matrix` supports a maximum of **3 parallel chains** on a standard 40-pin Raspberry Pi. A 512×256 arrangement using sixteen 128×64 panels (4 wide × 4 tall) requires a Raspberry Pi Compute Module or an active adapter board that provides 4+ parallel chains. It will not work on a Pi 4 with a single-channel adapter using `parallel=4`.
 >
 > On a standard Pi you can still drive 512×256 by wiring all sixteen 128×64 panels in **one chain** and using the `U-mapper`. Set `chain=16`, `parallel=1`, and `pixel_mapper=U-mapper`.
 
@@ -37,21 +54,6 @@ Panel 7  ◄── Panel 6  ◄── Panel 5  ◄── Panel 4
 Panel 8  ──► Panel 9  ──► Panel 10 ──► Panel 11
 Panel 15 ◄── Panel 14 ◄── Panel 13 ◄── Panel 12
 (Chain: 16, Parallel: 1, Pixel mapper: U-mapper)
-```
-
-Set these environment variables in `/opt/adsbledmatrix/.env`:
-```bash
-ADSB_LED_MATRIX_ROWS=64
-ADSB_LED_MATRIX_COLS=128
-ADSB_LED_MATRIX_CHAIN=16
-ADSB_LED_MATRIX_PARALLEL=1
-ADSB_LED_MATRIX_PIXEL_MAPPER=U-mapper
-```
-
-For 512×64 using four 128×64 panels in one chain:
-```
-Panel 0 ──► Panel 1 ──► Panel 2 ──► Panel 3
-(Chain: 4, Parallel: 1)
 ```
 
 ## Software Installation
@@ -170,16 +172,20 @@ sudo journalctl -u adsbledmatrix -f
 ls /dev/spi*
 # Should show /dev/spi0.0 and /dev/spi0.1
 
-# Test LED matrix directly (uses the default 2x2 64x64 panel config)
+# Test LED matrix directly (uses the default 4-panel 128x64 U-mapper config)
 cd /opt/adsbledmatrix
 source venv/bin/activate
-python3 -c "
+sudo python3 -c "
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 options = RGBMatrixOptions()
 options.rows = 64
-options.cols = 64
-options.chain_length = 2
-options.parallel = 2
+options.cols = 128
+options.chain_length = 4
+options.parallel = 1
+options.hardware_mapping = 'regular'
+options.pixel_mapper_config = 'U-mapper'
+options.row_address_type = 0
+options.gpio_slowdown = 4
 matrix = RGBMatrix(options=options)
 matrix.Fill(255, 0, 0)
 "

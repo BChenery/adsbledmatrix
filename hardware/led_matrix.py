@@ -57,6 +57,12 @@ class LEDMatrix:
                     options.drop_priv_group = "adsb"
 
                 self.matrix = RGBMatrix(options=options)
+                # Pixel mappers such as U-mapper change the logical canvas size
+                # (e.g. 4x 128x64 panels become 256x128 rather than 512x64).
+                # Use the matrix's reported dimensions so downstream renderers
+                # produce images that match the physical layout.
+                self.width = self.matrix.width
+                self.height = self.matrix.height
                 logger.info(
                     f"LED matrix initialized: {self.width}x{self.height}"
                 )
