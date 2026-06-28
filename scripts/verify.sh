@@ -17,7 +17,12 @@ check() {
 echo "=== ADS-B LED Display Verification ==="
 
 # Git version
-git -C /opt/adsbledmatrix log --oneline -1 2>/dev/null
+repo_owner=$(stat -c '%U' /opt/adsbledmatrix)
+if [ "$repo_owner" = "$(whoami)" ]; then
+  git -C /opt/adsbledmatrix log --oneline -1 2>/dev/null
+else
+  sudo -u "$repo_owner" git -C /opt/adsbledmatrix log --oneline -1 2>/dev/null
+fi
 check $? "Project installed at /opt/adsbledmatrix"
 
 # SPI

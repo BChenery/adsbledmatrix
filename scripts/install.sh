@@ -144,7 +144,12 @@ echo "[5/8] Installing application..."
 if [ -d "$INSTALL_DIR" ]; then
   echo "Existing installation found. Updating..."
   cd "$INSTALL_DIR"
-  git pull || true
+  repo_owner=$(stat -c '%U' "$INSTALL_DIR")
+  if [ "$repo_owner" = "$(whoami)" ]; then
+    git pull || true
+  else
+    sudo -u "$repo_owner" git pull || true
+  fi
 else
   git clone "$REPO_URL" "$INSTALL_DIR"
   cd "$INSTALL_DIR"
@@ -209,7 +214,11 @@ chmod 440 /etc/sudoers.d/adsbledmatrix
 
 # Set permissions
 echo "[8/8] Setting permissions..."
-chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
+# The main service and manual update/verify scripts run as root, so keep the
+# application code and git repo root-owned. Only runtime data needs to be
+# writable by the adsb service user.
+chown -R root:root "$INSTALL_DIR"
+chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR/data"
 chmod +x scripts/*.sh
 
 # Ensure netfilter-persistent is enabled so iptables rules survive reboots

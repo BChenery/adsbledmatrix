@@ -19,9 +19,9 @@ async def broadcast_aircraft():
         if not connected_clients:
             continue
 
-        closest = receiver.get_closest(n=5)
+        recent = receiver.get_recent(n=20)
         data = []
-        for ac in closest:
+        for ac in recent:
             enriched = await db.enrich(ac.hex_code)
             data.append({
                 "hex_code": ac.hex_code,
@@ -36,6 +36,11 @@ async def broadcast_aircraft():
                 "model": enriched.get("model"),
                 "operator": enriched.get("operator"),
                 "operator_icao": enriched.get("operator_icao"),
+                "type_code": enriched.get("type_code"),
+                "type_name": enriched.get("type_name"),
+                "messages": ac.messages,
+                "last_seen": ac.last_seen.isoformat() if ac.last_seen else None,
+                "bearing": ac.bearing,
             })
 
         message = json.dumps({"type": "aircraft", "data": data})

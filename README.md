@@ -1,13 +1,13 @@
 # ADS-B LED Aircraft Display
 
-A complete, consumer-ready ADS-B aircraft display system for Raspberry Pi 4. Receives real-time aircraft transponder signals via RTL-SDR, decodes them with [`readsb`](https://github.com/wiedehopf/readsb), and renders the closest aircraft onto a configurable 512×256 RGB LED matrix — all controllable through a built-in web interface.
+A complete, consumer-ready ADS-B aircraft display system for Raspberry Pi 4. Receives real-time aircraft transponder signals via RTL-SDR, decodes them with [`readsb`](https://github.com/wiedehopf/readsb), and renders the closest aircraft onto a configurable 256×128 RGB LED matrix — all controllable through a built-in web interface.
 
 ---
 
 ## ✨ Features
 
 - **Real-Time ADS-B Reception** — Decodes 1090 MHz transponder signals using RTL-SDR + `readsb`
-- **512×256 LED Matrix Display** — Shows the nearest aircraft with fully customizable layouts
+- **256×128 LED Matrix Display** — Shows the nearest aircraft with fully customizable layouts
 - **Visual Layout Designer** — Drag-and-drop web UI to design exactly what appears on the LED panel
 - **Onboarding Wizard** — First-boot WiFi captive portal for location, network, and display setup
 - **Aircraft Database** — Local SQLite enrichment with registration, type, operator, and airline logos
@@ -26,7 +26,7 @@ A complete, consumer-ready ADS-B aircraft display system for Raspberry Pi 4. Rec
 | **Storage** | MicroSD card (16 GB+, Class 10) |
 | **Receiver** | RTL-SDR USB dongle with 1090 MHz antenna |
 | **Display** | RGB LED Matrix panels (default config is 256×128; larger arrangements need a Compute Module or active adapter) |
-| **Driver** | LED Matrix HAT or Bonnet (e.g., Adafruit RGB Matrix Bonnet) |
+| **Driver** | Single-channel HUB75 adapter board for Raspberry Pi (e.g. AliExpress "Conversion board for Raspberry Pi to HUB75") |
 | **Power** | 5 V power supply (10 A+ recommended for 4 panels) |
 | **Cooling** | Heatsinks and/or fan for the Pi 4 |
 
@@ -233,15 +233,17 @@ Environment variables (all prefixed with `ADSB_`):
 | `ADSB_READSB_HOST` | `127.0.0.1` | `readsb` TCP host |
 | `ADSB_READSB_PORT` | `30003` | `readsb` SBS/BaseStation port |
 | `ADSB_LED_MATRIX_ROWS` | `64` | LED panel rows |
-| `ADSB_LED_MATRIX_COLS` | `64` | LED panel columns |
-| `ADSB_LED_MATRIX_CHAIN` | `2` | Panels chained |
-| `ADSB_LED_MATRIX_PARALLEL` | `2` | Parallel chains (max 3 on a standard Pi) |
+| `ADSB_LED_MATRIX_COLS` | `128` | LED panel columns |
+| `ADSB_LED_MATRIX_CHAIN` | `4` | Panels chained |
+| `ADSB_LED_MATRIX_PARALLEL` | `1` | Parallel chains (max 3 on a standard Pi) |
 | `ADSB_LED_MATRIX_HARDWARE_MAPPING` | `regular` | HUB75 mapping (`regular`, `adafruit-hat`, `adafruit-hat-pwm`) |
-| `ADSB_LED_MATRIX_PIXEL_MAPPER` | `""` | Pixel mapper, e.g. `U-mapper` for chained grids |
-| `ADSB_LED_MATRIX_ROW_ADDRESS_TYPE` | `0` | Row address type (0–5) |
+| `ADSB_LED_MATRIX_PIXEL_MAPPER` | `U-mapper` | Pixel mapper, e.g. `U-mapper` for serpentine chained grids |
+| `ADSB_LED_MATRIX_ROW_ADDRESS_TYPE` | `3` | Row address type (0–5) |
 | `ADSB_LED_MATRIX_MULTIPLEXING` | `0` | Multiplexing type (0–17) |
 | `ADSB_LED_MATRIX_PANEL_TYPE` | `""` | Panel type, e.g. `FM6126A` |
-| `ADSB_LED_MATRIX_BRIGHTNESS` | `100` | Brightness (0–100) |
+| `ADSB_LED_MATRIX_PWM_BITS` | `7` | PWM bits (1–11) |
+| `ADSB_LED_MATRIX_BRIGHTNESS` | `70` | Brightness (0–100) |
+| `ADSB_LED_MATRIX_GPIO_SLOWDOWN` | `4` | GPIO slowdown (0–4) |
 | `ADSB_GITHUB_REPO` | `BChenery/adsbledmatrix` | Update source repo |
 
 ---
@@ -297,11 +299,20 @@ sudo journalctl -u adsbledmatrix -f
 ls /dev/spi*
 # Expected: /dev/spi0.0 and /dev/spi0.1
 
-# Test matrix directly (uses the default 2x2 64x64 panel config)
+# Test matrix directly (uses the default P2 4-panel serpentine config)
 python3 -c "
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 opts = RGBMatrixOptions()
-opts.rows = 64; opts.cols = 64; opts.chain_length = 2; opts.parallel = 2
+opts.rows = 64
+opts.cols = 128
+opts.chain_length = 4
+opts.parallel = 1
+opts.hardware_mapping = 'regular'
+opts.pixel_mapper_config = 'U-mapper'
+opts.row_address_type = 3
+opts.pwm_bits = 7
+opts.brightness = 70
+opts.gpio_slowdown = 4
 RGBMatrix(options=opts).Fill(255, 0, 0)
 "
 ```

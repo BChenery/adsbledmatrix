@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
 import { useDisplayDiagnostics } from '@/hooks/useDisplayDiagnostics';
+import LocationLookup from '@/components/LocationLookup/LocationLookup';
 
 export default function Settings() {
   const [config, setConfig] = useState<UserConfig | null>(null);
@@ -181,7 +182,16 @@ export default function Settings() {
         <CardHeader>
           <CardTitle className="text-sm text-white/70">Location</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <LocationLookup
+            latitude={config.latitude}
+            longitude={config.longitude}
+            onChange={(lat, lon) => {
+              update('latitude', lat);
+              update('longitude', lon);
+            }}
+          />
+
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Latitude</Label>

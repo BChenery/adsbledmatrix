@@ -2,7 +2,7 @@
 
 ## Overview
 
-The ADS-B LED Display is a full-stack embedded system running on Raspberry Pi 4. It receives aircraft transponder signals via RTL-SDR, decodes them with `readsb`, enriches the data with a local SQLite aircraft database, and renders the closest aircraft onto a configurable 512×256 LED matrix.
+The ADS-B LED Display is a full-stack embedded system running on Raspberry Pi 4. It receives aircraft transponder signals via RTL-SDR, decodes them with `readsb`, enriches the data with a local SQLite aircraft database, and renders the closest aircraft onto a configurable 256×128 LED matrix (four P2 128×64 panels in a single serpentine HUB75 chain).
 
 ## Component Diagram
 
@@ -10,7 +10,7 @@ The ADS-B LED Display is a full-stack embedded system running on Raspberry Pi 4.
 ┌─────────────────────────────────────────────────────────────────┐
 │                        RASPBERRY PI 4                            │
 │  ┌──────────┐      ┌──────────────┐      ┌──────────────────┐  │
-│  │ RTL-SDR  │      │ 512×256 LED  │      │   PYTHON FASTAPI  │  │
+│  │ RTL-SDR  │      │ 256×128 LED  │      │   PYTHON FASTAPI  │  │
 │  │ Dongle   │─────▶│ Matrix (4×)  │◀─────│   BACKEND         │  │
 │  └──────────┘      └──────────────┘      └──────────────────┘  │
 │       │                                          │               │
@@ -94,8 +94,8 @@ The ADS-B LED Display is a full-stack embedded system running on Raspberry Pi 4.
 |--------|------|-------------|
 | id | INTEGER PK | Layout ID |
 | name | TEXT | Display name |
-| width | INTEGER | Canvas width (512) |
-| height | INTEGER | Canvas height (256) |
+| width | INTEGER | Canvas width (256) |
+| height | INTEGER | Canvas height (128) |
 | is_default | BOOLEAN | Pre-installed layout |
 
 ### layout_elements
@@ -116,23 +116,19 @@ Single-row configuration table storing all user preferences.
 
 ## LED Matrix Configuration
 
-The system uses `rpi-rgb-led-matrix` Python bindings. Configuration via environment:
+The system uses `rpi-rgb-led-matrix` Python bindings. The default build is a 256×128 display made from four P2 128×64 panels wired in a single serpentine HUB75 chain:
 
 ```bash
 ADSB_LED_MATRIX_ROWS=64
 ADSB_LED_MATRIX_COLS=128
 ADSB_LED_MATRIX_CHAIN=4
-ADSB_LED_MATRIX_PARALLEL=4
+ADSB_LED_MATRIX_PARALLEL=1
 ADSB_LED_MATRIX_HARDWARE_MAPPING=regular
-ADSB_LED_MATRIX_BRIGHTNESS=100
-```
-
-For a 256×128 display (4 panels in 2×2 grid with 2 parallel chains):
-```bash
-ADSB_LED_MATRIX_ROWS=64
-ADSB_LED_MATRIX_COLS=128
-ADSB_LED_MATRIX_CHAIN=2
-ADSB_LED_MATRIX_PARALLEL=2
+ADSB_LED_MATRIX_PIXEL_MAPPER=U-mapper
+ADSB_LED_MATRIX_ROW_ADDRESS_TYPE=3
+ADSB_LED_MATRIX_PWM_BITS=7
+ADSB_LED_MATRIX_BRIGHTNESS=70
+ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
 ```
 
 ## Update Mechanism

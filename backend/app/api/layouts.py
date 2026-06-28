@@ -39,8 +39,8 @@ class ElementResponse(ElementCreate):
 class LayoutCreate(BaseModel):
     name: str
     description: Optional[str] = None
-    width: int = 512
-    height: int = 256
+    width: int = 256
+    height: int = 128
     is_default: bool = False
     elements: List[ElementCreate] = []
 

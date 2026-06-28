@@ -1,8 +1,10 @@
+import json
 from typing import Optional
-from pydantic import BaseModel, Field
+import httpx
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from app.database import get_db
 from app.models import UserConfig, Layout
 
@@ -26,8 +28,7 @@ class ConfigResponse(BaseModel):
     night_mode_start: Optional[str]
     night_mode_end: Optional[str]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ConfigUpdate(BaseModel):
@@ -47,6 +48,12 @@ class ConfigUpdate(BaseModel):
     night_mode: Optional[bool] = None
     night_mode_start: Optional[str] = None
     night_mode_end: Optional[str] = None
+
+
+class GeocodeResponse(BaseModel):
+    display_name: str
+    latitude: float
+    longitude: float
 
 
 async def get_or_create_config(session: AsyncSession) -> UserConfig:
@@ -115,3 +122,47 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
             engine.set_layout(layout, idle)
 
     return ConfigResponse.model_validate(config)
+
+
+NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
+NOMINATIM_USER_AGENT = "ADS-B LED Display / https://github.com/BChenery/adsbledmatrix"
+
+
+@router.get("/geocode", response_model=GeocodeResponse)
+async def geocode_address(q: str = Query(..., min_length=1, max_length=200)):
+    """Proxy a geocoding request to Nominatim (OpenStreetMap)."""
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        try:
+            response = await client.get(
+                NOMINATIM_URL,
+                params={"q": q, "format": "json", "limit": 1},
+                headers={"User-Agent": NOMINATIM_USER_AGENT},
+            )
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            raise HTTPException(
+                status_code=502,
+                detail=f"Geocoding service returned an error: {e.response.status_code}",
+            )
+        except httpx.RequestError:
+            raise HTTPException(
+                status_code=503,
+                detail="Geocoding service is unreachable. Please enter coordinates manually.",
+            )
+
+    try:
+        results = response.json()
+        if not results:
+            raise HTTPException(status_code=404, detail="Address not found.")
+
+        result = results[0]
+        return GeocodeResponse(
+            display_name=result["display_name"],
+            latitude=float(result["lat"]),
+            longitude=float(result["lon"]),
+        )
+    except (KeyError, ValueError, TypeError, json.JSONDecodeError) as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Unexpected response from geocoding service: {e}",
+        )

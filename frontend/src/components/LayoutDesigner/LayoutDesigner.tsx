@@ -21,8 +21,8 @@ import { Save, Plus } from 'lucide-react';
 
 const DEFAULT_LAYOUT: Layout = {
   name: 'New Layout',
-  width: 512,
-  height: 256,
+  width: 256,
+  height: 128,
   is_default: false,
   elements: [],
 };

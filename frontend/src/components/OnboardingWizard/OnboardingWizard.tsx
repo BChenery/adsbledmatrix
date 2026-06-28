@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '@/api/client';
+import LocationLookup from '@/components/LocationLookup/LocationLookup';
 import { UserConfig } from '@/types/config';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,26 +22,54 @@ export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
   const [loading, setLoading] = useState(false);
   const [rebooting, setRebooting] = useState(false);
   const [rebootError, setRebootError] = useState('');
+  const [online, setOnline] = useState(navigator.onLine);
 
-  const handleLocationSubmit = async () => {
+  useEffect(() => {
+    const handleOnline = () => setOnline(true);
+    const handleOffline = () => setOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const handleLocationSubmit = () => {
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lon);
     if (isNaN(latitude) || isNaN(longitude)) return;
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return;
     setStep(2);
   };
 
   const handleFinish = async () => {
     setLoading(true);
     setRebootError('');
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lon);
+    if (
+      isNaN(latitude) ||
+      isNaN(longitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      setRebootError('Invalid latitude or longitude. Please check your location.');
+      setLoading(false);
+      return;
+    }
     try {
       // Save user configuration
-      await api.put<UserConfig>('/api/config', {
-        latitude: parseFloat(lat),
-        longitude: parseFloat(lon),
+      const savedConfig = await api.put<UserConfig>('/api/config', {
+        latitude,
+        longitude,
         wifi_ssid: wifiSsid || undefined,
         wifi_password: wifiPassword || undefined,
         onboarding_complete: true,
       });
+      _onComplete(savedConfig);
 
       // Trigger WiFi switch and reboot
       setRebooting(true);
@@ -107,6 +136,15 @@ export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
                 <p className="text-sm text-white/50">
                   Enter your latitude and longitude so the display can calculate distances to aircraft.
                 </p>
+                <LocationLookup
+                  latitude={lat ? parseFloat(lat) : 0}
+                  longitude={lon ? parseFloat(lon) : 0}
+                  disabled={!online}
+                  onChange={(latitude, longitude) => {
+                    setLat(latitude.toString());
+                    setLon(longitude.toString());
+                  }}
+                />
 
                 <div className="space-y-3">
                   <div className="space-y-2">

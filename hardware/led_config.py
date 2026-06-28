@@ -1,33 +1,48 @@
 """LED matrix hardware configuration for Raspberry Pi."""
 
-# Default arrangement: 256x128 using four 64x64 panels (2 wide x 2 tall).
-# rpi-rgb-led-matrix supports up to 3 parallel chains on a standard 40-pin Pi.
-# Larger 512x256 arrangements need a Compute Module or an active adapter board.
+
+def calculate_matrix_dimensions(
+    rows: int,
+    cols: int,
+    chain: int,
+    parallel: int,
+    pixel_mapper: str,
+) -> tuple[int, int]:
+    """Return the logical display width and height after applying a pixel mapper.
+
+    This assumes the standard single-chain U-mapper layout used by this
+    project: the chain is folded in half vertically, forming a 2-row grid.
+    """
+    if rows <= 0 or cols <= 0 or chain <= 0 or parallel <= 0:
+        raise ValueError("rows, cols, chain, and parallel must be positive")
+    mapper = (pixel_mapper or "").strip()
+    if mapper.startswith("U-mapper"):
+        if chain % 2 != 0:
+            raise ValueError("U-mapper requires an even chain length")
+        return cols * (chain // 2), rows * 2 * parallel
+    return cols * chain, rows * parallel
+
+
+# Default arrangement: 256x128 using four 128x64 P2 panels wired in a single
+# HUB75 chain with a serpentine (U-mapper) bottom row.
+#
+#   Panel 1 (UL) -> Panel 2 (UR) -> Panel 3 (BR) -> Panel 4 (BL)
+#
+# Total logical display: 256x128 pixels.
+# This requires a single-channel HUB75 adapter board and an external 5V PSU.
 
 LED_MATRIX_CONFIG = {
     "rows": 64,
-    "cols": 64,
-    "chain_length": 2,   # 2 panels wide
-    "parallel": 2,       # 2 panels tall
-    "hardware_mapping": "regular",  # or "adafruit-hat", "adafruit-hat-pwm"
-    "pwm_bits": 11,
-    "brightness": 100,
-    "gpio_slowdown": 2,  # Increase to 2-4 for Pi 4
-    "limit_refresh": 0,
-}
-
-# 512x256 arrangement using sixteen 128x64 panels (4 wide x 4 tall).
-# NOTE: This requires a Raspberry Pi Compute Module or an active adapter board
-# that provides 4+ parallel chains. It will NOT work on a standard Pi 4.
-LED_MATRIX_CONFIG_4x4 = {
-    "rows": 64,
     "cols": 128,
     "chain_length": 4,
-    "parallel": 4,
+    "parallel": 1,
     "hardware_mapping": "regular",
-    "pwm_bits": 11,
-    "brightness": 100,
-    "gpio_slowdown": 2,
+    "pixel_mapper": "U-mapper",
+    "row_address_type": 0,
+    "pwm_bits": 7,
+    "brightness": 70,
+    "gpio_slowdown": 4,
+    "limit_refresh": 0,
 }
 
 # 128x64 panels in a single 1x4 chain (512x64)
