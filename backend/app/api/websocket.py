@@ -5,6 +5,7 @@ from typing import Set
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.services.adsb_receiver import receiver
 from app.services.aircraft_db import db
+from app.services.route_service import route_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["websocket"])
@@ -23,6 +24,7 @@ async def broadcast_aircraft():
         data = []
         for ac in recent:
             enriched = await db.enrich(ac.hex_code)
+            route = await route_service.lookup(ac.callsign) if ac.callsign else None
             data.append({
                 "hex_code": ac.hex_code,
                 "callsign": ac.callsign,
@@ -41,6 +43,9 @@ async def broadcast_aircraft():
                 "messages": ac.messages,
                 "last_seen": ac.last_seen.isoformat() if ac.last_seen else None,
                 "bearing": ac.bearing,
+                "route": f"{route.origin}-{route.destination}" if route else None,
+                "origin": route.origin if route else None,
+                "destination": route.destination if route else None,
             })
 
         message = json.dumps({"type": "aircraft", "data": data})

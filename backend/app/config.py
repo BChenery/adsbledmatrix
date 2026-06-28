@@ -49,6 +49,7 @@ class Settings(BaseSettings):
     led_matrix_brightness: int = 70
     led_matrix_gpio_slowdown: int = 4
     led_matrix_limit_refresh: int = 0
+    led_matrix_flip_vertical: bool = False
 
     # Update
     github_repo: str = "BChenery/adsbledmatrix"

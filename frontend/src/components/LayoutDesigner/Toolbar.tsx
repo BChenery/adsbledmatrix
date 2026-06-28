@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut, Monitor, Moon } from 'lucide-react';
+import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut, Monitor, Moon, Eye } from 'lucide-react';
 
 interface ToolbarProps {
   layouts: Layout[];
@@ -23,6 +23,8 @@ interface ToolbarProps {
   onZoomChange: (zoom: number) => void;
   onSetAsActive: () => void;
   onSetAsIdle: () => void;
+  panelPreview: boolean;
+  onTogglePanelPreview: () => void;
 }
 
 const ZOOM_OPTIONS = [1, 2, 3, 4, 5, 6];
@@ -40,6 +42,8 @@ export default function Toolbar({
   onZoomChange,
   onSetAsActive,
   onSetAsIdle,
+  panelPreview,
+  onTogglePanelPreview,
 }: ToolbarProps) {
   return (
     <div className="h-14 bg-led-panel border-b border-white/10 flex items-center px-4 gap-4">
@@ -86,28 +90,28 @@ export default function Toolbar({
         </div>
       )}
 
-      {activeLayout?.id && (
-        <div className="flex items-center gap-1">
-          <Button
-            variant={activeLayout.id === config?.active_layout_id ? 'default' : 'secondary'}
-            size="sm"
-            onClick={onSetAsActive}
-            className="gap-2"
-          >
-            <Monitor size={14} />
-            {activeLayout.id === config?.active_layout_id ? 'Active Layout' : 'Set Active'}
-          </Button>
-          <Button
-            variant={activeLayout.id === config?.idle_layout_id ? 'default' : 'secondary'}
-            size="sm"
-            onClick={onSetAsIdle}
-            className="gap-2"
-          >
-            <Moon size={14} />
-            {activeLayout.id === config?.idle_layout_id ? 'Idle Layout' : 'Set Idle'}
-          </Button>
-        </div>
-      )}
+      <div className="flex items-center gap-1">
+        <Button
+          variant={activeLayout?.id === config?.active_layout_id ? 'default' : 'secondary'}
+          size="sm"
+          onClick={onSetAsActive}
+          disabled={!activeLayout?.id}
+          className="gap-2"
+        >
+          <Monitor size={14} />
+          {activeLayout?.id === config?.active_layout_id ? 'Active Layout' : 'Set Active'}
+        </Button>
+        <Button
+          variant={activeLayout?.id === config?.idle_layout_id ? 'default' : 'secondary'}
+          size="sm"
+          onClick={onSetAsIdle}
+          disabled={!activeLayout?.id}
+          className="gap-2"
+        >
+          <Moon size={14} />
+          {activeLayout?.id === config?.idle_layout_id ? 'Idle Layout' : 'Set Idle'}
+        </Button>
+      </div>
 
       <div className="flex-1" />
 
@@ -145,6 +149,17 @@ export default function Toolbar({
           <ZoomIn size={16} />
         </Button>
       </div>
+
+      <Button
+        variant={panelPreview ? 'default' : 'secondary'}
+        size="sm"
+        onClick={onTogglePanelPreview}
+        className={`gap-2 ${panelPreview ? 'text-cyan-400' : 'text-white/70'}`}
+        title="Show canvas as the physical panels see it"
+      >
+        <Eye size={16} />
+        {panelPreview ? 'Panel Preview' : 'Logical'}
+      </Button>
 
       <Button
         variant={useMockData ? 'default' : 'secondary'}

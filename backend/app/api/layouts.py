@@ -1,6 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException
@@ -51,6 +51,7 @@ class LayoutUpdate(BaseModel):
     width: Optional[int] = None
     height: Optional[int] = None
     is_default: Optional[bool] = None
+    elements: Optional[List[ElementCreate]] = None
 
 
 class LayoutResponse(BaseModel):
@@ -122,8 +123,19 @@ async def update_layout(layout_id: int, update: LayoutUpdate, session: AsyncSess
     if not layout:
         raise HTTPException(status_code=404, detail="Layout not found")
 
-    for field, value in update.model_dump(exclude_unset=True).items():
+    update_data = update.model_dump(exclude_unset=True)
+    elements = update_data.pop("elements", None)
+
+    for field, value in update_data.items():
         setattr(layout, field, value)
+
+    # Replace elements if provided — the designer always sends the full layout.
+    if elements is not None:
+        await session.execute(delete(LayoutElement).where(LayoutElement.layout_id == layout_id))
+        await session.flush()
+        for elem in elements:
+            db_elem = LayoutElement(layout_id=layout_id, **elem)
+            session.add(db_elem)
 
     await session.commit()
     await session.refresh(layout)

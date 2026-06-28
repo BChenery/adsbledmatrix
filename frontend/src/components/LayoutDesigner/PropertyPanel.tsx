@@ -1,4 +1,4 @@
-import { LayoutElement } from '@/types/layout';
+import { Layout, LayoutElement } from '@/types/layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,16 +12,66 @@ import {
 import { Trash2 } from 'lucide-react';
 
 interface PropertyPanelProps {
+  layout: Layout;
+  onLayoutChange: (layout: Layout) => void;
   element: LayoutElement | null;
   onChange: (el: LayoutElement) => void;
   onDelete: () => void;
 }
 
-export default function PropertyPanel({ element, onChange, onDelete }: PropertyPanelProps) {
+export default function PropertyPanel({ layout, onLayoutChange, element, onChange, onDelete }: PropertyPanelProps) {
   if (!element) {
+    const updateLayout = (field: keyof Layout, value: unknown) => {
+      onLayoutChange({ ...layout, [field]: value });
+    };
+
     return (
-      <div className="w-64 bg-led-panel border-l border-white/10 p-4">
-        <p className="text-sm text-white/30">Select an element to edit its properties</p>
+      <div className="w-64 bg-led-panel border-l border-white/10 flex flex-col">
+        <div className="p-3 border-b border-white/10">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Layout Properties</h3>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="space-y-1">
+            <Label>Name</Label>
+            <Input
+              type="text"
+              value={layout.name}
+              onChange={(e) => updateLayout('name', e.target.value)}
+              placeholder="Layout name"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label>Width</Label>
+              <Input
+                type="number"
+                min={1}
+                value={layout.width}
+                onChange={(e) => updateLayout('width', parseInt(e.target.value) || 1)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>Height</Label>
+              <Input
+                type="number"
+                min={1}
+                value={layout.height}
+                onChange={(e) => updateLayout('height', parseInt(e.target.value) || 1)}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <Label>Description</Label>
+            <Input
+              type="text"
+              value={layout.description || ''}
+              onChange={(e) => updateLayout('description', e.target.value)}
+              placeholder="What this layout is for"
+            />
+          </div>
+        </div>
       </div>
     );
   }

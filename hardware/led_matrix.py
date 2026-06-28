@@ -84,6 +84,18 @@ class LEDMatrix:
         # Ensure image is correct size
         if image.size != (self.width, self.height):
             image = image.resize((self.width, self.height), Image.LANCZOS)
+        # Support panels wired with the first panel at the bottom of the
+        # physical display instead of the top (upside-down U chain).  Rather
+        # than flipping the whole image (which rotates text), swap the top and
+        # bottom panel rows so text stays the right way up.
+        if settings.led_matrix_flip_vertical:
+            half = self.height // 2
+            top = image.crop((0, 0, self.width, half))
+            bottom = image.crop((0, half, self.width, self.height))
+            swapped = Image.new("RGB", (self.width, self.height))
+            swapped.paste(bottom, (0, 0))
+            swapped.paste(top, (0, half))
+            image = swapped
         self.matrix.SetImage(image)
         self._last_frame = image.copy()
 

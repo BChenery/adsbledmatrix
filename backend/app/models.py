@@ -101,8 +101,7 @@ class LayoutElement(Base):
 class Route(Base):
     __tablename__ = "routes"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    callsign = Column(String(20), nullable=False, unique=True, index=True)
+    callsign = Column(String(20), primary_key=True)
     origin = Column(String(10), nullable=False)
     destination = Column(String(10), nullable=False)
 

@@ -562,6 +562,7 @@ class DisplayEngine:
             "panel_type": settings.led_matrix_panel_type,
             "pwm_bits": settings.led_matrix_pwm_bits,
             "gpio_slowdown": settings.led_matrix_gpio_slowdown,
+            "flip_vertical": settings.led_matrix_flip_vertical,
             "spi_enabled": len(spi_devices) > 0,
             "spi_devices": spi_devices,
             "gpio_access": gpio_access,

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/api/client';
 import { UserConfig } from '@/types/config';
+import { Layout } from '@/types/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,12 +16,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity } from 'lucide-react';
+import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
 import { useDisplayDiagnostics } from '@/hooks/useDisplayDiagnostics';
 import { useLayouts } from '@/hooks/useLayout';
+import { useAircraft } from '@/hooks/useAircraft';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
 
 export default function Settings() {
@@ -49,6 +52,7 @@ export default function Settings() {
   const preview = useDisplayPreview();
   const diagnostics = useDisplayDiagnostics();
   const { layouts } = useLayouts();
+  const aircraft = useAircraft();
 
   const activeLayout = layouts.find((l) => l.id === config?.active_layout_id);
   const idleLayout = layouts.find((l) => l.id === config?.idle_layout_id);
@@ -250,67 +254,107 @@ export default function Settings() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm text-white/70">Display</CardTitle>
+          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
+            <Monitor size={14} />
+            Display Behaviour
+          </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <SelectField
-            label="Display Mode"
-            value={config.display_mode}
-            options={['closest', 'cycle3', 'list']}
-            onChange={(v) => update('display_mode', v)}
-          />
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label>Active Layout</Label>
-              <Select
-                value={config.active_layout_id?.toString() || 'none'}
-                onValueChange={(v) => update('active_layout_id', v === 'none' ? undefined : parseInt(v))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="None">
-                    {activeLayout?.name || 'None'}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  {layouts.map((l) => (
-                    <SelectItem key={l.id} value={l.id!.toString()}>
-                      {l.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Idle Layout</Label>
-              <Select
-                value={config.idle_layout_id?.toString() || 'none'}
-                onValueChange={(v) => update('idle_layout_id', v === 'none' ? undefined : parseInt(v))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="None">
-                    {idleLayout?.name || 'None'}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
-                  {layouts.map((l) => (
-                    <SelectItem key={l.id} value={l.id!.toString()}>
-                      {l.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+        <CardContent className="space-y-5">
           <div className="space-y-2">
-            <Label>Cycle Interval (seconds)</Label>
-            <Input
-              type="number"
-              min={1}
-              max={60}
-              value={config.cycle_interval_sec}
-              onChange={(e) => update('cycle_interval_sec', parseInt(e.target.value))}
+            <div className="flex items-center justify-between gap-3">
+              <Label className="flex items-center gap-2">
+                <Plane size={14} className="text-white/50" />
+                When aircraft are detected
+              </Label>
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1">
+                <Radio size={10} />
+                {aircraft.length} in range
+              </Badge>
+            </div>
+            <Select
+              value={config.display_mode}
+              onValueChange={(v) => update('display_mode', v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="closest">Closest aircraft only</SelectItem>
+                <SelectItem value="cycle3">Cycle up to 3 nearest aircraft</SelectItem>
+                <SelectItem value="list">Show list of nearby aircraft</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-white/40">
+              {config.display_mode === 'closest' && (aircraft.length <= 1 ? 'Only one aircraft in range, so the display stays on it.' : 'Keeps the display focused on the single closest aircraft.')}
+              {config.display_mode === 'cycle3' && (aircraft.length <= 1 ? 'Cycle mode is on, but only one aircraft is in range. It will switch when more are detected.' : `Rotates through the ${Math.min(3, aircraft.length)} nearest aircraft every ${config.cycle_interval_sec} seconds.`)}
+              {config.display_mode === 'list' && 'Uses a layout that can show multiple aircraft at once. Pick a list-capable layout below.'}
+            </p>
+          </div>
+
+          {config.display_mode === 'cycle3' && (
+            <div className="space-y-2">
+              <Label>Switch aircraft every</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  min={1}
+                  max={60}
+                  value={config.cycle_interval_sec}
+                  onChange={(e) => update('cycle_interval_sec', parseInt(e.target.value))}
+                  className="w-24"
+                />
+                <span className="text-sm text-white/60">seconds</span>
+              </div>
+            </div>
+          )}
+
+          <Separator />
+
+          <div className="space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <Label className="flex items-center gap-2">
+                  <LayoutTemplate size={14} className="text-white/50" />
+                  Aircraft layout
+                </Label>
+                <p className="text-xs text-white/40 mt-0.5">
+                  Shown when at least one aircraft is in range.
+                </p>
+              </div>
+              {activeLayout && (
+                <Badge variant="default" className="shrink-0">Active</Badge>
+              )}
+            </div>
+            <LayoutPicker
+              layouts={layouts}
+              selectedId={config.active_layout_id}
+              onSelect={(id) => update('active_layout_id', id)}
+              highlightMode="active"
+            />
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <Label className="flex items-center gap-2">
+                  <Crosshair size={14} className="text-white/50" />
+                  Idle / scanning layout
+                </Label>
+                <p className="text-xs text-white/40 mt-0.5">
+                  Shown when no aircraft are detected.
+                </p>
+              </div>
+              {idleLayout && (
+                <Badge variant="secondary" className="shrink-0">Idle</Badge>
+              )}
+            </div>
+            <LayoutPicker
+              layouts={layouts}
+              selectedId={config.idle_layout_id}
+              onSelect={(id) => update('idle_layout_id', id)}
+              highlightMode="idle"
             />
           </div>
         </CardContent>
@@ -400,6 +444,84 @@ function SelectField({ label, value, options, onChange }: { label: string; value
           ))}
         </SelectContent>
       </Select>
+    </div>
+  );
+}
+
+function LayoutPicker({
+  layouts,
+  selectedId,
+  onSelect,
+  highlightMode,
+}: {
+  layouts: Layout[];
+  selectedId?: number;
+  onSelect: (id?: number) => void;
+  highlightMode: 'active' | 'idle';
+}) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {layouts.length === 0 && (
+        <div className="text-sm text-white/40 col-span-full">No layouts available.</div>
+      )}
+      {layouts.map((layout) => {
+        const isSelected = layout.id === selectedId;
+        const elements = layout.elements || [];
+        const hasList = elements.some((e) => e.element_type === 'aircraft_list');
+        return (
+          <div
+            key={layout.id}
+            className={`relative rounded-lg border p-3 transition-colors ${
+              isSelected
+                ? highlightMode === 'active'
+                  ? 'border-primary bg-primary/10'
+                  : 'border-white/40 bg-white/10'
+                : 'border-white/10 bg-white/5 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <div className="text-sm font-medium">{layout.name}</div>
+                <div className="text-xs text-white/40 mt-0.5">
+                  {layout.width}×{layout.height}px
+                </div>
+              </div>
+              <div className="flex flex-wrap justify-end gap-1">
+                {layout.is_default && <Badge variant="secondary" className="text-[10px] px-1 py-0">Default</Badge>}
+                {hasList && (
+                  <Badge variant="outline" className="text-[10px] px-1 py-0 flex items-center gap-1">
+                    <ListOrdered size={10} />
+                    List
+                  </Badge>
+                )}
+              </div>
+            </div>
+            {layout.description && (
+              <p className="text-xs text-white/50 mt-2 line-clamp-2">{layout.description}</p>
+            )}
+            <div className="flex items-center gap-2 mt-3">
+              <Button
+                variant={isSelected ? 'default' : 'secondary'}
+                size="sm"
+                className="flex-1 text-xs"
+                onClick={() => onSelect(layout.id)}
+              >
+                {isSelected ? 'Selected' : `Use for ${highlightMode === 'active' ? 'aircraft' : 'idle'}`}
+              </Button>
+              {isSelected && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-white/50 hover:text-white"
+                  onClick={() => onSelect(undefined)}
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

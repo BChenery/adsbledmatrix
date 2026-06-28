@@ -9,10 +9,11 @@ interface CanvasProps {
   onUpdateElement: (el: LayoutElement) => void;
   aircraft?: Aircraft[];
   zoom?: number;
+  flipVertical?: boolean;
 }
 
 
-export default function Canvas({ layout, selectedElement, onSelectElement, onUpdateElement, aircraft = [], zoom = 1 }: CanvasProps) {
+export default function Canvas({ layout, selectedElement, onSelectElement, onUpdateElement, aircraft = [], zoom = 1, flipVertical = false }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dragging, setDragging] = useState<{ el: LayoutElement; offsetX: number; offsetY: number } | null>(null);
   const [resizing, setResizing] = useState<{ el: LayoutElement; corner: string } | null>(null);
@@ -27,7 +28,10 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
           return ac.distance_display || `${ac.distance_km.toFixed(1)} km`;
         }
         const val = ac[key as keyof Aircraft];
-        return val !== undefined && val !== null ? String(val) : '';
+        if (val !== undefined && val !== null) return String(val);
+        // Route-related fields show a placeholder instead of blank when missing
+        if (['route', 'origin', 'destination'].includes(key)) return '---';
+        return '';
       });
     }
 
@@ -211,7 +215,23 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         handles.forEach((h) => ctx.fillRect(h.x, h.y, 8, 8));
       }
     });
-  }, [layout, selectedElement, getDisplayValue]);
+
+    // If the hardware is configured to swap panel rows, mirror that here so the
+    // designer preview matches the physical LED output.
+    if (flipVertical) {
+      const half = canvas.height / 2;
+      const offscreen = document.createElement('canvas');
+      offscreen.width = canvas.width;
+      offscreen.height = canvas.height;
+      const offCtx = offscreen.getContext('2d');
+      if (offCtx) {
+        offCtx.drawImage(canvas, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(offscreen, 0, half, canvas.width, half, 0, 0, canvas.width, half);
+        ctx.drawImage(offscreen, 0, 0, canvas.width, half, 0, half, canvas.width, half);
+      }
+    }
+  }, [layout, selectedElement, getDisplayValue, flipVertical]);
 
   useEffect(() => {
     draw();

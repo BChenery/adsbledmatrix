@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLayouts } from '@/hooks/useLayout';
 import { useAircraft } from '@/hooks/useAircraft';
+import { useDisplayDiagnostics } from '@/hooks/useDisplayDiagnostics';
 import { Layout, LayoutElement } from '@/types/layout';
 import { UserConfig } from '@/types/config';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -36,10 +39,13 @@ const ELEMENT_TEMPLATES: Record<string, Partial<LayoutElement>> = Object.fromEnt
 export default function LayoutDesigner() {
   const { layouts, loading, create, update } = useLayouts();
   const aircraft = useAircraft();
+  const diagnostics = useDisplayDiagnostics();
   const [activeLayout, setActiveLayout] = useState<Layout | null>(null);
   const [selectedElement, setSelectedElement] = useState<LayoutElement | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [newLayoutName, setNewLayoutName] = useState('');
   const [useMockData, setUseMockData] = useState(false);
+  const [panelPreview, setPanelPreview] = useState(false);
   const [zoom, setZoom] = useState(3);
   const [config, setConfig] = useState<UserConfig | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -116,9 +122,13 @@ export default function LayoutDesigner() {
   };
 
   const handleCreateNew = () => {
-    setActiveLayout({ ...DEFAULT_LAYOUT });
+    setActiveLayout({
+      ...DEFAULT_LAYOUT,
+      name: newLayoutName.trim() || DEFAULT_LAYOUT.name,
+    });
     setSelectedElement(null);
     setShowNewModal(false);
+    setNewLayoutName('');
   };
 
   const handleSelectLayout = async (layout: Layout | null) => {
@@ -151,6 +161,8 @@ export default function LayoutDesigner() {
         onZoomChange={setZoom}
         onSetAsActive={setAsActive}
         onSetAsIdle={setAsIdle}
+        panelPreview={panelPreview}
+        onTogglePanelPreview={() => setPanelPreview((v) => !v)}
       />
 
       <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
@@ -158,9 +170,24 @@ export default function LayoutDesigner() {
           <DialogHeader>
             <DialogTitle>New Layout</DialogTitle>
             <DialogDescription>
-              Create a new layout for the {DEFAULT_LAYOUT.width}×{DEFAULT_LAYOUT.height} LED matrix.
+              Give your layout a name and create it for the {DEFAULT_LAYOUT.width}×{DEFAULT_LAYOUT.height} LED matrix.
             </DialogDescription>
           </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="layout-name">Layout name</Label>
+              <Input
+                id="layout-name"
+                placeholder="e.g. My Custom Layout"
+                value={newLayoutName}
+                onChange={(e) => setNewLayoutName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleCreateNew();
+                }}
+                autoFocus
+              />
+            </div>
+          </div>
           <DialogFooter className="flex gap-2">
             <Button variant="secondary" onClick={() => setShowNewModal(false)} className="flex-1">
               Cancel
@@ -186,11 +213,14 @@ export default function LayoutDesigner() {
                 onUpdateElement={handleUpdateElement}
                 aircraft={useMockData ? MOCK_AIRCRAFT_FLEET : aircraft}
                 zoom={zoom}
+                flipVertical={panelPreview && (diagnostics?.flip_vertical ?? false)}
               />
             </div>
           </div>
 
           <PropertyPanel
+            layout={activeLayout}
+            onLayoutChange={setActiveLayout}
             element={selectedElement}
             onChange={handleUpdateElement}
             onDelete={handleDeleteElement}

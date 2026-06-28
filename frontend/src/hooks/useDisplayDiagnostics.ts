@@ -12,6 +12,7 @@ export interface DisplayDiagnostics {
   cols: number;
   chain: number;
   parallel: number;
+  flip_vertical: boolean;
   spi_enabled: boolean;
   spi_devices: string[];
   gpio_access: boolean;
