@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Save, Plus, ChevronDown, Radio, FlaskConical } from 'lucide-react';
+import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut } from 'lucide-react';
 
 interface ToolbarProps {
   layouts: Layout[];
@@ -16,9 +16,13 @@ interface ToolbarProps {
   onSave: () => void;
   useMockData: boolean;
   onToggleMockData: () => void;
+  zoom: number;
+  onZoomChange: (zoom: number) => void;
 }
 
-export default function Toolbar({ layouts, activeLayout, onSelectLayout, onNew, onSave, useMockData, onToggleMockData }: ToolbarProps) {
+const ZOOM_OPTIONS = [1, 2, 3, 4, 5, 6];
+
+export default function Toolbar({ layouts, activeLayout, onSelectLayout, onNew, onSave, useMockData, onToggleMockData, zoom, onZoomChange }: ToolbarProps) {
   return (
     <div className="h-14 bg-led-panel border-b border-white/10 flex items-center px-4 gap-4">
       <DropdownMenu>
@@ -48,6 +52,41 @@ export default function Toolbar({ layouts, activeLayout, onSelectLayout, onNew, 
       </Button>
 
       <div className="flex-1" />
+
+      <div className="flex items-center gap-1 bg-black/30 rounded-md px-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => onZoomChange(Math.max(1, zoom - 1))}
+          disabled={zoom <= 1}
+        >
+          <ZoomOut size={16} />
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="min-w-[64px] text-xs">
+              {zoom}×
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="center">
+            {ZOOM_OPTIONS.map((z) => (
+              <DropdownMenuItem key={z} onClick={() => onZoomChange(z)}>
+                {z}×
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => onZoomChange(Math.min(6, zoom + 1))}
+          disabled={zoom >= 6}
+        >
+          <ZoomIn size={16} />
+        </Button>
+      </div>
 
       <Button
         variant={useMockData ? 'default' : 'secondary'}

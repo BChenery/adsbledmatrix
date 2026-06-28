@@ -8,10 +8,11 @@ interface CanvasProps {
   onSelectElement: (el: LayoutElement | null) => void;
   onUpdateElement: (el: LayoutElement) => void;
   aircraft?: Aircraft[];
+  zoom?: number;
 }
 
 
-export default function Canvas({ layout, selectedElement, onSelectElement, onUpdateElement, aircraft = [] }: CanvasProps) {
+export default function Canvas({ layout, selectedElement, onSelectElement, onUpdateElement, aircraft = [], zoom = 1 }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [dragging, setDragging] = useState<{ el: LayoutElement; offsetX: number; offsetY: number } | null>(null);
   const [resizing, setResizing] = useState<{ el: LayoutElement; corner: string } | null>(null);
@@ -122,7 +123,9 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
       }
 
       if (text) {
-        ctx.fillText(text, x + 4, y + 4, w - 8);
+        const metrics = ctx.measureText(text);
+        const textX = x + Math.max(0, (w - metrics.width) / 2);
+        ctx.fillText(text, textX, y + 4, w - 8);
       }
 
       // Shape preview
@@ -218,7 +221,7 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    return { x: (e.clientX - rect.left) / zoom, y: (e.clientY - rect.top) / zoom };
   };
 
   const getHandleAt = (mx: number, my: number, el: LayoutElement): string | null => {
@@ -306,11 +309,19 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
   return (
     <div
       className="relative shadow-2xl"
-      style={{ width: layout.width, height: layout.height }}
+      style={{
+        width: layout.width * zoom,
+        height: layout.height * zoom,
+      }}
     >
       <canvas
         ref={canvasRef}
-        className="cursor-crosshair"
+        className="cursor-crosshair block"
+        style={{
+          width: layout.width * zoom,
+          height: layout.height * zoom,
+          imageRendering: 'pixelated',
+        }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}

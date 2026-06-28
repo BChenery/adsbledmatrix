@@ -39,6 +39,7 @@ export default function LayoutDesigner() {
   const [selectedElement, setSelectedElement] = useState<LayoutElement | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [useMockData, setUseMockData] = useState(false);
+  const [zoom, setZoom] = useState(3);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const handleAddElement = (key: string) => {
@@ -122,6 +123,8 @@ export default function LayoutDesigner() {
         onSave={handleSave}
         useMockData={useMockData}
         onToggleMockData={() => setUseMockData((v) => !v)}
+        zoom={zoom}
+        onZoomChange={setZoom}
       />
 
       <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
@@ -156,6 +159,7 @@ export default function LayoutDesigner() {
                 onSelectElement={setSelectedElement}
                 onUpdateElement={handleUpdateElement}
                 aircraft={useMockData ? MOCK_AIRCRAFT_FLEET : aircraft}
+                zoom={zoom}
               />
             </div>
           </div>

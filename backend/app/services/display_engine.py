@@ -200,11 +200,11 @@ class DisplayEngine:
 
         if element.element_type == "text":
             text = element.format_str or ""
-            self._draw_text(draw, x, y, text, color, element.font_family, element.font_size)
+            self._draw_text(draw, x, y, w, text, color, element.font_family, element.font_size)
 
         elif element.element_type == "data_field":
             text = self._resolve_data_field(element.data_field, element.format_str, ctx)
-            self._draw_text(draw, x, y, text, color, element.font_family, element.font_size)
+            self._draw_text(draw, x, y, w, text, color, element.font_family, element.font_size)
 
         elif element.element_type == "image":
             self._draw_image(img, x, y, w, h, element, ctx)
@@ -227,7 +227,18 @@ class DisplayEngine:
         elif element.element_type == "aircraft_list":
             self._draw_aircraft_list(draw, x, y, w, h, element, ctx, color)
 
-    def _draw_text(self, draw: ImageDraw.Draw, x: int, y: int, text: str, color: Tuple[int, int, int], font_family: Optional[str], font_size: Optional[int]):
+    def _draw_text(
+        self,
+        draw: ImageDraw.Draw,
+        x: int,
+        y: int,
+        width: int,
+        text: str,
+        color: Tuple[int, int, int],
+        font_family: Optional[str],
+        font_size: Optional[int],
+        align: str = "center",
+    ):
         size = font_size or 12
         family = font_family or "default"
         key = (family, size)
@@ -240,7 +251,16 @@ class DisplayEngine:
                 self._font_cache[key] = ImageFont.load_default()
 
         font = self._font_cache[key]
-        draw.text((x, y), str(text), fill=color, font=font)
+        text = str(text)
+        bbox = draw.textbbox((0, 0), text, font=font)
+        text_width = bbox[2] - bbox[0]
+        if align == "center":
+            draw_x = x + max(0, (width - text_width) // 2)
+        elif align == "right":
+            draw_x = x + max(0, width - text_width)
+        else:
+            draw_x = x
+        draw.text((draw_x, y), text, fill=color, font=font)
 
     def _draw_image(self, img: Image.Image, x: int, y: int, w: int, h: int, element: Any, ctx: RenderContext):
         path = element.image_path
@@ -300,7 +320,7 @@ class DisplayEngine:
             text = f"▼ {abs(rate)}"
         else:
             text = "→ level"
-        self._draw_text(draw, x, y, text, color, None, h - 4)
+        self._draw_text(draw, x, y, w, text, color, None, h - 4)
 
     def _draw_distance_bar(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, ctx: RenderContext, color: Tuple[int, int, int]):
         dist = ctx.aircraft.distance_km if ctx.aircraft else None
@@ -312,7 +332,7 @@ class DisplayEngine:
         draw.rectangle([x, y, x + w, y + h], outline=(50, 50, 50))
         draw.rectangle([x, y, x + bar_w, y + h], fill=color)
         label = f"{dist:.1f} km"
-        self._draw_text(draw, x, y + h + 2, label, color, None, 10)
+        self._draw_text(draw, x, y + h + 2, w, label, color, None, 10)
 
     def _draw_radar_blip(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, ctx: RenderContext, color: Tuple[int, int, int]):
         import random
@@ -340,14 +360,14 @@ class DisplayEngine:
 
         closest = receiver.get_closest(n=max_rows)
         if not closest:
-            self._draw_text(draw, x, y, "No aircraft", color, None, font_size)
+            self._draw_text(draw, x, y, w, "No aircraft", color, None, font_size, align="left")
             return
 
         # Header
         row_y = y + 4
         if show_header:
             header_text = "  ".join(col.upper()[:8] for col in columns)
-            self._draw_text(draw, x + 4, row_y, header_text, color, None, font_size)
+            self._draw_text(draw, x + 4, row_y, w - 8, header_text, color, None, font_size, align="left")
             row_y += row_height
             # Separator line
             draw.line([x + 4, row_y - 4, x + w - 4, row_y - 4], fill=(50, 50, 50), width=1)
@@ -383,7 +403,7 @@ class DisplayEngine:
                 row_parts.append(str(val)[:10])
             row_text = "  ".join(row_parts)
 
-            self._draw_text(draw, x + 4, row_y, row_text, color, None, font_size)
+            self._draw_text(draw, x + 4, row_y, w - 8, row_text, color, None, font_size, align="left")
             row_y += row_height
             if row_y > y + h:
                 break
