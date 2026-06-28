@@ -71,7 +71,6 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
     const cached = logoCacheRef.current[code];
     if (cached) return;
     const img = new Image();
-    img.crossOrigin = 'anonymous';
     img.src = `/api/aircraft/logo/${code}`;
     img.onload = () => {
       logoCacheRef.current[code] = img;

@@ -210,13 +210,12 @@ class LogoManager:
 
             # The archive extracts to airline-logos-main/
             repo_root = next(extract_path.iterdir())
-            logo_sources = [
-                repo_root / "flightaware_logos",
-                repo_root / "radarbox_logos",
-            ]
+            flightaware_dir = repo_root / "flightaware_logos"
+            radarbox_dir = repo_root / "radarbox_logos"
 
-            tasks = []
-            for source in logo_sources:
+            # Build a per-ICAO lookup, preferring FlightAware over Radarbox.
+            logo_choices: Dict[str, Path] = {}
+            for source in (flightaware_dir, radarbox_dir):
                 if not source.exists():
                     continue
                 for png_file in source.glob("*.png"):
@@ -225,11 +224,16 @@ class LogoManager:
                     if not icao.isalpha():
                         skipped += 1
                         continue
-                    dest = settings.logos_dir / f"{icao}.png"
-                    if dest.exists():
-                        skipped += 1
-                        continue
-                    tasks.append(self._import_bulk_logo(icao, png_file, dest))
+                    if icao not in logo_choices:
+                        logo_choices[icao] = png_file
+
+            tasks = []
+            for icao, png_file in logo_choices.items():
+                dest = settings.logos_dir / f"{icao}.png"
+                if dest.exists():
+                    skipped += 1
+                    continue
+                tasks.append(self._import_bulk_logo(icao, png_file, dest))
 
             if tasks:
                 results = await asyncio.gather(*tasks, return_exceptions=True)
