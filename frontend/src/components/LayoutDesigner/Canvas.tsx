@@ -15,6 +15,7 @@ interface CanvasProps {
 
 export default function Canvas({ layout, selectedElement, onSelectElement, onUpdateElement, aircraft = [], zoom = 1, flipVertical = false }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const logoCacheRef = useRef<Record<string, HTMLImageElement>>({});
   const [dragging, setDragging] = useState<{ el: LayoutElement; offsetX: number; offsetY: number } | null>(null);
   const [resizing, setResizing] = useState<{ el: LayoutElement; corner: string } | null>(null);
 
@@ -62,6 +63,22 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
   const getDisplayValue = useCallback((el: LayoutElement): string => {
     return getAircraftDisplayValue(aircraft[0], el);
   }, [aircraft, getAircraftDisplayValue]);
+
+  const drawRef = useRef<() => void>(() => {});
+
+  const loadLogo = useCallback((icao: string) => {
+    const code = icao.toUpperCase();
+    const cached = logoCacheRef.current[code];
+    if (cached) return;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = `/api/aircraft/logo/${code}`;
+    img.onload = () => {
+      logoCacheRef.current[code] = img;
+      drawRef.current();
+    };
+    logoCacheRef.current[code] = img;
+  }, []);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -119,7 +136,21 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
       else if (el.element_type === 'distance_bar') text = getDisplayValue(el) || '|||||';
       else if (el.element_type === 'radar_blip') text = '◎';
       else if (el.element_type === 'image') {
-        text = aircraft[0]?.operator_icao ? `[${aircraft[0].operator_icao}]` : '[IMG]';
+        const icao = aircraft[0]?.operator_icao;
+        let drewLogo = false;
+        if (icao) {
+          const code = icao.toUpperCase();
+          const logo = logoCacheRef.current[code];
+          if (logo?.complete && logo.naturalWidth > 0) {
+            ctx.drawImage(logo, x, y, w, h);
+            drewLogo = true;
+          } else {
+            loadLogo(icao);
+          }
+        }
+        if (!drewLogo) {
+          text = icao ? `[${icao}]` : '[IMG]';
+        }
       }
       else if (el.element_type === 'shape') text = '';
       else if (el.element_type === 'aircraft_list') {
@@ -232,6 +263,9 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
       }
     }
   }, [layout, selectedElement, getDisplayValue, flipVertical]);
+
+  // Keep a ref to the latest draw function for async logo loading callbacks.
+  drawRef.current = draw;
 
   useEffect(() => {
     draw();

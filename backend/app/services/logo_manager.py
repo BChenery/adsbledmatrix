@@ -21,6 +21,18 @@ logger = logging.getLogger(__name__)
 # Target size for all cached logos
 LOGO_SIZE = (96, 96)
 
+# The aircraft database sometimes stores IATA codes (or wrong codes) in the
+# operator_icao field. Map those to the real ICAO used in the logo filenames.
+_LOGO_ICAO_OVERRIDES: Dict[str, str] = {
+    "VA": "VOZ",      # Virgin Australia
+    "VIR": "VOZ",     # Virgin Australia (wrong ICAO in some DBs)
+    "JQ": "JST",      # Jetstar
+    "JJP": "JST",     # Jetstar (wrong ICAO in some DBs)
+    "TT": "TGW",      # Tigerair
+    "TGG": "TGW",     # Tigerair (wrong ICAO in some DBs)
+    "NZ": "ANZ",      # Air New Zealand
+}
+
 
 class LogoManager:
     """Downloads, resizes, and caches airline logos."""
@@ -82,6 +94,20 @@ class LogoManager:
 
     def _unknown_path(self) -> Path:
         return settings.logos_dir / "UNKNOWN.png"
+
+    def logo_path_for_icao(self, icao_code: str) -> Optional[Path]:
+        """Return the local logo path for an ICAO, applying known overrides."""
+        if not icao_code:
+            return None
+        icao = icao_code.upper()
+        candidates = [icao, _LOGO_ICAO_OVERRIDES.get(icao)]
+        for candidate in candidates:
+            if not candidate:
+                continue
+            path = settings.logos_dir / f"{candidate}.png"
+            if path.exists():
+                return path
+        return None
 
     async def _download_logo(self, icao: str, dest: Path) -> Optional[Path]:
         """Attempt to download logo from multiple sources, resize, and save."""

@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Aircraft, AirlineLogo
 from app.database import AsyncSessionLocal
 from app.config import settings
+from app.services.logo_manager import logo_manager
 
 
 # Operators that should reuse another airline's logo when their own ICAO/logo
@@ -127,9 +128,8 @@ class AircraftDatabase:
         """Return local path to airline logo if cached."""
         if not icao_code:
             return None
-        icao = icao_code.upper()
-        path = settings.logos_dir / f"{icao}.png"
-        if path.exists():
+        path = logo_manager.logo_path_for_icao(icao_code)
+        if path and path.exists():
             return str(path)
         return None
 

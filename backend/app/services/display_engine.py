@@ -8,6 +8,7 @@ from typing import Optional, List, Dict, Any, Tuple
 from PIL import Image, ImageDraw, ImageFont
 from app.config import settings
 from app.services.geocalc import convert_distance, convert_altitude, convert_speed, format_heading
+from app.services.logo_manager import logo_manager
 from app.services.route_service import route_service
 from hardware.led_config import calculate_matrix_dimensions
 
@@ -266,10 +267,8 @@ class DisplayEngine:
         path = element.image_path
         if not path and ctx.enriched:
             icao = ctx.enriched.get("operator_icao")
-            if icao:
-                logo_path = settings.logos_dir / f"{icao}.png"
-                if not logo_path.exists():
-                    logo_path = settings.logos_dir / "UNKNOWN.png"
+            logo_path = logo_manager.logo_path_for_icao(icao)
+            if logo_path and logo_path.exists():
                 path = str(logo_path)
             else:
                 # No ICAO known for this aircraft — fall back to the unknown logo
@@ -474,9 +473,9 @@ class DisplayEngine:
     def _evaluate_condition(self, condition: str, ctx: RenderContext) -> bool:
         if condition == "has_logo":
             icao = (ctx.enriched or {}).get("operator_icao")
-            if icao:
-                if (settings.logos_dir / f"{icao}.png").exists():
-                    return True
+            logo_path = logo_manager.logo_path_for_icao(icao)
+            if logo_path and logo_path.exists():
+                return True
             # Fallback logo is always available
             return (settings.logos_dir / "UNKNOWN.png").exists()
         if condition == "altitude>0":

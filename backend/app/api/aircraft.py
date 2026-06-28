@@ -1,9 +1,11 @@
 from typing import List, Optional
 from pydantic import BaseModel
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
+from fastapi.responses import FileResponse
 from app.services.adsb_receiver import receiver
 from app.services.aircraft_db import db
 from app.services.geocalc import convert_distance, convert_altitude, convert_speed, format_heading
+from app.services.logo_manager import logo_manager
 
 router = APIRouter(prefix="/api/aircraft", tags=["aircraft"])
 
@@ -94,3 +96,12 @@ async def get_closest_aircraft():
         operator=enriched.get("operator"),
         operator_icao=enriched.get("operator_icao"),
     )
+
+
+@router.get("/logo/{icao}")
+async def get_airline_logo(icao: str):
+    """Serve the airline logo PNG for an ICAO/IATA code, applying overrides."""
+    path = logo_manager.logo_path_for_icao(icao)
+    if path and path.exists():
+        return FileResponse(path, media_type="image/png")
+    return Response(status_code=404)
