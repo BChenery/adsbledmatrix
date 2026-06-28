@@ -1,5 +1,8 @@
 import csv
 import logging
+import shutil
+import tempfile
+import zipfile
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -155,6 +158,82 @@ class LogoManager:
                 await session.commit()
         except Exception as e:
             logger.debug(f"Failed to record logo in DB for {icao}: {e}")
+
+    async def bulk_import_from_github(self, repo_url: str = "https://github.com/Jxck-S/airline-logos") -> Dict[str, int]:
+        """Download the airline-logos repo and import all PNG logos locally."""
+        import asyncio
+
+        zip_url = f"{repo_url.rstrip('/')}/archive/refs/heads/main.zip"
+        client = await self._get_client()
+        downloaded = 0
+        skipped = 0
+        failed = 0
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            zip_path = tmp_path / "airline-logos.zip"
+
+            logger.info(f"Downloading airline logos archive from {zip_url}")
+            response = await client.get(zip_url)
+            response.raise_for_status()
+            zip_path.write_bytes(response.content)
+
+            extract_path = tmp_path / "extracted"
+            with zipfile.ZipFile(zip_path, "r") as zf:
+                zf.extractall(extract_path)
+
+            # The archive extracts to airline-logos-main/
+            repo_root = next(extract_path.iterdir())
+            logo_sources = [
+                repo_root / "flightaware_logos",
+                repo_root / "radarbox_logos",
+            ]
+
+            tasks = []
+            for source in logo_sources:
+                if not source.exists():
+                    continue
+                for png_file in source.glob("*.png"):
+                    icao = png_file.stem.upper()
+                    # Skip non-ICAO filenames
+                    if not icao.isalpha():
+                        skipped += 1
+                        continue
+                    dest = settings.logos_dir / f"{icao}.png"
+                    if dest.exists():
+                        skipped += 1
+                        continue
+                    tasks.append(self._import_bulk_logo(icao, png_file, dest))
+
+            if tasks:
+                results = await asyncio.gather(*tasks, return_exceptions=True)
+                for result in results:
+                    if isinstance(result, Exception):
+                        logger.warning(f"Bulk logo import error: {result}")
+                        failed += 1
+                    elif result:
+                        downloaded += 1
+                    else:
+                        failed += 1
+
+        logger.info(f"Bulk logo import complete: {downloaded} downloaded, {skipped} skipped, {failed} failed")
+        return {"downloaded": downloaded, "skipped": skipped, "failed": failed}
+
+    async def _import_bulk_logo(self, icao: str, source: Path, dest: Path) -> bool:
+        """Resize and copy a single logo from the bulk import."""
+        try:
+            data = source.read_bytes()
+            resized = self._resize_image(data)
+            if not resized:
+                return False
+            dest.write_bytes(resized)
+            iata = self._icao_to_iata.get(icao)
+            name = self._icao_to_name.get(icao, "")
+            await self._record_logo(icao, iata, name, dest, str(source))
+            return True
+        except Exception as e:
+            logger.warning(f"Failed to import logo for {icao}: {e}")
+            return False
 
     async def close(self):
         if self._client:

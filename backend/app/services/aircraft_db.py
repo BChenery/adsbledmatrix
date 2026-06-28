@@ -9,6 +9,35 @@ from app.models import Aircraft, AirlineLogo
 from app.database import AsyncSessionLocal
 from app.config import settings
 
+
+# Operators that should reuse another airline's logo when their own ICAO/logo
+# isn't available. Key: operator name fragment (lowercase), Value: target ICAO.
+_OPERATOR_LOGO_ALIASES: Dict[str, str] = {
+    "qantaslink": "QFA",
+    "sunstate": "QFA",
+    "network aviation": "QFA",
+    "national jet systems": "QFA",
+}
+
+
+def _load_operator_to_icao() -> Dict[str, str]:
+    """Build a case-insensitive operator-name -> ICAO lookup from airlines.csv."""
+    mapping: Dict[str, str] = {}
+    csv_path = settings.data_dir / "airlines.csv"
+    if not csv_path.exists():
+        return mapping
+    try:
+        with open(csv_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                icao = row.get("icao", "").strip().upper()
+                name = row.get("name", "").strip()
+                if icao and name:
+                    mapping[name.lower()] = icao
+    except Exception as e:
+        logging.warning(f"Failed to load airline codes for operator lookup: {e}")
+    return mapping
+
 logger = logging.getLogger(__name__)
 
 # Prefer the richer localadsb lookup table, fall back to project root.
@@ -35,6 +64,7 @@ class AircraftDatabase:
     def __init__(self):
         self._cache: Dict[str, Dict[str, Any]] = {}
         self._type_names: Dict[str, str] = _load_type_names()
+        self._operator_to_icao: Dict[str, str] = _load_operator_to_icao()
 
     async def enrich(self, hex_code: str) -> Dict[str, Any]:
         """Return metadata dict for an aircraft hex code."""
@@ -48,14 +78,26 @@ class AircraftDatabase:
             aircraft = result.scalar_one_or_none()
             if aircraft:
                 type_code = aircraft.type_code
+                operator = aircraft.operator
+                operator_icao = aircraft.operator_icao
+                # If the aircraft DB is missing operator_icao, try to infer it
+                # from the operator name using the airline codes CSV or known aliases.
+                if not operator_icao and operator:
+                    op_lower = operator.strip().lower()
+                    operator_icao = self._operator_to_icao.get(op_lower)
+                    if not operator_icao:
+                        for fragment, icao in _OPERATOR_LOGO_ALIASES.items():
+                            if fragment in op_lower:
+                                operator_icao = icao
+                                break
                 data = {
                     "registration": aircraft.registration,
                     "manufacturer": aircraft.manufacturer,
                     "model": aircraft.model,
                     "type_code": type_code,
                     "type_name": self._type_names.get(type_code) if type_code else None,
-                    "operator": aircraft.operator,
-                    "operator_icao": aircraft.operator_icao,
+                    "operator": operator,
+                    "operator_icao": operator_icao,
                 }
                 self._cache[hex_code] = data
                 return data

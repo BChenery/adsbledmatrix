@@ -271,6 +271,12 @@ class DisplayEngine:
                 if not logo_path.exists():
                     logo_path = settings.logos_dir / "UNKNOWN.png"
                 path = str(logo_path)
+            else:
+                # No ICAO known for this aircraft — fall back to the unknown logo
+                # rather than drawing nothing.
+                unknown_path = settings.logos_dir / "UNKNOWN.png"
+                if unknown_path.exists():
+                    path = str(unknown_path)
 
         if not path:
             return
