@@ -501,10 +501,9 @@ class DisplayEngine:
     def fill(self, r: int, g: int, b: int):
         """Fill the LED matrix with a solid color."""
         logger.info(f"Filling LED matrix with color ({r}, {g}, {b})")
-        self._test_color = None
         color = (max(0, min(255, r)), max(0, min(255, g)), max(0, min(255, b)))
-        img = Image.new("RGB", (self.width, self.height), color)
-        self._output_to_matrix(img)
+        # Persist the color by setting _test_color so the render loop keeps it lit.
+        self._test_color = color
 
     def get_diagnostics(self) -> Dict[str, Any]:
         """Return diagnostics about the LED matrix interface."""

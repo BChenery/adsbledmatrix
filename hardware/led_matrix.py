@@ -41,16 +41,36 @@ class LEDMatrix:
                 if settings.led_matrix_multiplexing != 0:
                     options.multiplexing = settings.led_matrix_multiplexing
                 if settings.led_matrix_panel_type:
-                    options.panel_type = settings.led_matrix_panel_type
+                    try:
+                        options.panel_type = settings.led_matrix_panel_type
+                    except Exception as e:
+                        logger.warning(
+                            f"Panel type '{settings.led_matrix_panel_type}' not supported by this "
+                            f"rpi-rgb-led-matrix build: {e}"
+                        )
                 options.pwm_bits = settings.led_matrix_pwm_bits
                 options.brightness = settings.led_matrix_brightness
                 options.gpio_slowdown = settings.led_matrix_gpio_slowdown
                 if settings.led_matrix_limit_refresh > 0:
                     options.limit_refresh_rate_hz = settings.led_matrix_limit_refresh
 
-                options.spwm_row_address_type = settings.led_matrix_spwm_row_address_type
-                options.spwm_register_config = settings.led_matrix_spwm_register_config
-                options.spwm_scan_rows = settings.led_matrix_spwm_scan_rows
+                # SPWM options only exist in the PWM fork of rpi-rgb-led-matrix.
+                # Set them defensively so the same code works with the main library.
+                for spwm_attr in (
+                    "spwm_row_address_type",
+                    "spwm_register_config",
+                    "spwm_scan_rows",
+                ):
+                    if hasattr(options, spwm_attr):
+                        setattr(options, spwm_attr, getattr(settings, f"led_matrix_{spwm_attr}"))
+                    else:
+                        logger.debug(f"RGBMatrixOptions does not support {spwm_attr}")
+
+                if settings.led_matrix_led_rgb_sequence and settings.led_matrix_led_rgb_sequence != "RGB":
+                    if hasattr(options, "led_rgb_sequence"):
+                        options.led_rgb_sequence = settings.led_matrix_led_rgb_sequence
+                    else:
+                        logger.debug("RGBMatrixOptions does not support led_rgb_sequence")
 
                 # rpi-rgb-led-matrix needs root to initialise GPIO timing, then
                 # drops privileges. Make sure it drops back to the service user
