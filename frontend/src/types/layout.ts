@@ -6,6 +6,7 @@ export type ElementType =
   | 'heading_arrow'
   | 'vertical_rate'
   | 'distance_bar'
+  | 'radar'
   | 'radar_blip'
   | 'aircraft_list';
 
@@ -27,6 +28,12 @@ export interface LayoutElement {
   image_url?: string;
   show_if?: string;
   extra?: Record<string, unknown>;
+  range_km?: number;
+  ring_color?: string;
+  dot_color?: string;
+  user_dot_color?: string;
+  show_rings?: boolean;
+  show_ticks?: boolean;
 }
 
 export interface Layout {

@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .slider {
+    -webkit-appearance: none;
+    @apply h-2 w-full cursor-pointer rounded-lg bg-transparent;
+  }
+
+  .slider::-webkit-slider-runnable-track {
+    @apply h-2 rounded-lg;
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)) var(--brightness, 0%),
+      hsla(0, 0%, 100%, 0.1) var(--brightness, 0%)
+    );
+  }
+
+  .slider::-moz-range-track {
+    @apply h-2 rounded-lg;
+    background: linear-gradient(
+      to right,
+      hsl(var(--primary)) var(--brightness, 0%),
+      hsla(0, 0%, 100%, 0.1) var(--brightness, 0%)
+    );
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    @apply -mt-1.5 h-5 w-5 rounded-full border-2 border-led-panel bg-primary shadow-md transition-transform;
+  }
+
+  .slider::-webkit-slider-thumb:hover {
+    @apply scale-110;
+  }
+
+  .slider::-moz-range-thumb {
+    @apply h-5 w-5 rounded-full border-2 border-led-panel bg-primary shadow-md;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 4%;

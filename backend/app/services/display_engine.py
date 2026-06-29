@@ -59,6 +59,7 @@ class DisplayEngine:
         self._cycle_index = 0
         self._cycle_time = datetime.utcnow()
         self._test_color: Optional[Tuple[int, int, int]] = None
+        self._brightness = settings.led_matrix_brightness
 
         from hardware import create_matrix
         self._matrix = create_matrix(self.width, self.height)
@@ -509,11 +510,14 @@ class DisplayEngine:
     def is_hardware_mode(self) -> bool:
         return getattr(self._matrix, "is_hardware", False)
 
+    def set_brightness(self, brightness: int):
+        brightness = max(0, min(100, brightness))
+        self._brightness = brightness
+        if self._matrix and hasattr(self._matrix, "set_brightness"):
+            self._matrix.set_brightness(brightness)
+
     def get_brightness(self) -> int:
-        # Real matrix stores brightness on the object; mock ignores it
-        if self.is_hardware_mode() and hasattr(self._matrix, "matrix") and self._matrix.matrix:
-            return getattr(self._matrix.matrix, "brightness", settings.led_matrix_brightness)
-        return settings.led_matrix_brightness
+        return self._brightness
 
     def get_framebuffer(self) -> Optional[Image.Image]:
         with self._lock:

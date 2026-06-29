@@ -27,6 +27,7 @@ class ConfigResponse(BaseModel):
     night_mode: bool
     night_mode_start: Optional[str]
     night_mode_end: Optional[str]
+    led_matrix_brightness: int
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -48,6 +49,7 @@ class ConfigUpdate(BaseModel):
     night_mode: Optional[bool] = None
     night_mode_start: Optional[str] = None
     night_mode_end: Optional[str] = None
+    led_matrix_brightness: Optional[int] = None
 
 
 class GeocodeResponse(BaseModel):
@@ -120,6 +122,10 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
                 r = await s.execute(select(Layout).where(Layout.id == config.idle_layout_id).options(selectinload(Layout.elements)))
                 idle = r.scalar_one_or_none()
             engine.set_layout(layout, idle)
+
+    if "led_matrix_brightness" in update_data:
+        from app.services.display_engine import engine
+        engine.set_brightness(config.led_matrix_brightness)
 
     return ConfigResponse.model_validate(config)
 

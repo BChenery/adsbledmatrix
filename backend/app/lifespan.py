@@ -2,7 +2,7 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.database import init_db
+from app.database import init_db, migrate_db
 from app.services.adsb_receiver import receiver
 from app.services.display_engine import engine
 from app.services.updater import updater
@@ -17,6 +17,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting ADS-B LED Display...")
     await init_db()
+    await migrate_db()
 
     # Load user config and set receiver location
     from app.database import AsyncSessionLocal
@@ -94,6 +95,7 @@ async def lifespan(app: FastAPI):
             idle = None
 
         engine.set_layout(layout, idle)
+        engine.set_brightness(config.led_matrix_brightness)
 
     await receiver.start()
     await engine.start()

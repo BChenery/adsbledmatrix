@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { api } from '@/api/client';
 import { UserConfig } from '@/types/config';
 import { Layout } from '@/types/layout';
@@ -10,13 +10,21 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio } from 'lucide-react';
+import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
@@ -27,6 +35,9 @@ import LocationLookup from '@/components/LocationLookup/LocationLookup';
 
 export default function Settings() {
   const [config, setConfig] = useState<UserConfig | null>(null);
+  const [powerAction, setPowerAction] = useState<'reboot' | 'shutdown' | null>(null);
+  const [brightnessSaved, setBrightnessSaved] = useState(false);
+  const brightnessTimer = useRef<number | null>(null);
 
   useEffect(() => {
     api.get<UserConfig>('/api/config').then(setConfig);
@@ -35,6 +46,41 @@ export default function Settings() {
   const update = (field: keyof UserConfig, value: unknown) => {
     if (!config) return;
     setConfig({ ...config, [field]: value });
+  };
+
+  const handleBrightnessChange = (value: number) => {
+    if (!config) return;
+    update('led_matrix_brightness', value);
+    setBrightnessSaved(false);
+
+    if (brightnessTimer.current) {
+      window.clearTimeout(brightnessTimer.current);
+    }
+    brightnessTimer.current = window.setTimeout(async () => {
+      try {
+        await api.put('/api/config', { led_matrix_brightness: value });
+        setBrightnessSaved(true);
+      } catch {
+        toast.error('Failed to update brightness');
+      }
+    }, 300);
+  };
+
+  const handlePowerAction = async () => {
+    if (!powerAction) return;
+    try {
+      if (powerAction === 'reboot') {
+        await api.post('/api/system/reboot');
+        toast.success('The Pi is rebooting. This page will become unreachable.');
+      } else {
+        await api.post('/api/system/shutdown');
+        toast.success('The Pi is shutting down. Power off once the LEDs go dark.');
+      }
+    } catch {
+      toast.error(`Failed to ${powerAction === 'reboot' ? 'reboot' : 'shut down'} the Pi`);
+    } finally {
+      setPowerAction(null);
+    }
   };
 
   const handleSave = async () => {
@@ -157,6 +203,44 @@ export default function Settings() {
               </Button>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
+            <Sun size={14} />
+            LED Matrix Brightness
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-white/60">Brightness</span>
+            <span className="font-medium tabular-nums">{config.led_matrix_brightness}%</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Moon size={14} className="text-white/30" />
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={config.led_matrix_brightness}
+              onChange={(e) => handleBrightnessChange(parseInt(e.target.value, 10))}
+              className="slider flex-1"
+              style={{ '--brightness': `${config.led_matrix_brightness}%` } as React.CSSProperties}
+              aria-label="LED matrix brightness"
+            />
+            <Sun size={20} className="text-white/70" />
+          </div>
+          <div className="flex items-center justify-between text-xs">
+            <p className="text-white/40">
+              Drag to adjust the live LED matrix brightness. Changes are applied immediately.
+            </p>
+            {brightnessSaved && (
+              <span className="text-led-accent transition-opacity duration-500">Saved</span>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -420,12 +504,70 @@ export default function Settings() {
         </Button>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
+            <Power size={14} />
+            System Power
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-white/40">
+            Reboot or shut down the Raspberry Pi. These actions disconnect the device from the network.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="secondary"
+              className="w-full gap-2"
+              onClick={() => setPowerAction('reboot')}
+            >
+              <RotateCcw size={16} />
+              Reboot Pi
+            </Button>
+            <Button
+              variant="destructive"
+              className="w-full gap-2"
+              onClick={() => setPowerAction('shutdown')}
+            >
+              <PowerOff size={16} />
+              Shut Down Pi
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Separator />
 
       <Button variant="destructive" onClick={handleResetOnboarding} className="w-full gap-2">
         <RotateCcw size={16} />
         Reset Onboarding
       </Button>
+
+      <Dialog open={!!powerAction} onOpenChange={() => setPowerAction(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {powerAction === 'reboot' ? 'Reboot the Pi?' : 'Shut down the Pi?'}
+            </DialogTitle>
+            <DialogDescription>
+              {powerAction === 'reboot'
+                ? 'The Raspberry Pi will restart. You will lose connection to this page until it comes back online.'
+                : 'The Raspberry Pi will power off. You will need to cycle power to turn it back on.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPowerAction(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant={powerAction === 'shutdown' ? 'destructive' : 'default'}
+              onClick={handlePowerAction}
+            >
+              {powerAction === 'reboot' ? 'Reboot Pi' : 'Shut Down Pi'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

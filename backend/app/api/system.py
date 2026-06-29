@@ -71,6 +71,20 @@ async def restart_system():
     return {"message": "Restarting..."}
 
 
+@router.post("/reboot")
+async def reboot_system():
+    import subprocess
+    subprocess.Popen(["bash", "-c", "sleep 2 && sudo reboot"])
+    return {"message": "Rebooting the Pi..."}
+
+
+@router.post("/shutdown")
+async def shutdown_system():
+    import subprocess
+    subprocess.Popen(["bash", "-c", "sleep 2 && sudo shutdown now"])
+    return {"message": "Shutting down the Pi..."}
+
+
 class WiFiApplyRequest(BaseModel):
     ssid: str
     password: str

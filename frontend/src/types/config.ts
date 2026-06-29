@@ -14,4 +14,5 @@ export interface UserConfig {
   night_mode: boolean;
   night_mode_start?: string;
   night_mode_end?: string;
+  led_matrix_brightness: number;
 }
