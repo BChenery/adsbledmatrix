@@ -159,6 +159,24 @@ export default function LayoutDesigner() {
     }
   };
 
+  const handleRename = async (name: string) => {
+    if (!activeLayout?.id || name === activeLayout.name) return;
+    const normalized = normalizeLayoutName(name, activeLayout.name);
+    try {
+      const updated = await update(activeLayout.id, { name: normalized });
+      setActiveLayout(updated);
+      toast.success('Layout renamed');
+    } catch (err: any) {
+      const message = err?.response?.detail
+        ? JSON.stringify(err.response.detail)
+        : err instanceof Error
+        ? err.message
+        : 'Rename failed';
+      toast.error(`Rename failed: ${message}`);
+      throw err;
+    }
+  };
+
   const handleSelectLayout = async (layout: Layout | null) => {
     if (!layout || !layout.id) {
       setActiveLayout(layout);
@@ -191,6 +209,9 @@ export default function LayoutDesigner() {
         onSetAsIdle={setAsIdle}
         panelPreview={panelPreview}
         onTogglePanelPreview={() => setPanelPreview((v) => !v)}
+        layoutName={activeLayout?.name || ''}
+        onRename={handleRename}
+        canRename={!!activeLayout?.id}
       />
 
       <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
