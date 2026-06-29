@@ -179,7 +179,11 @@ async def main():
         )
         print(result.stdout)
         if result.returncode != 0:
-            print(f"  ⚠ localadsb import warning: {result.stderr.strip() or 'unknown'}")
+            print(
+                f"  ✗ localadsb import failed: {result.stderr.strip() or 'unknown'}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
 
     # Write sync timestamp
     sync_file = settings.data_dir / ".last_sync"

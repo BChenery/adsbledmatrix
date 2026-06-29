@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
       contents: write
@@ -29,16 +29,13 @@ jobs:
         with:
           repository: BChenery/localadsb
           path: _localadsb
+          token: ${{ secrets.LOCALADSB_PAT }}
 
       - name: Copy data assets
         run: |
           mkdir -p data/localadsb
           cp _localadsb/flights.db data/localadsb/flights.db
           cp _localadsb/aircraft_type_names.json data/localadsb/aircraft_type_names.json
-          # Optional route enrichment files
-          for f in _localadsb/qantas_routes.json _localadsb/acars_routes.json; do
-            if [ -f "$f" ]; then cp "$f" data/localadsb/; fi
-          done
 
       - name: Verify source database
         run: |
@@ -78,4 +75,5 @@ jobs:
         with:
           commit_message: 'chore: sync localadsb data'
           file_pattern: 'data/localadsb/* data/aircraft_db.sqlite3'
+          # aircraft_db.sqlite3 is gitignored, so force-add is required
           add_options: '-f'

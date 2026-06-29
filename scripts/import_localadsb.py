@@ -78,6 +78,16 @@ def _manufacturer_from_model(model: str) -> str | None:
     return None
 
 
+def _validate_source_db(conn: sqlite3.Connection) -> None:
+    """Abort if the source flights.db is missing required tables."""
+    required = {"aircraft_registry", "aero_fleet", "route_cache"}
+    cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    found = {row[0] for row in cur.fetchall()}
+    missing = required - found
+    if missing:
+        raise RuntimeError(f"flights.db missing required tables: {sorted(missing)}")
+
+
 def import_aircraft() -> int:
     if not FLIGHTS_DB.exists():
         logger.error("flights.db not found at %s", FLIGHTS_DB)
@@ -87,6 +97,8 @@ def import_aircraft() -> int:
 
     src = sqlite3.connect(FLIGHTS_DB)
     src.row_factory = sqlite3.Row
+    _validate_source_db(src)
+
     dst = sqlite3.connect(DB_PATH)
     dst.row_factory = sqlite3.Row
 
