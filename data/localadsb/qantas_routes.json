@@ -1,0 +1,8381 @@
+[
+  {
+    "flight": "QFA1681",
+    "from_city": "Gold Coast",
+    "to_city": "Adelaide",
+    "origin": "YBCG",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA7959",
+    "from_city": "Gold Coast",
+    "to_city": "Adelaide",
+    "origin": "YBCG",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2422",
+    "from_city": "Gold Coast",
+    "to_city": "Brisbane",
+    "origin": "YBCG",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2426",
+    "from_city": "Gold Coast",
+    "to_city": "Brisbane",
+    "origin": "YBCG",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0723",
+    "from_city": "Adelaide",
+    "to_city": "Alice Springs",
+    "origin": "YPAD",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA0660",
+    "from_city": "Adelaide",
+    "to_city": "Brisbane",
+    "origin": "YPAD",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0662",
+    "from_city": "Adelaide",
+    "to_city": "Brisbane",
+    "origin": "YPAD",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0664",
+    "from_city": "Adelaide",
+    "to_city": "Brisbane",
+    "origin": "YPAD",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0656",
+    "from_city": "Adelaide",
+    "to_city": "Brisbane",
+    "origin": "YPAD",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0706",
+    "from_city": "Adelaide",
+    "to_city": "Canberra",
+    "origin": "YPAD",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2092",
+    "from_city": "Adelaide",
+    "to_city": "Canberra",
+    "origin": "YPAD",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0708",
+    "from_city": "Adelaide",
+    "to_city": "Canberra",
+    "origin": "YPAD",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0754",
+    "from_city": "Adelaide",
+    "to_city": "Darwin",
+    "origin": "YPAD",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA1879",
+    "from_city": "Adelaide",
+    "to_city": "Gold Coast",
+    "origin": "YPAD",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA0670",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0674",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0676",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0678",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0680",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2066",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0682",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0686",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0684",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0690",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0688",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0692",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0694",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0696",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2600",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2604",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2606",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2608",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2612",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2614",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2616",
+    "from_city": "Adelaide",
+    "to_city": "Melbourne",
+    "origin": "YPAD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0593",
+    "from_city": "Adelaide",
+    "to_city": "Perth",
+    "origin": "YPAD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0587",
+    "from_city": "Adelaide",
+    "to_city": "Perth",
+    "origin": "YPAD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0585",
+    "from_city": "Adelaide",
+    "to_city": "Perth",
+    "origin": "YPAD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0595",
+    "from_city": "Adelaide",
+    "to_city": "Perth",
+    "origin": "YPAD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0599",
+    "from_city": "Adelaide",
+    "to_city": "Perth",
+    "origin": "YPAD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA2267",
+    "from_city": "Adelaide",
+    "to_city": "Port Lincoln",
+    "origin": "YPAD",
+    "destination": "YPLC"
+  },
+  {
+    "flight": "QFA2271",
+    "from_city": "Adelaide",
+    "to_city": "Port Lincoln",
+    "origin": "YPAD",
+    "destination": "YPLC"
+  },
+  {
+    "flight": "QFA2273",
+    "from_city": "Adelaide",
+    "to_city": "Port Lincoln",
+    "origin": "YPAD",
+    "destination": "YPLC"
+  },
+  {
+    "flight": "QFA2275",
+    "from_city": "Adelaide",
+    "to_city": "Port Lincoln",
+    "origin": "YPAD",
+    "destination": "YPLC"
+  },
+  {
+    "flight": "QFA0730",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0732",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0740",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0738",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0750",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0736",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0752",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0756",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0764",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0766",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0774",
+    "from_city": "Adelaide",
+    "to_city": "Sydney",
+    "origin": "YPAD",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2202",
+    "from_city": "Albury",
+    "to_city": "Sydney",
+    "origin": "YMAY",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2206",
+    "from_city": "Albury",
+    "to_city": "Sydney",
+    "origin": "YMAY",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2210",
+    "from_city": "Albury",
+    "to_city": "Sydney",
+    "origin": "YMAY",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2214",
+    "from_city": "Albury",
+    "to_city": "Sydney",
+    "origin": "YMAY",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0722",
+    "from_city": "Alice Springs",
+    "to_city": "Adelaide",
+    "origin": "YBAS",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA1941",
+    "from_city": "Alice Springs",
+    "to_city": "Ayers Rock",
+    "origin": "YBAS",
+    "destination": "YAYE"
+  },
+  {
+    "flight": "QFA1799",
+    "from_city": "Alice Springs",
+    "to_city": "Brisbane",
+    "origin": "YBAS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0982",
+    "from_city": "Alice Springs",
+    "to_city": "Brisbane",
+    "origin": "YBAS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1948",
+    "from_city": "Alice Springs",
+    "to_city": "Cairns",
+    "origin": "YBAS",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA1936",
+    "from_city": "Alice Springs",
+    "to_city": "Darwin",
+    "origin": "YBAS",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA1938",
+    "from_city": "Alice Springs",
+    "to_city": "Darwin",
+    "origin": "YBAS",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA0797",
+    "from_city": "Alice Springs",
+    "to_city": "Melbourne",
+    "origin": "YBAS",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1935",
+    "from_city": "Alice Springs",
+    "to_city": "Perth",
+    "origin": "YBAS",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0791",
+    "from_city": "Alice Springs",
+    "to_city": "Sydney",
+    "origin": "YBAS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2013",
+    "from_city": "Alice Springs",
+    "to_city": "Sydney",
+    "origin": "YBAS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2021",
+    "from_city": "Alice Springs",
+    "to_city": "Sydney",
+    "origin": "YBAS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2025",
+    "from_city": "Alice Springs",
+    "to_city": "Sydney",
+    "origin": "YBAS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2023",
+    "from_city": "Alice Springs",
+    "to_city": "Sydney",
+    "origin": "YBAS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2031",
+    "from_city": "Alice Springs",
+    "to_city": "Sydney",
+    "origin": "YBAS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0124",
+    "from_city": "Auckland",
+    "to_city": "Brisbane",
+    "origin": "NZAA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0126",
+    "from_city": "Auckland",
+    "to_city": "Brisbane",
+    "origin": "NZAA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0132",
+    "from_city": "Auckland",
+    "to_city": "Melbourne",
+    "origin": "NZAA",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0136",
+    "from_city": "Auckland",
+    "to_city": "Melbourne",
+    "origin": "NZAA",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0134",
+    "from_city": "Auckland",
+    "to_city": "Melbourne",
+    "origin": "NZAA",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0050",
+    "from_city": "Auckland",
+    "to_city": "Sydney",
+    "origin": "NZAA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0142",
+    "from_city": "Auckland",
+    "to_city": "Sydney",
+    "origin": "NZAA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0114",
+    "from_city": "Auckland",
+    "to_city": "Sydney",
+    "origin": "NZAA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0056",
+    "from_city": "Auckland",
+    "to_city": "Sydney",
+    "origin": "NZAA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0044",
+    "from_city": "Auckland",
+    "to_city": "Sydney",
+    "origin": "NZAA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1940",
+    "from_city": "Ayers Rock",
+    "to_city": "Alice Springs",
+    "origin": "YAYE",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA1854",
+    "from_city": "Ayers Rock",
+    "to_city": "Cairns",
+    "origin": "YAYE",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0729",
+    "from_city": "Ayers Rock",
+    "to_city": "Sydney",
+    "origin": "YAYE",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0024",
+    "from_city": "Bangkok",
+    "to_city": "Sydney",
+    "origin": "VTBS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2393",
+    "from_city": "Biloela",
+    "to_city": "Brisbane",
+    "origin": "YBIL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2397",
+    "from_city": "Biloela",
+    "to_city": "Brisbane",
+    "origin": "YBIL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2399",
+    "from_city": "Biloela",
+    "to_city": "Brisbane",
+    "origin": "YBIL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0661",
+    "from_city": "Brisbane",
+    "to_city": "Adelaide",
+    "origin": "YBBN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0667",
+    "from_city": "Brisbane",
+    "to_city": "Adelaide",
+    "origin": "YBBN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0663",
+    "from_city": "Brisbane",
+    "to_city": "Adelaide",
+    "origin": "YBBN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0665",
+    "from_city": "Brisbane",
+    "to_city": "Adelaide",
+    "origin": "YBBN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA1798",
+    "from_city": "Brisbane",
+    "to_city": "Alice Springs",
+    "origin": "YBBN",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA0981",
+    "from_city": "Brisbane",
+    "to_city": "Alice Springs",
+    "origin": "YBBN",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA0123",
+    "from_city": "Brisbane",
+    "to_city": "Auckland",
+    "origin": "YBBN",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0125",
+    "from_city": "Brisbane",
+    "to_city": "Auckland",
+    "origin": "YBBN",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA2532",
+    "from_city": "Brisbane",
+    "to_city": "Barcaldine",
+    "origin": "YBBN",
+    "destination": "YBAR"
+  },
+  {
+    "flight": "QFA2390",
+    "from_city": "Brisbane",
+    "to_city": "Biloela",
+    "origin": "YBBN",
+    "destination": "YBIL"
+  },
+  {
+    "flight": "QFA2396",
+    "from_city": "Brisbane",
+    "to_city": "Biloela",
+    "origin": "YBBN",
+    "destination": "YBIL"
+  },
+  {
+    "flight": "QFA2398",
+    "from_city": "Brisbane",
+    "to_city": "Biloela",
+    "origin": "YBBN",
+    "destination": "YBIL"
+  },
+  {
+    "flight": "QFA2530",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA2534",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA2532",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA1030",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA2320",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA2326",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA2322",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA2324",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA2328",
+    "from_city": "Brisbane",
+    "to_city": "Blackall",
+    "origin": "YBBN",
+    "destination": "YBCK"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Brisbane",
+    "to_city": "Cairns",
+    "origin": "YBBN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0798",
+    "from_city": "Brisbane",
+    "to_city": "Cairns",
+    "origin": "YBBN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Brisbane",
+    "to_city": "Cairns",
+    "origin": "YBBN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0782",
+    "from_city": "Brisbane",
+    "to_city": "Cairns",
+    "origin": "YBBN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0784",
+    "from_city": "Brisbane",
+    "to_city": "Cairns",
+    "origin": "YBBN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Brisbane",
+    "to_city": "Cairns",
+    "origin": "YBBN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA1750",
+    "from_city": "Brisbane",
+    "to_city": "Cairns",
+    "origin": "YBBN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0786",
+    "from_city": "Brisbane",
+    "to_city": "Cairns",
+    "origin": "YBBN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0951",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0953",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0955",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2567",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0957",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0961",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0959",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2540",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2579",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2544",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2550",
+    "from_city": "Brisbane",
+    "to_city": "Canberra",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0824",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2400",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2402",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2404",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2408",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2410",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2412",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2414",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2416",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2418",
+    "from_city": "Brisbane",
+    "to_city": "Darwin",
+    "origin": "YBBN",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA1702",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA1704",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2338",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA1706",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2336",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA1712",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA1708",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2342",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA1714",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA1716",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2344",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2346",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2374",
+    "from_city": "Brisbane",
+    "to_city": "Hamilton Island",
+    "origin": "YBBN",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2376",
+    "from_city": "Brisbane",
+    "to_city": "Hamilton Island",
+    "origin": "YBBN",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2378",
+    "from_city": "Brisbane",
+    "to_city": "Hamilton Island",
+    "origin": "YBBN",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2380",
+    "from_city": "Brisbane",
+    "to_city": "Hamilton Island",
+    "origin": "YBBN",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2382",
+    "from_city": "Brisbane",
+    "to_city": "Hamilton Island",
+    "origin": "YBBN",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2384",
+    "from_city": "Brisbane",
+    "to_city": "Hamilton Island",
+    "origin": "YBBN",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA0097",
+    "from_city": "Brisbane",
+    "to_city": "Hamilton Island",
+    "origin": "YBBN",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA0991",
+    "from_city": "Brisbane",
+    "to_city": "Karratha",
+    "origin": "YBBN",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA2530",
+    "from_city": "Brisbane",
+    "to_city": "Launceston",
+    "origin": "YBBN",
+    "destination": "YMLT"
+  },
+  {
+    "flight": "QFA2534",
+    "from_city": "Brisbane",
+    "to_city": "Launceston",
+    "origin": "YBBN",
+    "destination": "YMLT"
+  },
+  {
+    "flight": "QFA2532",
+    "from_city": "Brisbane",
+    "to_city": "Launceston",
+    "origin": "YBBN",
+    "destination": "YMLT"
+  },
+  {
+    "flight": "QFA2440",
+    "from_city": "Brisbane",
+    "to_city": "Launceston",
+    "origin": "YBBN",
+    "destination": "YMLT"
+  },
+  {
+    "flight": "QFA0015",
+    "from_city": "Brisbane",
+    "to_city": "Los Angeles",
+    "origin": "YBBN",
+    "destination": "KLAX"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA1760",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2514",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2512",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA1764",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA1766",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA1768",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2520",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA0019",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA0605",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0609",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0611",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0613",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0615",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0617",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0619",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0621",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0623",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0625",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0627",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0631",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0635",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0637",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0639",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2452",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2448",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2450",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2506",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2456",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2454",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2458",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2460",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2462",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2464",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2466",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2522",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2524",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2528",
+    "from_city": "Brisbane",
+    "to_city": "Moranbah",
+    "origin": "YBBN",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA1076",
+    "from_city": "Brisbane",
+    "to_city": "Mount Isa",
+    "origin": "YBBN",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA1068",
+    "from_city": "Brisbane",
+    "to_city": "Mount Isa",
+    "origin": "YBBN",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA1078",
+    "from_city": "Brisbane",
+    "to_city": "Mount Isa",
+    "origin": "YBBN",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA2421",
+    "from_city": "Brisbane",
+    "to_city": "Mount Isa",
+    "origin": "YBBN",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA2425",
+    "from_city": "Brisbane",
+    "to_city": "Mount Isa",
+    "origin": "YBBN",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA2427",
+    "from_city": "Brisbane",
+    "to_city": "Mount Isa",
+    "origin": "YBBN",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA0089",
+    "from_city": "Brisbane",
+    "to_city": "Mount Isa",
+    "origin": "YBBN",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA0589",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0651",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0597",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1209",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0767",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0983",
+    "from_city": "Brisbane",
+    "to_city": "Port Hedland",
+    "origin": "YBBN",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2362",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA1728",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2352",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA1730",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2364",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA1736",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2356",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2366",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2358",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA1740",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2368",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA1742",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2360",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA1744",
+    "from_city": "Brisbane",
+    "to_city": "Rockhampton",
+    "origin": "YBBN",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2536",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2546",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2538",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2552",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2540",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2574",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2542",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2544",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2548",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2570",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2550",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2572",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2558",
+    "from_city": "Brisbane",
+    "to_city": "Roma",
+    "origin": "YBBN",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA0051",
+    "from_city": "Brisbane",
+    "to_city": "Singapore",
+    "origin": "YBBN",
+    "destination": "WSSS"
+  },
+  {
+    "flight": "QFA0020",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0501",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0008",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0503",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0505",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0507",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0509",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0511",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0513",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0515",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0517",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0521",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0525",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0529",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0533",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0537",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0539",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0541",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0545",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0547",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0549",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0551",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0553",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0555",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0557",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0559",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0968",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0970",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0972",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0974",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0976",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0978",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA1031",
+    "from_city": "Brisbane",
+    "to_city": "Brisbane",
+    "origin": "YBBN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1051",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1925",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1073",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1927",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1929",
+    "from_city": "Brisbane",
+    "to_city": "Perth",
+    "origin": "YBBN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1043",
+    "from_city": "Brisbane",
+    "to_city": "Sydney",
+    "origin": "YBBN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2319",
+    "from_city": "Brisbane",
+    "to_city": "Brisbane",
+    "origin": "YBBN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2323",
+    "from_city": "Brisbane",
+    "to_city": "Brisbane",
+    "origin": "YBBN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2321",
+    "from_city": "Brisbane",
+    "to_city": "Brisbane",
+    "origin": "YBBN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2327",
+    "from_city": "Brisbane",
+    "to_city": "Brisbane",
+    "origin": "YBBN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2329",
+    "from_city": "Brisbane",
+    "to_city": "Brisbane",
+    "origin": "YBBN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2325",
+    "from_city": "Brisbane",
+    "to_city": "Brisbane",
+    "origin": "YBBN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1949",
+    "from_city": "Cairns",
+    "to_city": "Alice Springs",
+    "origin": "YBCS",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA1851",
+    "from_city": "Cairns",
+    "to_city": "Ayers Rock",
+    "origin": "YBCS",
+    "destination": "YAYE"
+  },
+  {
+    "flight": "QFA0799",
+    "from_city": "Cairns",
+    "to_city": "Brisbane",
+    "origin": "YBCS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1751",
+    "from_city": "Cairns",
+    "to_city": "Brisbane",
+    "origin": "YBCS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Cairns",
+    "to_city": "Brisbane",
+    "origin": "YBCS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0709",
+    "from_city": "Cairns",
+    "to_city": "Brisbane",
+    "origin": "YBCS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0649",
+    "from_city": "Cairns",
+    "to_city": "Brisbane",
+    "origin": "YBCS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Cairns",
+    "to_city": "Brisbane",
+    "origin": "YBCS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0655",
+    "from_city": "Cairns",
+    "to_city": "Brisbane",
+    "origin": "YBCS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1944",
+    "from_city": "Cairns",
+    "to_city": "Darwin",
+    "origin": "YBCS",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA1874",
+    "from_city": "Cairns",
+    "to_city": "Darwin",
+    "origin": "YBCS",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Cairns",
+    "to_city": "Gladstone",
+    "origin": "YBCS",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Cairns",
+    "to_city": "Gladstone",
+    "origin": "YBCS",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA1944",
+    "from_city": "Cairns",
+    "to_city": "Gold Coast",
+    "origin": "YBCS",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA2503",
+    "from_city": "Cairns",
+    "to_city": "Hamilton Island",
+    "origin": "YBCS",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2488",
+    "from_city": "Cairns",
+    "to_city": "Hamilton Island",
+    "origin": "YBCS",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2492",
+    "from_city": "Cairns",
+    "to_city": "Hamilton Island",
+    "origin": "YBCS",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2490",
+    "from_city": "Cairns",
+    "to_city": "Hamilton Island",
+    "origin": "YBCS",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2496",
+    "from_city": "Cairns",
+    "to_city": "Hamilton Island",
+    "origin": "YBCS",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2498",
+    "from_city": "Cairns",
+    "to_city": "Hamilton Island",
+    "origin": "YBCS",
+    "destination": "YBHM"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Cairns",
+    "to_city": "Mackay",
+    "origin": "YBCS",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2305",
+    "from_city": "Cairns",
+    "to_city": "Mackay",
+    "origin": "YBCS",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Cairns",
+    "to_city": "Mackay",
+    "origin": "YBCS",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2315",
+    "from_city": "Cairns",
+    "to_city": "Mackay",
+    "origin": "YBCS",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA0703",
+    "from_city": "Cairns",
+    "to_city": "Melbourne",
+    "origin": "YBCS",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2446",
+    "from_city": "Cairns",
+    "to_city": "Moranbah",
+    "origin": "YBCS",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA0191",
+    "from_city": "Cairns",
+    "to_city": "Port Moresby",
+    "origin": "YBCS",
+    "destination": "AYPY"
+  },
+  {
+    "flight": "QFA0197",
+    "from_city": "Cairns",
+    "to_city": "Port Moresby",
+    "origin": "YBCS",
+    "destination": "AYPY"
+  },
+  {
+    "flight": "QFA0193",
+    "from_city": "Cairns",
+    "to_city": "Port Moresby",
+    "origin": "YBCS",
+    "destination": "AYPY"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Cairns",
+    "to_city": "Rockhampton",
+    "origin": "YBCS",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Cairns",
+    "to_city": "Rockhampton",
+    "origin": "YBCS",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA0925",
+    "from_city": "Cairns",
+    "to_city": "Sydney",
+    "origin": "YBCS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0923",
+    "from_city": "Cairns",
+    "to_city": "Sydney",
+    "origin": "YBCS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0927",
+    "from_city": "Cairns",
+    "to_city": "Sydney",
+    "origin": "YBCS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2305",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2446",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2317",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2303",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2313",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2309",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2315",
+    "from_city": "Cairns",
+    "to_city": "Townsville",
+    "origin": "YBCS",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2480",
+    "from_city": "Cairns",
+    "to_city": "Weipa",
+    "origin": "YBCS",
+    "destination": "YBWP"
+  },
+  {
+    "flight": "QFA2478",
+    "from_city": "Cairns",
+    "to_city": "Weipa",
+    "origin": "YBCS",
+    "destination": "YBWP"
+  },
+  {
+    "flight": "QFA2482",
+    "from_city": "Cairns",
+    "to_city": "Weipa",
+    "origin": "YBCS",
+    "destination": "YBWP"
+  },
+  {
+    "flight": "QFA0713",
+    "from_city": "Canberra",
+    "to_city": "Adelaide",
+    "origin": "YSCB",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2091",
+    "from_city": "Canberra",
+    "to_city": "Adelaide",
+    "origin": "YSCB",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0737",
+    "from_city": "Canberra",
+    "to_city": "Adelaide",
+    "origin": "YSCB",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0948",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0950",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0952",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0956",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2568",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0960",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0962",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0795",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0477",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0811",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0763",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2133",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0853",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2139",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0851",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0815",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2137",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0819",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0833",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0483",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0821",
+    "from_city": "Canberra",
+    "to_city": "Melbourne",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0717",
+    "from_city": "Canberra",
+    "to_city": "Perth",
+    "origin": "YSCB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0719",
+    "from_city": "Canberra",
+    "to_city": "Perth",
+    "origin": "YSCB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1460",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0560",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1464",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0872",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1462",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0564",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1466",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0704",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1468",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1472",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1474",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1478",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1422",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1480",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1476",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0878",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1486",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1428",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0562",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1484",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0806",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1496",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1494",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2541",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2580",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2545",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2551",
+    "from_city": "Canberra",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2541",
+    "from_city": "Canberra",
+    "to_city": "Roma",
+    "origin": "YSCB",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2545",
+    "from_city": "Canberra",
+    "to_city": "Roma",
+    "origin": "YSCB",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA2551",
+    "from_city": "Canberra",
+    "to_city": "Roma",
+    "origin": "YSCB",
+    "destination": "YROM"
+  },
+  {
+    "flight": "QFA0046",
+    "from_city": "Canberra",
+    "to_city": "Sydney",
+    "origin": "YSCB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2468",
+    "from_city": "Canberra",
+    "to_city": "Mount Isa",
+    "origin": "YSCB",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA2474",
+    "from_city": "Canberra",
+    "to_city": "Mount Isa",
+    "origin": "YSCB",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA2469",
+    "from_city": "Canberra",
+    "to_city": "Townsville",
+    "origin": "YSCB",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2101",
+    "from_city": "Coffs Harbour",
+    "to_city": "Sydney",
+    "origin": "YCFS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2105",
+    "from_city": "Coffs Harbour",
+    "to_city": "Sydney",
+    "origin": "YCFS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2107",
+    "from_city": "Coffs Harbour",
+    "to_city": "Sydney",
+    "origin": "YCFS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2109",
+    "from_city": "Coffs Harbour",
+    "to_city": "Sydney",
+    "origin": "YCFS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2115",
+    "from_city": "Coffs Harbour",
+    "to_city": "Sydney",
+    "origin": "YCFS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2117",
+    "from_city": "Coffs Harbour",
+    "to_city": "Sydney",
+    "origin": "YCFS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0008",
+    "from_city": "Coffs Harbour",
+    "to_city": "Brisbane",
+    "origin": "YCFS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0008",
+    "from_city": "Coffs Harbour",
+    "to_city": "Sydney",
+    "origin": "YCFS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0757",
+    "from_city": "Darwin",
+    "to_city": "Adelaide",
+    "origin": "YPDN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA1935",
+    "from_city": "Darwin",
+    "to_city": "Alice Springs",
+    "origin": "YPDN",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA1939",
+    "from_city": "Darwin",
+    "to_city": "Alice Springs",
+    "origin": "YPDN",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA0825",
+    "from_city": "Darwin",
+    "to_city": "Brisbane",
+    "origin": "YPDN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1943",
+    "from_city": "Darwin",
+    "to_city": "Cairns",
+    "origin": "YPDN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA1871",
+    "from_city": "Darwin",
+    "to_city": "Cairns",
+    "origin": "YPDN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA1943",
+    "from_city": "Darwin",
+    "to_city": "Gold Coast",
+    "origin": "YPDN",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA0839",
+    "from_city": "Darwin",
+    "to_city": "Melbourne",
+    "origin": "YPDN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1935",
+    "from_city": "Darwin",
+    "to_city": "Perth",
+    "origin": "YPDN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0793",
+    "from_city": "Darwin",
+    "to_city": "Perth",
+    "origin": "YPDN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0829",
+    "from_city": "Darwin",
+    "to_city": "Sydney",
+    "origin": "YPDN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0843",
+    "from_city": "Darwin",
+    "to_city": "Sydney",
+    "origin": "YPDN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2050",
+    "from_city": "Darwin",
+    "to_city": "Melbourne",
+    "origin": "YPDN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2052",
+    "from_city": "Darwin",
+    "to_city": "Melbourne",
+    "origin": "YPDN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2054",
+    "from_city": "Darwin",
+    "to_city": "Melbourne",
+    "origin": "YPDN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2058",
+    "from_city": "Darwin",
+    "to_city": "Melbourne",
+    "origin": "YPDN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0009",
+    "from_city": "Darwin",
+    "to_city": "London - Heathrow",
+    "origin": "YPDN",
+    "destination": "EGLL"
+  },
+  {
+    "flight": "QFA0001",
+    "from_city": "Darwin",
+    "to_city": "London - Heathrow",
+    "origin": "YPDN",
+    "destination": "EGLL"
+  },
+  {
+    "flight": "QFA0010",
+    "from_city": "Darwin",
+    "to_city": "Melbourne",
+    "origin": "YPDN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0002",
+    "from_city": "Darwin",
+    "to_city": "Sydney",
+    "origin": "YPDN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2037",
+    "from_city": "Dubbo",
+    "to_city": "Sydney",
+    "origin": "YSDU",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2041",
+    "from_city": "Dubbo",
+    "to_city": "Sydney",
+    "origin": "YSDU",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2039",
+    "from_city": "Dubbo",
+    "to_city": "Sydney",
+    "origin": "YSDU",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2045",
+    "from_city": "Dubbo",
+    "to_city": "Sydney",
+    "origin": "YSDU",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2047",
+    "from_city": "Dubbo",
+    "to_city": "Sydney",
+    "origin": "YSDU",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2043",
+    "from_city": "Dubbo",
+    "to_city": "Sydney",
+    "origin": "YSDU",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2401",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2403",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2405",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2409",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2411",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2413",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2415",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2417",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2419",
+    "from_city": "Dubbo",
+    "to_city": "Brisbane",
+    "origin": "YSDU",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2433",
+    "from_city": "Dubbo",
+    "to_city": "Perth",
+    "origin": "YSDU",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA2439",
+    "from_city": "Dubbo",
+    "to_city": "Perth",
+    "origin": "YSDU",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA2331",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1703",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1705",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2339",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1707",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2337",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1713",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1709",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2343",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1715",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1717",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2345",
+    "from_city": "Gladstone",
+    "to_city": "Brisbane",
+    "origin": "YGLA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Gladstone",
+    "to_city": "Cairns",
+    "origin": "YGLA",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Gladstone",
+    "to_city": "Cairns",
+    "origin": "YGLA",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Gladstone",
+    "to_city": "Mackay",
+    "origin": "YGLA",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Gladstone",
+    "to_city": "Mackay",
+    "origin": "YGLA",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Gladstone",
+    "to_city": "Rockhampton",
+    "origin": "YGLA",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Gladstone",
+    "to_city": "Rockhampton",
+    "origin": "YGLA",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2121",
+    "from_city": "Gladstone",
+    "to_city": "Sydney",
+    "origin": "YGLA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2129",
+    "from_city": "Gladstone",
+    "to_city": "Sydney",
+    "origin": "YGLA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Gladstone",
+    "to_city": "Townsville",
+    "origin": "YGLA",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Gladstone",
+    "to_city": "Townsville",
+    "origin": "YGLA",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0861",
+    "from_city": "Gold Coast",
+    "to_city": "Sydney",
+    "origin": "YBCG",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0863",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0865",
+    "from_city": "Gold Coast",
+    "to_city": "Sydney",
+    "origin": "YBCG",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1943",
+    "from_city": "Gold Coast",
+    "to_city": "Cairns",
+    "origin": "YBCG",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA1944",
+    "from_city": "Gold Coast",
+    "to_city": "Darwin",
+    "origin": "YBCG",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2504",
+    "from_city": "Hamilton Island",
+    "to_city": "Cairns",
+    "origin": "YBHM",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2371",
+    "from_city": "Hamilton Island",
+    "to_city": "Brisbane",
+    "origin": "YBHM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2375",
+    "from_city": "Hamilton Island",
+    "to_city": "Brisbane",
+    "origin": "YBHM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2377",
+    "from_city": "Hamilton Island",
+    "to_city": "Brisbane",
+    "origin": "YBHM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2379",
+    "from_city": "Hamilton Island",
+    "to_city": "Brisbane",
+    "origin": "YBHM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2381",
+    "from_city": "Hamilton Island",
+    "to_city": "Brisbane",
+    "origin": "YBHM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2383",
+    "from_city": "Hamilton Island",
+    "to_city": "Brisbane",
+    "origin": "YBHM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2148",
+    "from_city": "Hobart",
+    "to_city": "Melbourne",
+    "origin": "YMHB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1012",
+    "from_city": "Hobart",
+    "to_city": "Melbourne",
+    "origin": "YMHB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1016",
+    "from_city": "Hobart",
+    "to_city": "Melbourne",
+    "origin": "YMHB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1020",
+    "from_city": "Hobart",
+    "to_city": "Sydney",
+    "origin": "YMHB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0098",
+    "from_city": "Hobart",
+    "to_city": "Brisbane",
+    "origin": "YMHB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0030",
+    "from_city": "Hobart",
+    "to_city": "Melbourne",
+    "origin": "YMHB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0068",
+    "from_city": "Hobart",
+    "to_city": "Perth",
+    "origin": "YMHB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0128",
+    "from_city": "Hobart",
+    "to_city": "Sydney",
+    "origin": "YMHB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0004",
+    "from_city": "Hobart",
+    "to_city": "Sydney",
+    "origin": "YMHB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2489",
+    "from_city": "Hobart",
+    "to_city": "Cairns",
+    "origin": "YMHB",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2493",
+    "from_city": "Hobart",
+    "to_city": "Cairns",
+    "origin": "YMHB",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2491",
+    "from_city": "Hobart",
+    "to_city": "Cairns",
+    "origin": "YMHB",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2497",
+    "from_city": "Hobart",
+    "to_city": "Cairns",
+    "origin": "YMHB",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2499",
+    "from_city": "Hobart",
+    "to_city": "Cairns",
+    "origin": "YMHB",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0042",
+    "from_city": "Hobart",
+    "to_city": "Sydney",
+    "origin": "YMHB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0064",
+    "from_city": "Hobart",
+    "to_city": "Sydney",
+    "origin": "YMHB",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA1878",
+    "from_city": "Hobart",
+    "to_city": "Adelaide",
+    "origin": "YMHB",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA1061",
+    "from_city": "Hobart",
+    "to_city": "Perth",
+    "origin": "YMHB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1893",
+    "from_city": "Hobart",
+    "to_city": "Perth",
+    "origin": "YMHB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1063",
+    "from_city": "Hobart",
+    "to_city": "Perth",
+    "origin": "YMHB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1895",
+    "from_city": "Hobart",
+    "to_city": "Perth",
+    "origin": "YMHB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1897",
+    "from_city": "Hobart",
+    "to_city": "Perth",
+    "origin": "YMHB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1065",
+    "from_city": "Hobart",
+    "to_city": "Perth",
+    "origin": "YMHB",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0992",
+    "from_city": "Karratha",
+    "to_city": "Brisbane",
+    "origin": "YPKA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0994",
+    "from_city": "Karratha",
+    "to_city": "Melbourne",
+    "origin": "YPKA",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0907",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1907",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1899",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0899",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0909",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1909",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0897",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0901",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0919",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1919",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0913",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1913",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1901",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1001",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0905",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1905",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0915",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0903",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1903",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0917",
+    "from_city": "Karratha",
+    "to_city": "Perth",
+    "origin": "YPKA",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0996",
+    "from_city": "Karratha",
+    "to_city": "Sydney",
+    "origin": "YPKA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2280",
+    "from_city": "Launceston",
+    "to_city": "Melbourne",
+    "origin": "YMLT",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2282",
+    "from_city": "Launceston",
+    "to_city": "Melbourne",
+    "origin": "YMLT",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2284",
+    "from_city": "Launceston",
+    "to_city": "Melbourne",
+    "origin": "YMLT",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2286",
+    "from_city": "Launceston",
+    "to_city": "Melbourne",
+    "origin": "YMLT",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1831",
+    "from_city": "Launceston",
+    "to_city": "Perth",
+    "origin": "YMLT",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA2431",
+    "from_city": "Launceston",
+    "to_city": "Perth",
+    "origin": "YMLT",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA2429",
+    "from_city": "Launceston",
+    "to_city": "Perth",
+    "origin": "YMLT",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0010",
+    "from_city": "London - Heathrow",
+    "to_city": "Melbourne",
+    "origin": "EGLL",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0002",
+    "from_city": "London - Heathrow",
+    "to_city": "Sydney",
+    "origin": "EGLL",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2531",
+    "from_city": "London - Heathrow",
+    "to_city": "Brisbane",
+    "origin": "EGLL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2535",
+    "from_city": "London - Heathrow",
+    "to_city": "Brisbane",
+    "origin": "EGLL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2533",
+    "from_city": "London - Heathrow",
+    "to_city": "Brisbane",
+    "origin": "EGLL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2441",
+    "from_city": "London - Heathrow",
+    "to_city": "Brisbane",
+    "origin": "EGLL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2252",
+    "from_city": "London - Heathrow",
+    "to_city": "Port Macquarie",
+    "origin": "EGLL",
+    "destination": "YPMQ"
+  },
+  {
+    "flight": "QFA2255",
+    "from_city": "London - Heathrow",
+    "to_city": "Sydney",
+    "origin": "EGLL",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2261",
+    "from_city": "London - Heathrow",
+    "to_city": "Sydney",
+    "origin": "EGLL",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2265",
+    "from_city": "London - Heathrow",
+    "to_city": "Sydney",
+    "origin": "EGLL",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0016",
+    "from_city": "Los Angeles",
+    "to_city": "Brisbane",
+    "origin": "KLAX",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0094",
+    "from_city": "Los Angeles",
+    "to_city": "Melbourne",
+    "origin": "KLAX",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0107",
+    "from_city": "Los Angeles",
+    "to_city": "Melbourne",
+    "origin": "KLAX",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0012",
+    "from_city": "Los Angeles",
+    "to_city": "Sydney",
+    "origin": "KLAX",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0108",
+    "from_city": "Los Angeles",
+    "to_city": "Sydney",
+    "origin": "KLAX",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2511",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1761",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2515",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2513",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1765",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1767",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1769",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2304",
+    "from_city": "Mackay",
+    "to_city": "Cairns",
+    "origin": "YBMK",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Mackay",
+    "to_city": "Cairns",
+    "origin": "YBMK",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Mackay",
+    "to_city": "Cairns",
+    "origin": "YBMK",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2306",
+    "from_city": "Mackay",
+    "to_city": "Cairns",
+    "origin": "YBMK",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Mackay",
+    "to_city": "Cairns",
+    "origin": "YBMK",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Mackay",
+    "to_city": "Gladstone",
+    "origin": "YBMK",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Mackay",
+    "to_city": "Gladstone",
+    "origin": "YBMK",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Mackay",
+    "to_city": "Rockhampton",
+    "origin": "YBMK",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Mackay",
+    "to_city": "Rockhampton",
+    "origin": "YBMK",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2304",
+    "from_city": "Mackay",
+    "to_city": "Townsville",
+    "origin": "YBMK",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Mackay",
+    "to_city": "Townsville",
+    "origin": "YBMK",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Mackay",
+    "to_city": "Townsville",
+    "origin": "YBMK",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2306",
+    "from_city": "Mackay",
+    "to_city": "Townsville",
+    "origin": "YBMK",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Mackay",
+    "to_city": "Townsville",
+    "origin": "YBMK",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0020",
+    "from_city": "Mackay",
+    "to_city": "Brisbane",
+    "origin": "YBMK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0020",
+    "from_city": "Mackay",
+    "to_city": "Sydney",
+    "origin": "YBMK",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0671",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0673",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0675",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0677",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0679",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0681",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0683",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0687",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0685",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2069",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0689",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0693",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0697",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0701",
+    "from_city": "Melbourne",
+    "to_city": "Adelaide",
+    "origin": "YMML",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0796",
+    "from_city": "Melbourne",
+    "to_city": "Alice Springs",
+    "origin": "YMML",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA0135",
+    "from_city": "Melbourne",
+    "to_city": "Auckland",
+    "origin": "YMML",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0131",
+    "from_city": "Melbourne",
+    "to_city": "Auckland",
+    "origin": "YMML",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0133",
+    "from_city": "Melbourne",
+    "to_city": "Auckland",
+    "origin": "YMML",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0600",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0604",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0608",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0610",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0612",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0614",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0616",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0618",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0620",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0624",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0626",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0628",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0632",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0634",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0636",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1050",
+    "from_city": "Melbourne",
+    "to_city": "Brisbane",
+    "origin": "YMML",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0702",
+    "from_city": "Melbourne",
+    "to_city": "Cairns",
+    "origin": "YMML",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0804",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0814",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2132",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0850",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2138",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0848",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0812",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0856",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0818",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0826",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0834",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0742",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0822",
+    "from_city": "Melbourne",
+    "to_city": "Canberra",
+    "origin": "YMML",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0838",
+    "from_city": "Melbourne",
+    "to_city": "Darwin",
+    "origin": "YMML",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2051",
+    "from_city": "Melbourne",
+    "to_city": "Darwin",
+    "origin": "YMML",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2053",
+    "from_city": "Melbourne",
+    "to_city": "Darwin",
+    "origin": "YMML",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2057",
+    "from_city": "Melbourne",
+    "to_city": "Darwin",
+    "origin": "YMML",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2061",
+    "from_city": "Melbourne",
+    "to_city": "Darwin",
+    "origin": "YMML",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA0009",
+    "from_city": "Melbourne",
+    "to_city": "Darwin",
+    "origin": "YMML",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA1011",
+    "from_city": "Melbourne",
+    "to_city": "Hobart",
+    "origin": "YMML",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA1015",
+    "from_city": "Melbourne",
+    "to_city": "Hobart",
+    "origin": "YMML",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA2155",
+    "from_city": "Melbourne",
+    "to_city": "Hobart",
+    "origin": "YMML",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA0029",
+    "from_city": "Melbourne",
+    "to_city": "Hobart",
+    "origin": "YMML",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA0993",
+    "from_city": "Melbourne",
+    "to_city": "Karratha",
+    "origin": "YMML",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA2281",
+    "from_city": "Melbourne",
+    "to_city": "Launceston",
+    "origin": "YMML",
+    "destination": "YMLT"
+  },
+  {
+    "flight": "QFA2283",
+    "from_city": "Melbourne",
+    "to_city": "Launceston",
+    "origin": "YMML",
+    "destination": "YMLT"
+  },
+  {
+    "flight": "QFA2285",
+    "from_city": "Melbourne",
+    "to_city": "Launceston",
+    "origin": "YMML",
+    "destination": "YMLT"
+  },
+  {
+    "flight": "QFA2289",
+    "from_city": "Melbourne",
+    "to_city": "Launceston",
+    "origin": "YMML",
+    "destination": "YMLT"
+  },
+  {
+    "flight": "QFA0009",
+    "from_city": "Melbourne",
+    "to_city": "London - Heathrow",
+    "origin": "YMML",
+    "destination": "EGLL"
+  },
+  {
+    "flight": "QFA0093",
+    "from_city": "Melbourne",
+    "to_city": "Los Angeles",
+    "origin": "YMML",
+    "destination": "KLAX"
+  },
+  {
+    "flight": "QFA2078",
+    "from_city": "Melbourne",
+    "to_city": "Mildura",
+    "origin": "YMML",
+    "destination": "YMIA"
+  },
+  {
+    "flight": "QFA2082",
+    "from_city": "Melbourne",
+    "to_city": "Mildura",
+    "origin": "YMML",
+    "destination": "YMIA"
+  },
+  {
+    "flight": "QFA2084",
+    "from_city": "Melbourne",
+    "to_city": "Mildura",
+    "origin": "YMML",
+    "destination": "YMIA"
+  },
+  {
+    "flight": "QFA2086",
+    "from_city": "Melbourne",
+    "to_city": "Mildura",
+    "origin": "YMML",
+    "destination": "YMIA"
+  },
+  {
+    "flight": "QFA0775",
+    "from_city": "Melbourne",
+    "to_city": "Perth",
+    "origin": "YMML",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0485",
+    "from_city": "Melbourne",
+    "to_city": "Perth",
+    "origin": "YMML",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0475",
+    "from_city": "Melbourne",
+    "to_city": "Perth",
+    "origin": "YMML",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0769",
+    "from_city": "Melbourne",
+    "to_city": "Perth",
+    "origin": "YMML",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0777",
+    "from_city": "Melbourne",
+    "to_city": "Perth",
+    "origin": "YMML",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0773",
+    "from_city": "Melbourne",
+    "to_city": "Perth",
+    "origin": "YMML",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0481",
+    "from_city": "Melbourne",
+    "to_city": "Perth",
+    "origin": "YMML",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0653",
+    "from_city": "Melbourne",
+    "to_city": "Perth",
+    "origin": "YMML",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0997",
+    "from_city": "Melbourne",
+    "to_city": "Port Hedland",
+    "origin": "YMML",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA0035",
+    "from_city": "Melbourne",
+    "to_city": "Singapore",
+    "origin": "YMML",
+    "destination": "WSSS"
+  },
+  {
+    "flight": "QFA0400",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0404",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0406",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0408",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0410",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0412",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0402",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0414",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0416",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0418",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0420",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0422",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0426",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0428",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0430",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0434",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0436",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0438",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0440",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0442",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0444",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0446",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0468",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0450",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0448",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0452",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0456",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0454",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0496",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0458",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0460",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0478",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0462",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0464",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0466",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0490",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0492",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0494",
+    "from_city": "Melbourne",
+    "to_city": "Sydney",
+    "origin": "YMML",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0037",
+    "from_city": "Melbourne",
+    "to_city": "Wellington",
+    "origin": "YMML",
+    "destination": "NZWN"
+  },
+  {
+    "flight": "QFA2077",
+    "from_city": "Mildura",
+    "to_city": "Melbourne",
+    "origin": "YMIA",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2079",
+    "from_city": "Mildura",
+    "to_city": "Melbourne",
+    "origin": "YMIA",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2085",
+    "from_city": "Mildura",
+    "to_city": "Melbourne",
+    "origin": "YMIA",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA2453",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2449",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2507",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2451",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2457",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2455",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2463",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2459",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2461",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2465",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2527",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2467",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2523",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2525",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2529",
+    "from_city": "Moranbah",
+    "to_city": "Brisbane",
+    "origin": "YMRB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2447",
+    "from_city": "Moranbah",
+    "to_city": "Cairns",
+    "origin": "YMRB",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2445",
+    "from_city": "Moranbah",
+    "to_city": "Townsville",
+    "origin": "YMRB",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2447",
+    "from_city": "Moranbah",
+    "to_city": "Townsville",
+    "origin": "YMRB",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA1077",
+    "from_city": "Mount Isa",
+    "to_city": "Brisbane",
+    "origin": "YBMA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1069",
+    "from_city": "Mount Isa",
+    "to_city": "Brisbane",
+    "origin": "YBMA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1079",
+    "from_city": "Mount Isa",
+    "to_city": "Brisbane",
+    "origin": "YBMA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2469",
+    "from_city": "Mount Isa",
+    "to_city": "Brisbane",
+    "origin": "YBMA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2469",
+    "from_city": "Mount Isa",
+    "to_city": "Townsville",
+    "origin": "YBMA",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2475",
+    "from_city": "Mount Isa",
+    "to_city": "Townsville",
+    "origin": "YBMA",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0108",
+    "from_city": "Mount Isa",
+    "to_city": "Los Angeles",
+    "origin": "YBMA",
+    "destination": "KLAX"
+  },
+  {
+    "flight": "QFA0108",
+    "from_city": "Mount Isa",
+    "to_city": "Sydney",
+    "origin": "YBMA",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2420",
+    "from_city": "Mount Isa",
+    "to_city": "Brisbane",
+    "origin": "YBMA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2422",
+    "from_city": "Mount Isa",
+    "to_city": "Brisbane",
+    "origin": "YBMA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2426",
+    "from_city": "Mount Isa",
+    "to_city": "Brisbane",
+    "origin": "YBMA",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1091",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1085",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1087",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1823",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1093",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1095",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1825",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1101",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1089",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1819",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1099",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1097",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1827",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0090",
+    "from_city": "Newman",
+    "to_city": "Brisbane",
+    "origin": "YNWN",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0092",
+    "from_city": "Newman",
+    "to_city": "Sydney",
+    "origin": "YNWN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2601",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2605",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2607",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2627",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2611",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2609",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2613",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2615",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2617",
+    "from_city": "Newman",
+    "to_city": "Adelaide",
+    "origin": "YNWN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA1801",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1803",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1805",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1837",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1807",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1809",
+    "from_city": "Newman",
+    "to_city": "Perth",
+    "origin": "YNWN",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0590",
+    "from_city": "Perth",
+    "to_city": "Adelaide",
+    "origin": "YPPH",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0586",
+    "from_city": "Perth",
+    "to_city": "Adelaide",
+    "origin": "YPPH",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0668",
+    "from_city": "Perth",
+    "to_city": "Adelaide",
+    "origin": "YPPH",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0592",
+    "from_city": "Perth",
+    "to_city": "Adelaide",
+    "origin": "YPPH",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0584",
+    "from_city": "Perth",
+    "to_city": "Adelaide",
+    "origin": "YPPH",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0810",
+    "from_city": "Perth",
+    "to_city": "Adelaide",
+    "origin": "YPPH",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA1938",
+    "from_city": "Perth",
+    "to_city": "Alice Springs",
+    "origin": "YPPH",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA0650",
+    "from_city": "Perth",
+    "to_city": "Brisbane",
+    "origin": "YPPH",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0598",
+    "from_city": "Perth",
+    "to_city": "Brisbane",
+    "origin": "YPPH",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0594",
+    "from_city": "Perth",
+    "to_city": "Brisbane",
+    "origin": "YPPH",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0652",
+    "from_city": "Perth",
+    "to_city": "Brisbane",
+    "origin": "YPPH",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1926",
+    "from_city": "Perth",
+    "to_city": "Brisbane",
+    "origin": "YPPH",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1928",
+    "from_city": "Perth",
+    "to_city": "Brisbane",
+    "origin": "YPPH",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1074",
+    "from_city": "Perth",
+    "to_city": "Brisbane",
+    "origin": "YPPH",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1930",
+    "from_city": "Perth",
+    "to_city": "Brisbane",
+    "origin": "YPPH",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0718",
+    "from_city": "Perth",
+    "to_city": "Canberra",
+    "origin": "YPPH",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0792",
+    "from_city": "Perth",
+    "to_city": "Darwin",
+    "origin": "YPPH",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA1938",
+    "from_city": "Perth",
+    "to_city": "Darwin",
+    "origin": "YPPH",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2432",
+    "from_city": "Perth",
+    "to_city": "Darwin",
+    "origin": "YPPH",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2438",
+    "from_city": "Perth",
+    "to_city": "Darwin",
+    "origin": "YPPH",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA1060",
+    "from_city": "Perth",
+    "to_city": "Gold Coast",
+    "origin": "YPPH",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA1062",
+    "from_city": "Perth",
+    "to_city": "Gold Coast",
+    "origin": "YPPH",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA1886",
+    "from_city": "Perth",
+    "to_city": "Gold Coast",
+    "origin": "YPPH",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA1894",
+    "from_city": "Perth",
+    "to_city": "Gold Coast",
+    "origin": "YPPH",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA1884",
+    "from_city": "Perth",
+    "to_city": "Gold Coast",
+    "origin": "YPPH",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA1064",
+    "from_city": "Perth",
+    "to_city": "Gold Coast",
+    "origin": "YPPH",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA1896",
+    "from_city": "Perth",
+    "to_city": "Gold Coast",
+    "origin": "YPPH",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA0906",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1906",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0898",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0908",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1898",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1908",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0896",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0900",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0912",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1912",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0914",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1914",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1900",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1000",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0904",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1904",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0916",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0902",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1902",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0918",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA1830",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA2430",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA2428",
+    "from_city": "Perth",
+    "to_city": "Karratha",
+    "origin": "YPPH",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0648",
+    "from_city": "Perth",
+    "to_city": "Melbourne",
+    "origin": "YPPH",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0480",
+    "from_city": "Perth",
+    "to_city": "Melbourne",
+    "origin": "YPPH",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0762",
+    "from_city": "Perth",
+    "to_city": "Melbourne",
+    "origin": "YPPH",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0772",
+    "from_city": "Perth",
+    "to_city": "Melbourne",
+    "origin": "YPPH",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0802",
+    "from_city": "Perth",
+    "to_city": "Melbourne",
+    "origin": "YPPH",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0476",
+    "from_city": "Perth",
+    "to_city": "Melbourne",
+    "origin": "YPPH",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0768",
+    "from_city": "Perth",
+    "to_city": "Melbourne",
+    "origin": "YPPH",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0776",
+    "from_city": "Perth",
+    "to_city": "Melbourne",
+    "origin": "YPPH",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1090",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1084",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1086",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1092",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1822",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1094",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1824",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1100",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1088",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1818",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1098",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1096",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1826",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1800",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1802",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1804",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1836",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1806",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1808",
+    "from_city": "Perth",
+    "to_city": "Newman",
+    "origin": "YPPH",
+    "destination": "YNWN"
+  },
+  {
+    "flight": "QFA1122",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1110",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1810",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1112",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1812",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1828",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1128",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1114",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1814",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1124",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1116",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1816",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA1118",
+    "from_city": "Perth",
+    "to_city": "Port Hedland",
+    "origin": "YPPH",
+    "destination": "YPPD"
+  },
+  {
+    "flight": "QFA0077",
+    "from_city": "Perth",
+    "to_city": "Singapore",
+    "origin": "YPPH",
+    "destination": "WSSS"
+  },
+  {
+    "flight": "QFA0568",
+    "from_city": "Perth",
+    "to_city": "Sydney",
+    "origin": "YPPH",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0574",
+    "from_city": "Perth",
+    "to_city": "Sydney",
+    "origin": "YPPH",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0576",
+    "from_city": "Perth",
+    "to_city": "Sydney",
+    "origin": "YPPH",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0642",
+    "from_city": "Perth",
+    "to_city": "Sydney",
+    "origin": "YPPH",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0580",
+    "from_city": "Perth",
+    "to_city": "Sydney",
+    "origin": "YPPH",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0582",
+    "from_city": "Perth",
+    "to_city": "Sydney",
+    "origin": "YPPH",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0566",
+    "from_city": "Perth",
+    "to_city": "Sydney",
+    "origin": "YPPH",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0984",
+    "from_city": "Port Hedland",
+    "to_city": "Brisbane",
+    "origin": "YPPD",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0998",
+    "from_city": "Port Hedland",
+    "to_city": "Melbourne",
+    "origin": "YPPD",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA1123",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1811",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1111",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1113",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1813",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1829",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1129",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1109",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1115",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1815",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1125",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1117",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1817",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA1119",
+    "from_city": "Port Hedland",
+    "to_city": "Perth",
+    "origin": "YPPD",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA2266",
+    "from_city": "Port Lincoln",
+    "to_city": "Adelaide",
+    "origin": "YPLC",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2268",
+    "from_city": "Port Lincoln",
+    "to_city": "Adelaide",
+    "origin": "YPLC",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2272",
+    "from_city": "Port Lincoln",
+    "to_city": "Adelaide",
+    "origin": "YPLC",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2274",
+    "from_city": "Port Lincoln",
+    "to_city": "Adelaide",
+    "origin": "YPLC",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2161",
+    "from_city": "Port Macquarie",
+    "to_city": "Sydney",
+    "origin": "YPMQ",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2159",
+    "from_city": "Port Macquarie",
+    "to_city": "Sydney",
+    "origin": "YPMQ",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2165",
+    "from_city": "Port Macquarie",
+    "to_city": "Sydney",
+    "origin": "YPMQ",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2167",
+    "from_city": "Port Macquarie",
+    "to_city": "Sydney",
+    "origin": "YPMQ",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2171",
+    "from_city": "Port Macquarie",
+    "to_city": "Sydney",
+    "origin": "YPMQ",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2173",
+    "from_city": "Port Macquarie",
+    "to_city": "Sydney",
+    "origin": "YPMQ",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2175",
+    "from_city": "Port Macquarie",
+    "to_city": "Sydney",
+    "origin": "YPMQ",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2179",
+    "from_city": "Port Macquarie",
+    "to_city": "Sydney",
+    "origin": "YPMQ",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0192",
+    "from_city": "Port Moresby",
+    "to_city": "Cairns",
+    "origin": "AYPY",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0198",
+    "from_city": "Port Moresby",
+    "to_city": "Cairns",
+    "origin": "AYPY",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0194",
+    "from_city": "Port Moresby",
+    "to_city": "Cairns",
+    "origin": "AYPY",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0122",
+    "from_city": "Queenstown",
+    "to_city": "Sydney",
+    "origin": "NZQN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2349",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2363",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1729",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2353",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1731",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2365",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1737",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2357",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2367",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2359",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2369",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1741",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1743",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1745",
+    "from_city": "Rockhampton",
+    "to_city": "Brisbane",
+    "origin": "YBRK",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Rockhampton",
+    "to_city": "Cairns",
+    "origin": "YBRK",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Rockhampton",
+    "to_city": "Cairns",
+    "origin": "YBRK",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Rockhampton",
+    "to_city": "Cairns",
+    "origin": "YBRK",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Rockhampton",
+    "to_city": "Gladstone",
+    "origin": "YBRK",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Rockhampton",
+    "to_city": "Gladstone",
+    "origin": "YBRK",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Rockhampton",
+    "to_city": "Mackay",
+    "origin": "YBRK",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Rockhampton",
+    "to_city": "Mackay",
+    "origin": "YBRK",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Rockhampton",
+    "to_city": "Mackay",
+    "origin": "YBRK",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Rockhampton",
+    "to_city": "Townsville",
+    "origin": "YBRK",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Rockhampton",
+    "to_city": "Townsville",
+    "origin": "YBRK",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Rockhampton",
+    "to_city": "Townsville",
+    "origin": "YBRK",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA2537",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2547",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2539",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2553",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2541",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2575",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2543",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2545",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2549",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2571",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2551",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2573",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2559",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2540",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2544",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2550",
+    "from_city": "Roma",
+    "to_city": "Brisbane",
+    "origin": "YROM",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0028",
+    "from_city": "Roma",
+    "to_city": "Sydney",
+    "origin": "YROM",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0130",
+    "from_city": "Roma",
+    "to_city": "Sydney",
+    "origin": "YROM",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0052",
+    "from_city": "Singapore",
+    "to_city": "Brisbane",
+    "origin": "WSSS",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0036",
+    "from_city": "Singapore",
+    "to_city": "Melbourne",
+    "origin": "WSSS",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0078",
+    "from_city": "Singapore",
+    "to_city": "Perth",
+    "origin": "WSSS",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0082",
+    "from_city": "Singapore",
+    "to_city": "Sydney",
+    "origin": "WSSS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0006",
+    "from_city": "Singapore",
+    "to_city": "Sydney",
+    "origin": "WSSS",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0735",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0739",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0741",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0747",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0751",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0759",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0761",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0765",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0783",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0743",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA0785",
+    "from_city": "Sydney",
+    "to_city": "Adelaide",
+    "origin": "YSSY",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QFA2205",
+    "from_city": "Sydney",
+    "to_city": "Albury",
+    "origin": "YSSY",
+    "destination": "YMAY"
+  },
+  {
+    "flight": "QFA2209",
+    "from_city": "Sydney",
+    "to_city": "Albury",
+    "origin": "YSSY",
+    "destination": "YMAY"
+  },
+  {
+    "flight": "QFA2213",
+    "from_city": "Sydney",
+    "to_city": "Albury",
+    "origin": "YSSY",
+    "destination": "YMAY"
+  },
+  {
+    "flight": "QFA2217",
+    "from_city": "Sydney",
+    "to_city": "Albury",
+    "origin": "YSSY",
+    "destination": "YMAY"
+  },
+  {
+    "flight": "QFA0790",
+    "from_city": "Sydney",
+    "to_city": "Alice Springs",
+    "origin": "YSSY",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA2020",
+    "from_city": "Sydney",
+    "to_city": "Alice Springs",
+    "origin": "YSSY",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA2024",
+    "from_city": "Sydney",
+    "to_city": "Alice Springs",
+    "origin": "YSSY",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA2022",
+    "from_city": "Sydney",
+    "to_city": "Alice Springs",
+    "origin": "YSSY",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA2030",
+    "from_city": "Sydney",
+    "to_city": "Alice Springs",
+    "origin": "YSSY",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA2034",
+    "from_city": "Sydney",
+    "to_city": "Alice Springs",
+    "origin": "YSSY",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QFA0141",
+    "from_city": "Sydney",
+    "to_city": "Auckland",
+    "origin": "YSSY",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0055",
+    "from_city": "Sydney",
+    "to_city": "Auckland",
+    "origin": "YSSY",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0043",
+    "from_city": "Sydney",
+    "to_city": "Auckland",
+    "origin": "YSSY",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0113",
+    "from_city": "Sydney",
+    "to_city": "Auckland",
+    "origin": "YSSY",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0049",
+    "from_city": "Sydney",
+    "to_city": "Auckland",
+    "origin": "YSSY",
+    "destination": "NZAA"
+  },
+  {
+    "flight": "QFA0728",
+    "from_city": "Sydney",
+    "to_city": "Ayers Rock",
+    "origin": "YSSY",
+    "destination": "YAYE"
+  },
+  {
+    "flight": "QFA0023",
+    "from_city": "Sydney",
+    "to_city": "Bangkok",
+    "origin": "YSSY",
+    "destination": "VTBS"
+  },
+  {
+    "flight": "QFA0500",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0502",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0504",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0506",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0508",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0510",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0512",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0516",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0019",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0520",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0524",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0528",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0534",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0530",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0532",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0538",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0536",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0540",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0542",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0544",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0546",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0548",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0552",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0556",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA1042",
+    "from_city": "Sydney",
+    "to_city": "Brisbane",
+    "origin": "YSSY",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0924",
+    "from_city": "Sydney",
+    "to_city": "Cairns",
+    "origin": "YSSY",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0922",
+    "from_city": "Sydney",
+    "to_city": "Cairns",
+    "origin": "YSSY",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0926",
+    "from_city": "Sydney",
+    "to_city": "Cairns",
+    "origin": "YSSY",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA1461",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0803",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1463",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0787",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1467",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1471",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1473",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1419",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1477",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1479",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1475",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1485",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0771",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1427",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1483",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0779",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0879",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1493",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1489",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0805",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1491",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0883",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1495",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0807",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA1499",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA0045",
+    "from_city": "Sydney",
+    "to_city": "Canberra",
+    "origin": "YSSY",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QFA2104",
+    "from_city": "Sydney",
+    "to_city": "Coffs Harbour",
+    "origin": "YSSY",
+    "destination": "YCFS"
+  },
+  {
+    "flight": "QFA2106",
+    "from_city": "Sydney",
+    "to_city": "Coffs Harbour",
+    "origin": "YSSY",
+    "destination": "YCFS"
+  },
+  {
+    "flight": "QFA2108",
+    "from_city": "Sydney",
+    "to_city": "Coffs Harbour",
+    "origin": "YSSY",
+    "destination": "YCFS"
+  },
+  {
+    "flight": "QFA2114",
+    "from_city": "Sydney",
+    "to_city": "Coffs Harbour",
+    "origin": "YSSY",
+    "destination": "YCFS"
+  },
+  {
+    "flight": "QFA2116",
+    "from_city": "Sydney",
+    "to_city": "Coffs Harbour",
+    "origin": "YSSY",
+    "destination": "YCFS"
+  },
+  {
+    "flight": "QFA2118",
+    "from_city": "Sydney",
+    "to_city": "Coffs Harbour",
+    "origin": "YSSY",
+    "destination": "YCFS"
+  },
+  {
+    "flight": "QFA0007",
+    "from_city": "Sydney",
+    "to_city": "Coffs Harbour",
+    "origin": "YSSY",
+    "destination": "YCFS"
+  },
+  {
+    "flight": "QFA0842",
+    "from_city": "Sydney",
+    "to_city": "Darwin",
+    "origin": "YSSY",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA0846",
+    "from_city": "Sydney",
+    "to_city": "Darwin",
+    "origin": "YSSY",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA0001",
+    "from_city": "Sydney",
+    "to_city": "Darwin",
+    "origin": "YSSY",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QFA2040",
+    "from_city": "Sydney",
+    "to_city": "Dubbo",
+    "origin": "YSSY",
+    "destination": "YSDU"
+  },
+  {
+    "flight": "QFA2038",
+    "from_city": "Sydney",
+    "to_city": "Dubbo",
+    "origin": "YSSY",
+    "destination": "YSDU"
+  },
+  {
+    "flight": "QFA2044",
+    "from_city": "Sydney",
+    "to_city": "Dubbo",
+    "origin": "YSSY",
+    "destination": "YSDU"
+  },
+  {
+    "flight": "QFA2046",
+    "from_city": "Sydney",
+    "to_city": "Dubbo",
+    "origin": "YSSY",
+    "destination": "YSDU"
+  },
+  {
+    "flight": "QFA2042",
+    "from_city": "Sydney",
+    "to_city": "Dubbo",
+    "origin": "YSSY",
+    "destination": "YSDU"
+  },
+  {
+    "flight": "QFA2048",
+    "from_city": "Sydney",
+    "to_city": "Dubbo",
+    "origin": "YSSY",
+    "destination": "YSDU"
+  },
+  {
+    "flight": "QFA2120",
+    "from_city": "Sydney",
+    "to_city": "Gladstone",
+    "origin": "YSSY",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2128",
+    "from_city": "Sydney",
+    "to_city": "Gladstone",
+    "origin": "YSSY",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA0860",
+    "from_city": "Sydney",
+    "to_city": "Gold Coast",
+    "origin": "YSSY",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA0862",
+    "from_city": "Brisbane",
+    "to_city": "Townsville",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QFA0864",
+    "from_city": "Sydney",
+    "to_city": "Gold Coast",
+    "origin": "YSSY",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QFA1019",
+    "from_city": "Sydney",
+    "to_city": "Hobart",
+    "origin": "YSSY",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA0127",
+    "from_city": "Sydney",
+    "to_city": "Hobart",
+    "origin": "YSSY",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA0003",
+    "from_city": "Sydney",
+    "to_city": "Hobart",
+    "origin": "YSSY",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA0041",
+    "from_city": "Sydney",
+    "to_city": "Hobart",
+    "origin": "YSSY",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA0063",
+    "from_city": "Sydney",
+    "to_city": "Hobart",
+    "origin": "YSSY",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QFA0995",
+    "from_city": "Sydney",
+    "to_city": "Karratha",
+    "origin": "YSSY",
+    "destination": "YPKA"
+  },
+  {
+    "flight": "QFA0001",
+    "from_city": "Sydney",
+    "to_city": "London - Heathrow",
+    "origin": "YSSY",
+    "destination": "EGLL"
+  },
+  {
+    "flight": "QFA2254",
+    "from_city": "Sydney",
+    "to_city": "London - Heathrow",
+    "origin": "YSSY",
+    "destination": "EGLL"
+  },
+  {
+    "flight": "QFA2260",
+    "from_city": "Sydney",
+    "to_city": "London - Heathrow",
+    "origin": "YSSY",
+    "destination": "EGLL"
+  },
+  {
+    "flight": "QFA2264",
+    "from_city": "Sydney",
+    "to_city": "London - Heathrow",
+    "origin": "YSSY",
+    "destination": "EGLL"
+  },
+  {
+    "flight": "QFA0107",
+    "from_city": "Sydney",
+    "to_city": "Los Angeles",
+    "origin": "YSSY",
+    "destination": "KLAX"
+  },
+  {
+    "flight": "QFA0011",
+    "from_city": "Sydney",
+    "to_city": "Los Angeles",
+    "origin": "YSSY",
+    "destination": "KLAX"
+  },
+  {
+    "flight": "QFA0019",
+    "from_city": "Sydney",
+    "to_city": "Los Angeles",
+    "origin": "YSSY",
+    "destination": "KLAX"
+  },
+  {
+    "flight": "QFA0401",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0405",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0403",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0409",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0407",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0411",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0413",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0415",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0417",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0461",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0419",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0421",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0423",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0427",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0429",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0431",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0435",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0437",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0439",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0473",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0441",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0443",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0445",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0447",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0469",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0449",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0453",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0451",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0455",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0457",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0459",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0463",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0479",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0465",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0467",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0487",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0489",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0497",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0107",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0091",
+    "from_city": "Sydney",
+    "to_city": "Melbourne",
+    "origin": "YSSY",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0565",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0575",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0581",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0577",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0579",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0567",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0569",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0571",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA0583",
+    "from_city": "Sydney",
+    "to_city": "Perth",
+    "origin": "YSSY",
+    "destination": "YPPH"
+  },
+  {
+    "flight": "QFA2164",
+    "from_city": "Sydney",
+    "to_city": "Port Macquarie",
+    "origin": "YSSY",
+    "destination": "YPMQ"
+  },
+  {
+    "flight": "QFA2170",
+    "from_city": "Sydney",
+    "to_city": "Port Macquarie",
+    "origin": "YSSY",
+    "destination": "YPMQ"
+  },
+  {
+    "flight": "QFA2172",
+    "from_city": "Sydney",
+    "to_city": "Port Macquarie",
+    "origin": "YSSY",
+    "destination": "YPMQ"
+  },
+  {
+    "flight": "QFA2174",
+    "from_city": "Sydney",
+    "to_city": "Port Macquarie",
+    "origin": "YSSY",
+    "destination": "YPMQ"
+  },
+  {
+    "flight": "QFA2178",
+    "from_city": "Sydney",
+    "to_city": "Port Macquarie",
+    "origin": "YSSY",
+    "destination": "YPMQ"
+  },
+  {
+    "flight": "QFA0121",
+    "from_city": "Sydney",
+    "to_city": "Queenstown",
+    "origin": "YSSY",
+    "destination": "NZQN"
+  },
+  {
+    "flight": "QFA0027",
+    "from_city": "Sydney",
+    "to_city": "Queenstown",
+    "origin": "YSSY",
+    "destination": "NZQN"
+  },
+  {
+    "flight": "QFA0129",
+    "from_city": "Sydney",
+    "to_city": "Queenstown",
+    "origin": "YSSY",
+    "destination": "NZQN"
+  },
+  {
+    "flight": "QFA0081",
+    "from_city": "Sydney",
+    "to_city": "Singapore",
+    "origin": "YSSY",
+    "destination": "WSSS"
+  },
+  {
+    "flight": "QFA0005",
+    "from_city": "Sydney",
+    "to_city": "Singapore",
+    "origin": "YSSY",
+    "destination": "WSSS"
+  },
+  {
+    "flight": "QFA2012",
+    "from_city": "Sydney",
+    "to_city": "Tamworth",
+    "origin": "YSSY",
+    "destination": "YSTW"
+  },
+  {
+    "flight": "QFA2002",
+    "from_city": "Sydney",
+    "to_city": "Tamworth",
+    "origin": "YSSY",
+    "destination": "YSTW"
+  },
+  {
+    "flight": "QFA2004",
+    "from_city": "Sydney",
+    "to_city": "Tamworth",
+    "origin": "YSSY",
+    "destination": "YSTW"
+  },
+  {
+    "flight": "QFA2010",
+    "from_city": "Sydney",
+    "to_city": "Tamworth",
+    "origin": "YSSY",
+    "destination": "YSTW"
+  },
+  {
+    "flight": "QFA2006",
+    "from_city": "Sydney",
+    "to_city": "Tamworth",
+    "origin": "YSSY",
+    "destination": "YSTW"
+  },
+  {
+    "flight": "QFA2008",
+    "from_city": "Sydney",
+    "to_city": "Tamworth",
+    "origin": "YSSY",
+    "destination": "YSTW"
+  },
+  {
+    "flight": "QFA0021",
+    "from_city": "Sydney",
+    "to_city": "Tamworth",
+    "origin": "YSSY",
+    "destination": "YSTW"
+  },
+  {
+    "flight": "QFA2221",
+    "from_city": "Sydney",
+    "to_city": "Wagga Wagga",
+    "origin": "YSSY",
+    "destination": "YSWG"
+  },
+  {
+    "flight": "QFA2225",
+    "from_city": "Sydney",
+    "to_city": "Wagga Wagga",
+    "origin": "YSSY",
+    "destination": "YSWG"
+  },
+  {
+    "flight": "QFA2229",
+    "from_city": "Sydney",
+    "to_city": "Wagga Wagga",
+    "origin": "YSSY",
+    "destination": "YSWG"
+  },
+  {
+    "flight": "QFA2231",
+    "from_city": "Sydney",
+    "to_city": "Wagga Wagga",
+    "origin": "YSSY",
+    "destination": "YSWG"
+  },
+  {
+    "flight": "QFA0047",
+    "from_city": "Sydney",
+    "to_city": "Wellington",
+    "origin": "YSSY",
+    "destination": "NZWN"
+  },
+  {
+    "flight": "QFA0117",
+    "from_city": "Sydney",
+    "to_city": "Wellington",
+    "origin": "YSSY",
+    "destination": "NZWN"
+  },
+  {
+    "flight": "QFA2001",
+    "from_city": "Tamworth",
+    "to_city": "Sydney",
+    "origin": "YSTW",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2009",
+    "from_city": "Tamworth",
+    "to_city": "Sydney",
+    "origin": "YSTW",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2003",
+    "from_city": "Tamworth",
+    "to_city": "Sydney",
+    "origin": "YSTW",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2005",
+    "from_city": "Tamworth",
+    "to_city": "Sydney",
+    "origin": "YSTW",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2011",
+    "from_city": "Tamworth",
+    "to_city": "Sydney",
+    "origin": "YSTW",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2007",
+    "from_city": "Tamworth",
+    "to_city": "Sydney",
+    "origin": "YSTW",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0022",
+    "from_city": "Tamworth",
+    "to_city": "Sydney",
+    "origin": "YSTW",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0969",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0967",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0971",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0973",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0975",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA0977",
+    "from_city": "Townsville",
+    "to_city": "Brisbane",
+    "origin": "YBTL",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QFA2302",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2304",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2300",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2312",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2308",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2306",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2447",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2310",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2314",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2318",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2468",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2474",
+    "from_city": "Townsville",
+    "to_city": "Cairns",
+    "origin": "YBTL",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Townsville",
+    "to_city": "Gladstone",
+    "origin": "YBTL",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Townsville",
+    "to_city": "Gladstone",
+    "origin": "YBTL",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Townsville",
+    "to_city": "Mackay",
+    "origin": "YBTL",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2305",
+    "from_city": "Townsville",
+    "to_city": "Mackay",
+    "origin": "YBTL",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Townsville",
+    "to_city": "Mackay",
+    "origin": "YBTL",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2315",
+    "from_city": "Townsville",
+    "to_city": "Mackay",
+    "origin": "YBTL",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QFA2444",
+    "from_city": "Townsville",
+    "to_city": "Moranbah",
+    "origin": "YBTL",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2446",
+    "from_city": "Townsville",
+    "to_city": "Moranbah",
+    "origin": "YBTL",
+    "destination": "YMRB"
+  },
+  {
+    "flight": "QFA2468",
+    "from_city": "Townsville",
+    "to_city": "Mount Isa",
+    "origin": "YBTL",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA2474",
+    "from_city": "Townsville",
+    "to_city": "Mount Isa",
+    "origin": "YBTL",
+    "destination": "YBMA"
+  },
+  {
+    "flight": "QFA2301",
+    "from_city": "Townsville",
+    "to_city": "Rockhampton",
+    "origin": "YBTL",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2307",
+    "from_city": "Townsville",
+    "to_city": "Rockhampton",
+    "origin": "YBTL",
+    "destination": "YBRK"
+  },
+  {
+    "flight": "QFA2220",
+    "from_city": "Wagga Wagga",
+    "to_city": "Sydney",
+    "origin": "YSWG",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2222",
+    "from_city": "Wagga Wagga",
+    "to_city": "Sydney",
+    "origin": "YSWG",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2226",
+    "from_city": "Wagga Wagga",
+    "to_city": "Sydney",
+    "origin": "YSWG",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2230",
+    "from_city": "Wagga Wagga",
+    "to_city": "Sydney",
+    "origin": "YSWG",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA2481",
+    "from_city": "Weipa",
+    "to_city": "Cairns",
+    "origin": "YBWP",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2479",
+    "from_city": "Weipa",
+    "to_city": "Cairns",
+    "origin": "YBWP",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA2483",
+    "from_city": "Weipa",
+    "to_city": "Cairns",
+    "origin": "YBWP",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QFA0038",
+    "from_city": "Wellington",
+    "to_city": "Melbourne",
+    "origin": "NZWN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QFA0118",
+    "from_city": "Wellington",
+    "to_city": "Sydney",
+    "origin": "NZWN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QFA0048",
+    "from_city": "Wellington",
+    "to_city": "Sydney",
+    "origin": "NZWN",
+    "destination": "YSSY"
+  },
+  {
+    "flight": "QLK1251",
+    "from_city": "Brisbane",
+    "to_city": "Melbourne Tullamarine",
+    "origin": "YBBN",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QLK1291",
+    "from_city": "Melbourne Tullamarine",
+    "to_city": "Hobart Int'l",
+    "origin": "YMML",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QLK1467",
+    "from_city": "Canberra Int'l",
+    "to_city": "Melbourne Tullamarine",
+    "origin": "YSCB",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QLK1503",
+    "from_city": "Sydney",
+    "to_city": "Hobart Int'l",
+    "origin": "YSSY",
+    "destination": "YMHB"
+  },
+  {
+    "flight": "QLK1532",
+    "from_city": "Sydney",
+    "to_city": "Coffs Harbour",
+    "origin": "YSSY",
+    "destination": "YCFS"
+  },
+  {
+    "flight": "QLK1550",
+    "from_city": "Brisbane",
+    "to_city": "Townsville Int'l / RAAF",
+    "origin": "YBBN",
+    "destination": "YBTL"
+  },
+  {
+    "flight": "QLK1572",
+    "from_city": "Melbourne Tullamarine",
+    "to_city": "Gold Coast",
+    "origin": "YMML",
+    "destination": "YBCG"
+  },
+  {
+    "flight": "QLK1598",
+    "from_city": "Melbourne Tullamarine",
+    "to_city": "Alice Springs",
+    "origin": "YMML",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QLK1800",
+    "from_city": "Adelaide Int'l",
+    "to_city": "Brisbane",
+    "origin": "YPAD",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QLK1803",
+    "from_city": "Brisbane",
+    "to_city": "Adelaide Int'l",
+    "origin": "YBBN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QLK1816",
+    "from_city": "Adelaide Int'l",
+    "to_city": "Alice Springs",
+    "origin": "YPAD",
+    "destination": "YBAS"
+  },
+  {
+    "flight": "QLK1822",
+    "from_city": "Brisbane",
+    "to_city": "Mackay",
+    "origin": "YBBN",
+    "destination": "YBMK"
+  },
+  {
+    "flight": "QLK1889",
+    "from_city": "Darwin Int'l / RAAF",
+    "to_city": "Cairns Int'l",
+    "origin": "YPDN",
+    "destination": "YBCS"
+  },
+  {
+    "flight": "QLK1904",
+    "from_city": "Adelaide Int'l",
+    "to_city": "Darwin Int'l / RAAF",
+    "origin": "YPAD",
+    "destination": "YPDN"
+  },
+  {
+    "flight": "QLK1907",
+    "from_city": "Darwin Int'l / RAAF",
+    "to_city": "Adelaide Int'l",
+    "origin": "YPDN",
+    "destination": "YPAD"
+  },
+  {
+    "flight": "QLK1918",
+    "from_city": "Brisbane",
+    "to_city": "Gladstone",
+    "origin": "YBBN",
+    "destination": "YGLA"
+  },
+  {
+    "flight": "QLK1941",
+    "from_city": "Townsville Int'l / RAAF",
+    "to_city": "Melbourne Tullamarine",
+    "origin": "YBTL",
+    "destination": "YMML"
+  },
+  {
+    "flight": "QLK1946",
+    "from_city": "Canberra Int'l",
+    "to_city": "Brisbane",
+    "origin": "YSCB",
+    "destination": "YBBN"
+  },
+  {
+    "flight": "QLK1947",
+    "from_city": "Brisbane",
+    "to_city": "Canberra Int'l",
+    "origin": "YBBN",
+    "destination": "YSCB"
+  },
+  {
+    "flight": "QLK1963",
+    "from_city": "Cairns Int'l",
+    "to_city": "Ayers Rock",
+    "origin": "YBCS",
+    "destination": "YAYE"
+  }
+]
