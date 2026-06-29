@@ -75,6 +75,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
         with:
           commit_message: 'chore: sync localadsb data'
-          file_pattern: 'data/localadsb/* data/aircraft_db.sqlite3'
-          # aircraft_db.sqlite3 is gitignored, so force-add is required
-          add_options: '-f'
+          file_pattern: 'data/localadsb/*'
