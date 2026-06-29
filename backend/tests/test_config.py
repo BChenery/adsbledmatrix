@@ -160,3 +160,51 @@ async def test_geocode_empty_query():
         response = await client.get("/api/config/geocode?q=")
 
     assert response.status_code == 422
+
+
+def test_settings_version_read_from_version_file(monkeypatch, tmp_path):
+    """Settings.version should be read from PROJECT_ROOT/VERSION."""
+    monkeypatch.delenv("ADSB_VERSION", raising=False)
+
+    version_file = tmp_path / "VERSION"
+    version_file.write_text("1.2.3\n")
+
+    import app.config as config_module
+
+    monkeypatch.setattr(config_module, "PROJECT_ROOT", tmp_path)
+
+    from app.config import Settings
+
+    settings = Settings()
+    assert settings.version == "1.2.3"
+
+
+def test_settings_version_fallback_when_version_file_missing(monkeypatch, tmp_path):
+    """Settings.version should fall back to '0.1.0' when VERSION is missing."""
+    monkeypatch.delenv("ADSB_VERSION", raising=False)
+
+    import app.config as config_module
+
+    monkeypatch.setattr(config_module, "PROJECT_ROOT", tmp_path)
+
+    from app.config import Settings
+
+    settings = Settings()
+    assert settings.version == "0.1.0"
+
+
+def test_settings_version_env_override(monkeypatch, tmp_path):
+    """ADSB_VERSION environment variable should override the VERSION file."""
+    monkeypatch.setenv("ADSB_VERSION", "9.9.9")
+
+    version_file = tmp_path / "VERSION"
+    version_file.write_text("1.2.3\n")
+
+    import app.config as config_module
+
+    monkeypatch.setattr(config_module, "PROJECT_ROOT", tmp_path)
+
+    from app.config import Settings
+
+    settings = Settings()
+    assert settings.version == "9.9.9"

@@ -1,9 +1,25 @@
 import os
 from pathlib import Path
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent.parent
+
+
+class VersionSettingsSource(PydanticBaseSettingsSource):
+    """Custom settings source that reads the app version from PROJECT_ROOT/VERSION."""
+
+    def __init__(self, settings_cls):
+        super().__init__(settings_cls)
+        self._version = settings_cls._read_version()
+
+    def get_field_value(self, field, field_name):
+        if field_name == "version":
+            return self._version, field_name, False
+        return None, field_name, False
+
+    def __call__(self):
+        return {"version": self._version}
 
 
 class Settings(BaseSettings):
@@ -67,6 +83,31 @@ class Settings(BaseSettings):
 
     # Mock data for development/demo
     mock_aircraft: bool = False
+
+    @classmethod
+    def _read_version(cls) -> str:
+        """Read the app version from PROJECT_ROOT/VERSION."""
+        version_path = PROJECT_ROOT / "VERSION"
+        if version_path.exists():
+            return version_path.read_text().strip()
+        return "0.1.0"
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls,
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+            VersionSettingsSource(cls),
+        )
 
     class Config:
         env_prefix = "ADSB_"
