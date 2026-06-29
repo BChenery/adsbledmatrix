@@ -78,3 +78,4 @@ jobs:
         with:
           commit_message: 'chore: sync localadsb data'
           file_pattern: 'data/localadsb/* data/aircraft_db.sqlite3'
+          add_options: '-f'
