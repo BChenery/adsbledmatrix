@@ -177,10 +177,13 @@ async def main():
             capture_output=True,
             text=True,
         )
-        print(result.stdout)
+        if result.stdout:
+            print(result.stdout)
+        if result.stderr:
+            print(result.stderr)
         if result.returncode != 0:
             print(
-                f"  ✗ localadsb import failed: {result.stderr.strip() or 'unknown'}",
+                "  ✗ localadsb import failed (see output above)",
                 file=sys.stderr,
             )
             sys.exit(1)
