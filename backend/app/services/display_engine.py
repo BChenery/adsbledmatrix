@@ -223,6 +223,9 @@ class DisplayEngine:
         elif element.element_type == "distance_bar":
             self._draw_distance_bar(draw, x, y, w, h, ctx, color)
 
+        elif element.element_type == "radar":
+            self._draw_radar(draw, img, element, ctx)
+
         elif element.element_type == "radar_blip":
             self._draw_radar_blip(draw, x, y, w, h, ctx, color)
 
@@ -414,6 +417,59 @@ class DisplayEngine:
             row_y += row_height
             if row_y > y + h:
                 break
+
+    def _draw_radar(self, draw: ImageDraw.Draw, img: Image.Image, element: Any, ctx: RenderContext):
+        x, y = element.x, element.y
+        w = element.width or 100
+        h = element.height or 100
+        ring_color = self._parse_color(element.ring_color) or (50, 50, 50)
+        dot_color = self._parse_color(element.dot_color) or (255, 0, 0)
+        user_color = self._parse_color(element.user_dot_color) or (0, 255, 0)
+        bg_color = self._parse_color(element.bg_color)
+
+        if bg_color:
+            draw.rectangle([x, y, x + w, y + h], fill=bg_color)
+
+        # Keep the radar circular inside the bounding box
+        cx = x + w // 2
+        cy = y + h // 2
+        radius = min(w, h) // 2 - 2
+        range_km = getattr(element, "range_km", 20) or 20
+
+        # Outer circle
+        draw.ellipse([cx - radius, cy - radius, cx + radius, cy + radius], outline=ring_color)
+
+        # Range rings
+        if getattr(element, 'show_rings', True):
+            for step in (0.25, 0.5, 0.75):
+                r = int(radius * step)
+                if r > 0:
+                    draw.ellipse([cx - r, cy - r, cx + r, cy + r], outline=ring_color)
+
+        # N/E/S/W tick marks
+        if getattr(element, 'show_ticks', True):
+            tick_len = max(3, radius // 10)
+            for bearing_deg in (0, 90, 180, 270):
+                angle = math.radians(bearing_deg - 90)
+                inner_r = radius - tick_len
+                outer_r = radius
+                x1 = cx + inner_r * math.cos(angle)
+                y1 = cy + inner_r * math.sin(angle)
+                x2 = cx + outer_r * math.cos(angle)
+                y2 = cy + outer_r * math.sin(angle)
+                draw.line([(x1, y1), (x2, y2)], fill=ring_color, width=1)
+
+        # Centre user dot
+        draw.ellipse([cx - 2, cy - 2, cx + 2, cy + 2], fill=user_color)
+
+        # Aircraft dot
+        ac = ctx.aircraft
+        if ac and ac.distance_km is not None and ac.bearing is not None:
+            ratio = min(ac.distance_km / range_km, 1.0)
+            angle = math.radians(ac.bearing - 90)
+            dot_x = cx + radius * ratio * math.cos(angle)
+            dot_y = cy + radius * ratio * math.sin(angle)
+            draw.ellipse([dot_x - 3, dot_y - 3, dot_x + 3, dot_y + 3], fill=dot_color)
 
     def _resolve_data_field(self, field: Optional[str], fmt: Optional[str], ctx: RenderContext) -> str:
         ac = ctx.aircraft

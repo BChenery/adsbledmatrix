@@ -319,6 +319,88 @@ export default function PropertyPanel({ layout, onLayoutChange, element, onChang
           </>
         )}
 
+        {element.element_type === 'radar' && (
+          <>
+            <div className="space-y-1">
+              <Label>Range (km)</Label>
+              <Input
+                type="number"
+                min={1}
+                value={element.range_km || 20}
+                onChange={(e) => update('range_km', parseInt(e.target.value) || 20)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label>Ring Color</Label>
+              <div className="flex gap-2">
+                <input
+                  type="color"
+                  value={element.ring_color || '#333333'}
+                  onChange={(e) => update('ring_color', e.target.value)}
+                  className="w-10 h-9 rounded cursor-pointer border-0 p-0"
+                />
+                <Input
+                  type="text"
+                  value={element.ring_color || ''}
+                  onChange={(e) => update('ring_color', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label>Aircraft Dot Color</Label>
+              <div className="flex gap-2">
+                <input
+                  type="color"
+                  value={element.dot_color || '#ff0000'}
+                  onChange={(e) => update('dot_color', e.target.value)}
+                  className="w-10 h-9 rounded cursor-pointer border-0 p-0"
+                />
+                <Input
+                  type="text"
+                  value={element.dot_color || ''}
+                  onChange={(e) => update('dot_color', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label>User Dot Color</Label>
+              <div className="flex gap-2">
+                <input
+                  type="color"
+                  value={element.user_dot_color || '#00ff00'}
+                  onChange={(e) => update('user_dot_color', e.target.value)}
+                  className="w-10 h-9 rounded cursor-pointer border-0 p-0"
+                />
+                <Input
+                  type="text"
+                  value={element.user_dot_color || ''}
+                  onChange={(e) => update('user_dot_color', e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="show_rings"
+                checked={element.show_rings ?? true}
+                onChange={(e) => update('show_rings', e.target.checked)}
+                className="w-4 h-4 rounded border-gray-600"
+              />
+              <Label htmlFor="show_rings" className="cursor-pointer">Show Range Rings</Label>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="show_ticks"
+                checked={element.show_ticks ?? true}
+                onChange={(e) => update('show_ticks', e.target.checked)}
+                className="w-4 h-4 rounded border-gray-600"
+              />
+              <Label htmlFor="show_ticks" className="cursor-pointer">Show N/E/S/W Ticks</Label>
+            </div>
+          </>
+        )}
+
         <div className="space-y-1">
           <Label>Show If</Label>
           <Input
