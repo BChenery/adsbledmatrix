@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { Layout } from '@/types/layout';
 import { UserConfig } from '@/types/config';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +27,9 @@ interface ToolbarProps {
   onSetAsIdle: () => void;
   panelPreview: boolean;
   onTogglePanelPreview: () => void;
+  layoutName: string;
+  onRename: (name: string) => Promise<void>;
+  canRename: boolean;
 }
 
 const ZOOM_OPTIONS = [1, 2, 3, 4, 5, 6];
@@ -44,30 +49,56 @@ export default function Toolbar({
   onSetAsIdle,
   panelPreview,
   onTogglePanelPreview,
+  layoutName,
+  onRename,
+  canRename,
 }: ToolbarProps) {
+  const [draftName, setDraftName] = useState(layoutName);
+
+  useEffect(() => {
+    setDraftName(layoutName);
+  }, [layoutName]);
+
   return (
     <div className="h-14 bg-led-panel border-b border-white/10 flex items-center px-4 gap-4">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="secondary" className="min-w-[160px] justify-between gap-2">
-            <span className="truncate">{activeLayout?.name || 'Select Layout'}</span>
-            <ChevronDown size={14} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56">
-          {layouts.map((l) => (
-            <DropdownMenuItem key={l.id} onClick={() => onSelectLayout(l)}>
-              <div>
-                <div className="font-medium">{l.name}</div>
-                <div className="text-xs text-white/40">{l.width}×{l.height}</div>
-              </div>
-            </DropdownMenuItem>
-          ))}
-          {layouts.length === 0 && (
-            <div className="px-2 py-3 text-sm text-white/30">No layouts yet</div>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center gap-1">
+        <Input
+          type="text"
+          value={draftName}
+          onChange={(e) => setDraftName(e.target.value)}
+          onBlur={async () => {
+            if (!canRename || draftName === layoutName) return;
+            try {
+              await onRename(draftName);
+            } catch {
+              setDraftName(layoutName);
+            }
+          }}
+          disabled={!canRename}
+          placeholder="Layout name"
+          className="h-9 min-w-[140px] bg-led-black border-white/10 text-sm"
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary" size="icon" className="h-9 w-9">
+              <ChevronDown size={14} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            {layouts.map((l) => (
+              <DropdownMenuItem key={l.id} onClick={() => onSelectLayout(l)}>
+                <div>
+                  <div className="font-medium">{l.name}</div>
+                  <div className="text-xs text-white/40">{l.width}×{l.height}</div>
+                </div>
+              </DropdownMenuItem>
+            ))}
+            {layouts.length === 0 && (
+              <div className="px-2 py-3 text-sm text-white/30">No layouts yet</div>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <Button variant="secondary" size="icon" onClick={onNew}>
         <Plus size={16} />
