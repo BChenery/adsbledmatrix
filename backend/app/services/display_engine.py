@@ -267,7 +267,8 @@ class DisplayEngine:
         path = element.image_path
         if not path and ctx.enriched:
             icao = ctx.enriched.get("operator_icao")
-            logo_path = logo_manager.logo_path_for_icao(icao)
+            callsign = ctx.aircraft.callsign if ctx.aircraft else None
+            logo_path = logo_manager.logo_path_for_aircraft(icao, callsign)
             if logo_path and logo_path.exists():
                 path = str(logo_path)
             else:
@@ -473,7 +474,8 @@ class DisplayEngine:
     def _evaluate_condition(self, condition: str, ctx: RenderContext) -> bool:
         if condition == "has_logo":
             icao = (ctx.enriched or {}).get("operator_icao")
-            logo_path = logo_manager.logo_path_for_icao(icao)
+            callsign = ctx.aircraft.callsign if ctx.aircraft else None
+            logo_path = logo_manager.logo_path_for_aircraft(icao, callsign)
             if logo_path and logo_path.exists():
                 return True
             # Fallback logo is always available

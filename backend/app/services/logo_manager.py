@@ -1,5 +1,6 @@
 import csv
 import logging
+import re
 import shutil
 import tempfile
 import zipfile
@@ -21,8 +22,15 @@ logger = logging.getLogger(__name__)
 # Target size for all cached logos
 LOGO_SIZE = (96, 96)
 
+# Airlines that are branded as another airline. The target logo is always used
+# even if a logo for the original ICAO exists locally.
+_LOGO_DISPLAY_ALIASES: Dict[str, str] = {
+    "QLK": "QFA",     # QantasLink flights carry Qantas branding
+}
+
 # The aircraft database sometimes stores IATA codes (or wrong codes) in the
 # operator_icao field. Map those to the real ICAO used in the logo filenames.
+# These are only used as a fallback when the original code's logo is missing.
 _LOGO_ICAO_OVERRIDES: Dict[str, str] = {
     "VA": "VOZ",      # Virgin Australia
     "VIR": "VOZ",     # Virgin Australia (wrong ICAO in some DBs)
@@ -100,6 +108,13 @@ class LogoManager:
         if not icao_code:
             return None
         icao = icao_code.upper()
+        # Hard display aliases always take precedence (e.g. QantasLink -> Qantas).
+        forced_alias = _LOGO_DISPLAY_ALIASES.get(icao)
+        if forced_alias:
+            path = settings.logos_dir / f"{forced_alias}.png"
+            if path.exists():
+                return path
+        # Otherwise prefer the code's own logo, falling back to override targets.
         candidates = [icao, _LOGO_ICAO_OVERRIDES.get(icao)]
         for candidate in candidates:
             if not candidate:
@@ -108,6 +123,48 @@ class LogoManager:
             if path.exists():
                 return path
         return None
+
+    def logo_path_for_aircraft(
+        self, operator_icao: Optional[str], callsign: Optional[str]
+    ) -> Optional[Path]:
+        """Return the local logo path for an aircraft, using the callsign prefix first.
+
+        Aircraft are often wet-leased or operated by a different company from the
+        one selling the flight (e.g. an Alliance Airlines aircraft flying a Virgin
+        Australia VOZ service). The callsign prefix is a much better indicator of
+        the brand that should be shown on the display than the registered operator.
+
+        Falls back to the operator ICAO logo when no callsign is available or the
+        prefix cannot be resolved to a known airline.
+        """
+        if callsign:
+            prefix_icao = self._callsign_prefix_to_icao(callsign)
+            if prefix_icao:
+                logo_icao = (
+                    _LOGO_DISPLAY_ALIASES.get(prefix_icao)
+                    or _LOGO_ICAO_OVERRIDES.get(prefix_icao, prefix_icao)
+                )
+                path = settings.logos_dir / f"{logo_icao}.png"
+                if path.exists():
+                    return path
+
+        if operator_icao:
+            return self.logo_path_for_icao(operator_icao)
+
+        return None
+
+    def _callsign_prefix_to_icao(self, callsign: str) -> Optional[str]:
+        """Extract the airline code from a callsign and normalise it to ICAO.
+
+        The prefix is the leading 2-3 alphabetic characters. If the prefix matches
+        a known IATA code, the corresponding ICAO code is returned instead.
+        """
+        match = re.match(r"^([A-Z]{2,3})", callsign.upper().strip())
+        if not match:
+            return None
+        prefix = match.group(1)
+        # IATA codes are two letters; ICAO codes are three letters.
+        return self._iata_to_icao.get(prefix, prefix)
 
     async def _download_logo(self, icao: str, dest: Path) -> Optional[Path]:
         """Attempt to download logo from multiple sources, resize, and save."""
