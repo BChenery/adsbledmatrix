@@ -180,6 +180,72 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         ctx.stroke();
       }
 
+      // Radar preview
+      if (el.element_type === 'radar') {
+        const ac = aircraft[0];
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+        const radius = Math.min(w, h) / 2 - 2;
+        const ringColor = el.ring_color || '#333333';
+        const dotColor = el.dot_color || '#ff0000';
+        const userColor = el.user_dot_color || '#00ff00';
+        const showRings = el.show_rings ?? true;
+        const showTicks = el.show_ticks ?? true;
+        const rangeKm = el.range_km || 20;
+
+        ctx.strokeStyle = ringColor;
+        ctx.lineWidth = 1;
+
+        // Outer circle
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Range rings
+        if (showRings) {
+          [0.25, 0.5, 0.75].forEach((step) => {
+            const r = radius * step;
+            if (r > 0) {
+              ctx.beginPath();
+              ctx.arc(cx, cy, r, 0, Math.PI * 2);
+              ctx.stroke();
+            }
+          });
+        }
+
+        // N/E/S/W tick marks
+        if (showTicks) {
+          const tickLen = Math.max(3, Math.floor(radius / 10));
+          [0, 90, 180, 270].forEach((bearingDeg) => {
+            const angle = (bearingDeg - 90) * (Math.PI / 180);
+            const innerR = radius - tickLen;
+            const outerR = radius;
+            ctx.beginPath();
+            ctx.moveTo(cx + innerR * Math.cos(angle), cy + innerR * Math.sin(angle));
+            ctx.lineTo(cx + outerR * Math.cos(angle), cy + outerR * Math.sin(angle));
+            ctx.stroke();
+          });
+        }
+
+        // Centre user dot
+        ctx.fillStyle = userColor;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Aircraft dot
+        if (ac && ac.distance_km !== undefined && ac.bearing !== undefined) {
+          const ratio = Math.min(ac.distance_km / rangeKm, 1.0);
+          const angle = (ac.bearing - 90) * (Math.PI / 180);
+          const dotX = cx + radius * ratio * Math.cos(angle);
+          const dotY = cy + radius * ratio * Math.sin(angle);
+          ctx.fillStyle = dotColor;
+          ctx.beginPath();
+          ctx.arc(dotX, dotY, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
       // Aircraft list preview
       if (el.element_type === 'aircraft_list') {
         const extra = (el.extra || {}) as Record<string, any>;

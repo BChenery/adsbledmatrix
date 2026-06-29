@@ -53,4 +53,26 @@ async def migrate_db():
                     text("ALTER TABLE user_config ADD COLUMN led_matrix_brightness INTEGER NOT NULL DEFAULT 70")
                 )
 
+            # Radar element settings added after initial schema
+            result = sync_conn.execute(
+                text("SELECT name FROM sqlite_master WHERE type='table' AND name='layout_elements'")
+            )
+            if not result.fetchone():
+                return
+            result = sync_conn.execute(text("PRAGMA table_info(layout_elements)"))
+            columns = {row[1] for row in result}
+            radar_columns = [
+                ("range_km", "INTEGER DEFAULT 20"),
+                ("ring_color", "VARCHAR(7)"),
+                ("dot_color", "VARCHAR(7)"),
+                ("user_dot_color", "VARCHAR(7)"),
+                ("show_rings", "BOOLEAN DEFAULT 1"),
+                ("show_ticks", "BOOLEAN DEFAULT 1"),
+            ]
+            for col_name, col_type in radar_columns:
+                if col_name not in columns:
+                    sync_conn.execute(
+                        text(f"ALTER TABLE layout_elements ADD COLUMN {col_name} {col_type}")
+                    )
+
         await conn.run_sync(_add_missing_columns)

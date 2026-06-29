@@ -28,6 +28,14 @@ class ElementCreate(BaseModel):
     show_if: Optional[str] = None
     extra: Optional[dict] = None
 
+    # Radar element settings
+    range_km: Optional[int] = 20
+    ring_color: Optional[str] = '#333333'
+    dot_color: Optional[str] = '#ff0000'
+    user_dot_color: Optional[str] = '#00ff00'
+    show_rings: Optional[bool] = True
+    show_ticks: Optional[bool] = True
+
 
 class ElementResponse(ElementCreate):
     id: int

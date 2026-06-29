@@ -75,3 +75,50 @@ async def test_update_active_layout_triggers_engine_refresh(app, db_session, mon
     assert response.status_code == 200
     assert len(calls) == 1
     assert calls[0] == (layout.id, None)
+
+
+@pytest.mark.asyncio
+async def test_radar_element_settings_persist(app, db_session, monkeypatch):
+    """Radar-specific fields should survive a save/load round trip."""
+    async def fake_refresh(active_layout_id, idle_layout_id):
+        pass
+
+    monkeypatch.setattr(layouts, "_refresh_engine_layouts", fake_refresh)
+
+    result = await db_session.execute(select(Layout))
+    layout = result.scalar_one()
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.put(
+            f"/api/layouts/{layout.id}",
+            json={
+                "elements": [
+                    {
+                        "element_type": "radar",
+                        "x": 10,
+                        "y": 10,
+                        "width": 80,
+                        "height": 80,
+                        "z_index": 0,
+                        "range_km": 15,
+                        "ring_color": "#444444",
+                        "dot_color": "#00aaff",
+                        "user_dot_color": "#ff00ff",
+                        "show_rings": False,
+                        "show_ticks": False,
+                    }
+                ]
+            },
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["elements"]) == 1
+    el = data["elements"][0]
+    assert el["element_type"] == "radar"
+    assert el["range_km"] == 15
+    assert el["ring_color"] == "#444444"
+    assert el["dot_color"] == "#00aaff"
+    assert el["user_dot_color"] == "#ff00ff"
+    assert el["show_rings"] is False
+    assert el["show_ticks"] is False

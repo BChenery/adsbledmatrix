@@ -96,6 +96,14 @@ class LayoutElement(Base):
     show_if = Column(String(100))
     extra = Column(JSON)
 
+    # Radar element settings
+    range_km = Column(Integer, default=20)
+    ring_color = Column(String(7))
+    dot_color = Column(String(7))
+    user_dot_color = Column(String(7))
+    show_rings = Column(Boolean, default=True)
+    show_ticks = Column(Boolean, default=True)
+
     layout = relationship("Layout", back_populates="elements")
 
 
