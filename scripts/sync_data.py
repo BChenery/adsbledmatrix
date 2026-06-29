@@ -33,6 +33,7 @@ DATA_FILES = [
     "data/routes.csv",
     "data/localadsb/flights.db",
     "data/localadsb/aircraft_type_names.json",
+    "data/aircraft_db.sqlite3",
 ]
 
 RAW_BASE = "https://raw.githubusercontent.com/{repo}/main/{path}"

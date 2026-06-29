@@ -30,6 +30,7 @@ jobs:
           repository: BChenery/localadsb
           path: _localadsb
           token: ${{ secrets.LOCALADSB_PAT }}
+          persist-credentials: false
 
       - name: Copy data assets
         run: |
