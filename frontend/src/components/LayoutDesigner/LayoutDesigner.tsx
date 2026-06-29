@@ -18,6 +18,7 @@ import {
 import { api } from '@/api/client';
 import { MOCK_AIRCRAFT_FLEET } from '@/lib/mockAircraft';
 import { toast } from 'sonner';
+import { normalizeLayoutName } from '@/lib/layoutName';
 import Canvas from './Canvas';
 import ElementPalette, { QUICK_ADD_PRESETS, ADVANCED_ELEMENTS } from './ElementPalette';
 import PropertyPanel from './PropertyPanel';
@@ -45,6 +46,7 @@ export default function LayoutDesigner() {
   const [selectedElement, setSelectedElement] = useState<LayoutElement | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [newLayoutName, setNewLayoutName] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
   const [useMockData, setUseMockData] = useState(false);
   const [panelPreview, setPanelPreview] = useState(false);
   const [zoom, setZoom] = useState(3);
@@ -133,14 +135,28 @@ export default function LayoutDesigner() {
     }
   };
 
-  const handleCreateNew = () => {
-    setActiveLayout({
-      ...DEFAULT_LAYOUT,
-      name: newLayoutName.trim() || DEFAULT_LAYOUT.name,
-    });
-    setSelectedElement(null);
-    setShowNewModal(false);
-    setNewLayoutName('');
+  const handleCreateNew = async () => {
+    setIsCreating(true);
+    try {
+      const created = await create({
+        ...DEFAULT_LAYOUT,
+        name: normalizeLayoutName(newLayoutName, DEFAULT_LAYOUT.name),
+      });
+      setActiveLayout(created);
+      setSelectedElement(null);
+      setShowNewModal(false);
+      setNewLayoutName('');
+      toast.success('Layout created');
+    } catch (err: any) {
+      const message = err?.response?.detail
+        ? JSON.stringify(err.response.detail)
+        : err instanceof Error
+        ? err.message
+        : 'Create failed';
+      toast.error(`Create failed: ${message}`);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleSelectLayout = async (layout: Layout | null) => {
@@ -204,7 +220,7 @@ export default function LayoutDesigner() {
             <Button variant="secondary" onClick={() => setShowNewModal(false)} className="flex-1">
               Cancel
             </Button>
-            <Button onClick={handleCreateNew} className="flex-1 gap-2">
+            <Button onClick={handleCreateNew} disabled={isCreating} className="flex-1 gap-2">
               <Plus size={16} />
               Create
             </Button>
