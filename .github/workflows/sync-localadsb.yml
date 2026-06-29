@@ -1,0 +1,80 @@
+name: Sync localadsb data
+
+on:
+  repository_dispatch:
+    types: [localadsb-updated]
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out adsbledmatrix
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          ref: main
+
+      - name: Check out localadsb
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          repository: BChenery/localadsb
+          path: _localadsb
+
+      - name: Copy data assets
+        run: |
+          mkdir -p data/localadsb
+          cp _localadsb/flights.db data/localadsb/flights.db
+          cp _localadsb/aircraft_type_names.json data/localadsb/aircraft_type_names.json
+          # Optional route enrichment files
+          for f in _localadsb/qantas_routes.json _localadsb/acars_routes.json; do
+            if [ -f "$f" ]; then cp "$f" data/localadsb/; fi
+          done
+
+      - name: Verify source database
+        run: |
+          if [ ! -s data/localadsb/flights.db ]; then
+            echo "Aborting: data/localadsb/flights.db is missing or zero bytes" >&2
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: pip install -r requirements.txt
+
+      - name: Regenerate aircraft_db.sqlite3
+        run: python scripts/import_localadsb.py
+
+      - name: Validate generated database
+        run: |
+          python - <<'PY'
+          import sqlite3, sys
+          conn = sqlite3.connect('data/aircraft_db.sqlite3')
+          cur = conn.cursor()
+          aircraft = cur.execute('SELECT COUNT(*) FROM aircraft').fetchone()[0]
+          routes = cur.execute('SELECT COUNT(*) FROM routes').fetchone()[0]
+          conn.close()
+          print(f'aircraft: {aircraft}, routes: {routes}')
+          if aircraft == 0 or routes == 0:
+              sys.exit('Generated database is empty')
+          PY
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@b863ae1933cb653a53c021fe36dbb774e1fb9403 # v5.2.0
+        with:
+          commit_message: 'chore: sync localadsb data'
+          file_pattern: 'data/localadsb/* data/aircraft_db.sqlite3'
