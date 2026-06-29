@@ -30,6 +30,9 @@ DATA_FILES = [
     "data/aircraft_db.csv",
     "data/airlines.csv",
     "data/routes.csv",
+    "data/localadsb/flights.db",
+    "data/localadsb/aircraft_type_names.json",
+    "data/aircraft_db.sqlite3",
 ]
 
 RAW_BASE = "https://raw.githubusercontent.com/{repo}/main/{path}"
@@ -148,6 +151,21 @@ async def main():
         print("[1/4] Syncing data files...")
         updated = await sync_data_files(client, args.repo, force=args.force)
 
+        localadsb_script = Path(__file__).resolve().parent / "import_localadsb.py"
+        flights_db_local = settings.data_dir / "localadsb" / "flights.db"
+        if localadsb_script.exists() and flights_db_local.exists():
+            print()
+            print("[5/4] Importing localadsb databases...")
+            import subprocess
+            result = subprocess.run(
+                [sys.executable, str(localadsb_script)],
+                capture_output=True,
+                text=True,
+            )
+            print(result.stdout)
+            if result.returncode != 0:
+                print(f"  ⚠ localadsb import warning: {result.stderr.strip() or 'unknown'}")
+
     print()
     print("[2/4] Importing aircraft database...")
     aircraft_count = await import_aircraft_db()
@@ -163,21 +181,6 @@ async def main():
     else:
         print()
         print("[4/4] Skipping logo refresh (--skip-logos)")
-
-    # Import richer localadsb aircraft/route databases if present
-    localadsb_script = Path(__file__).resolve().parent / "import_localadsb.py"
-    if localadsb_script.exists():
-        print()
-        print("[5/4] Importing localadsb databases...")
-        import subprocess
-        result = subprocess.run(
-            [sys.executable, str(localadsb_script)],
-            capture_output=True,
-            text=True,
-        )
-        print(result.stdout)
-        if result.returncode != 0:
-            print(f"  ⚠ localadsb import warning: {result.stderr.strip() or 'unknown'}")
 
     # Write sync timestamp
     sync_file = settings.data_dir / ".last_sync"
