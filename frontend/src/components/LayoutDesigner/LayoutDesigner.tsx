@@ -270,6 +270,7 @@ export default function LayoutDesigner() {
           <PropertyPanel
             layout={activeLayout}
             onLayoutChange={setActiveLayout}
+            onNameBlur={() => activeLayout?.id && handleRename(activeLayout.name)}
             element={selectedElement}
             onChange={handleUpdateElement}
             onDelete={handleDeleteElement}

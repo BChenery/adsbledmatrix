@@ -14,12 +14,13 @@ import { Trash2 } from 'lucide-react';
 interface PropertyPanelProps {
   layout: Layout;
   onLayoutChange: (layout: Layout) => void;
+  onNameBlur?: () => void;
   element: LayoutElement | null;
   onChange: (el: LayoutElement) => void;
   onDelete: () => void;
 }
 
-export default function PropertyPanel({ layout, onLayoutChange, element, onChange, onDelete }: PropertyPanelProps) {
+export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, element, onChange, onDelete }: PropertyPanelProps) {
   if (!element) {
     const updateLayout = (field: keyof Layout, value: unknown) => {
       onLayoutChange({ ...layout, [field]: value });
@@ -37,6 +38,7 @@ export default function PropertyPanel({ layout, onLayoutChange, element, onChang
               type="text"
               value={layout.name}
               onChange={(e) => updateLayout('name', e.target.value)}
+              onBlur={onNameBlur}
               placeholder="Layout name"
             />
           </div>
