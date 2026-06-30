@@ -20,13 +20,19 @@ sha256sum -c "$CHECKSUM"
 
 BACKUP_DIR="${INSTALL_DIR}-backup-$(date +%Y%m%d%H%M%S)"
 echo "Stopping service and backing up current install to $BACKUP_DIR..."
-sudo systemctl stop adsbledmatrix.service
+sudo systemctl stop adsbledmatrix.service || true
 sudo cp -a "$INSTALL_DIR" "$BACKUP_DIR"
 
 sudo rm -rf /tmp/adsbledmatrix
 sudo tar -xzf "$ARCHIVE" -C /tmp
 
-sudo rsync -a --delete /tmp/adsbledmatrix/ "$INSTALL_DIR/"
+echo "Updating files in $INSTALL_DIR (preserving venv and local data)..."
+sudo rsync -a --delete \
+  --exclude='venv' \
+  --exclude='data/*.db' \
+  --exclude='data/*.sqlite' \
+  --exclude='.env' \
+  /tmp/adsbledmatrix/ "$INSTALL_DIR/"
 
 echo "Starting service..."
 sudo systemctl start adsbledmatrix.service
