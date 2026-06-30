@@ -6,7 +6,13 @@ REPO="BChenery/adsbledmatrix"
 API_URL="https://api.github.com/repos/${REPO}/releases/latest"
 SERVICE_USER="adsb"
 LOG_FILE="/var/log/adsbledmatrix-update.log"
-HEALTH_URL="http://127.0.0.1:8080/api/health"
+
+ADSB_PORT=8080
+if [ -f "${INSTALL_DIR}/.env" ]; then
+    port=$(grep -E '^[[:space:]]*ADSB_PORT[[:space:]]*=' "${INSTALL_DIR}/.env" | tail -n1 | sed -E 's/^[[:space:]]*ADSB_PORT[[:space:]]*=[[:space:]]*//;s/[[:space:]]*$//')
+    [ -n "${port}" ] && ADSB_PORT="${port}"
+fi
+HEALTH_URL="http://127.0.0.1:${ADSB_PORT}/api/health"
 
 log() {
     echo "[$(date -Iseconds)] $*" | tee -a "$LOG_FILE"
@@ -20,6 +26,16 @@ fi
 mkdir -p "$(dirname "$LOG_FILE")"
 touch "$LOG_FILE"
 
+cleanup() {
+    shopt -s nullglob
+    local f
+    for f in /tmp/adsbledmatrix* /tmp/adsbledmatrix-*.tar.gz*; do
+        rm -rf "$f"
+    done
+    shopt -u nullglob
+}
+trap cleanup EXIT
+
 if [ -d "${INSTALL_DIR}/venv" ]; then
     MODE="update"
     log "Detected existing install; running in update mode"
@@ -29,16 +45,20 @@ else
 fi
 
 fetch_release() {
+    local LATEST
+    local ARCHIVE
+    local CHECKSUM
+    local BASE_URL
     cd /tmp
-    LATEST=$(curl -s "$API_URL" | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'])")
+    LATEST=$(curl -fsSL "$API_URL" | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'])")
     log "Latest release: $LATEST"
 
     ARCHIVE="adsbledmatrix-${LATEST}.tar.gz"
     CHECKSUM="${ARCHIVE}.sha256"
     BASE_URL="https://github.com/${REPO}/releases/download/${LATEST}"
 
-    curl -L -o "$ARCHIVE" "$BASE_URL/$ARCHIVE"
-    curl -L -o "$CHECKSUM" "$BASE_URL/$CHECKSUM"
+    curl -fsSL -o "$ARCHIVE" "$BASE_URL/$ARCHIVE"
+    curl -fsSL -o "$CHECKSUM" "$BASE_URL/$CHECKSUM"
     sha256sum -c "$CHECKSUM"
 
     rm -rf /tmp/adsbledmatrix
@@ -102,12 +122,12 @@ install_or_update_code() {
     if [ "$MODE" = "fresh" ]; then
         log "Copying release to ${INSTALL_DIR}"
         mkdir -p "$INSTALL_DIR"
-        rm -rf "${INSTALL_DIR:?}/"*
+        find "${INSTALL_DIR}" -mindepth 1 -delete
         cp -a /tmp/adsbledmatrix/. "$INSTALL_DIR/"
     else
         BACKUP_DIR="${INSTALL_DIR}-backup-$(date +%Y%m%d%H%M%S)"
         log "Backing up current install to $BACKUP_DIR"
-        cp -a "$INSTALL_DIR" "$BACKUP_DIR"
+        rsync -a --exclude='venv' "${INSTALL_DIR}/" "${BACKUP_DIR}/"
 
         log "Updating files in $INSTALL_DIR (preserving venv, .env, and SQLite DBs)"
         rsync -a --delete \
@@ -124,7 +144,7 @@ install_systemd_units() {
     log "Installing systemd units"
     cp "${INSTALL_DIR}/systemd/"*.service /etc/systemd/system/ 2>/dev/null || true
     cp "${INSTALL_DIR}/systemd/"*.timer /etc/systemd/system/ 2>/dev/null || true
-    systemctl daemon-reload
+    systemctl daemon-reload 2>/dev/null || true
     systemctl enable adsbledmatrix.service || true
     systemctl enable adsbledmatrix-update.timer || true
     systemctl enable adsbledmatrix-update.service || true
@@ -133,6 +153,7 @@ install_systemd_units() {
 
 fix_ownership() {
     log "Setting ownership"
+    mkdir -p "${INSTALL_DIR}/data"
     chown -R "${SERVICE_USER}:${SERVICE_USER}" "${INSTALL_DIR}/venv"
     chown -R "${SERVICE_USER}:${SERVICE_USER}" "${INSTALL_DIR}/data"
     chown -R root:root "${INSTALL_DIR}/backend" "${INSTALL_DIR}/hardware" "${INSTALL_DIR}/scripts" "${INSTALL_DIR}/systemd" "${INSTALL_DIR}/docs" 2>/dev/null || true
@@ -144,7 +165,7 @@ wait_for_health() {
     local interval=5
     local elapsed=0
     while [ "$elapsed" -lt "$timeout_secs" ]; do
-        if curl -s --max-time 3 "$HEALTH_URL" | grep -q '"status":"ok"'; then
+        if curl -s --max-time 3 "$HEALTH_URL" | python3 -c "import sys,json; data=json.load(sys.stdin); sys.exit(0 if data.get('status')=='ok' else 1)"; then
             log "Health check passed"
             return 0
         fi
@@ -165,6 +186,9 @@ rollback() {
     rm -rf "${INSTALL_DIR:?}/"*
     cp -a "${BACKUP_DIR}/." "$INSTALL_DIR/"
     fix_ownership
+    cp "${INSTALL_DIR}/systemd/"*.service /etc/systemd/system/ 2>/dev/null || true
+    cp "${INSTALL_DIR}/systemd/"*.timer /etc/systemd/system/ 2>/dev/null || true
+    systemctl daemon-reload 2>/dev/null || true
     systemctl start adsbledmatrix.service || true
     if wait_for_health; then
         log "Rollback succeeded"
@@ -177,7 +201,9 @@ rollback() {
 
 prune_backups() {
     log "Pruning old backups (keeping last 2)"
-    ls -1dt "${INSTALL_DIR}-backup-"* 2>/dev/null | tail -n +3 | xargs -r rm -rf
+    ls -1dt "${INSTALL_DIR}-backup-"* 2>/dev/null | tail -n +3 | while IFS= read -r dir; do
+        rm -rf "$dir"
+    done
 }
 
 main() {
