@@ -1,5 +1,3 @@
-import asyncio
-import json
 import logging
 from typing import Optional
 import httpx
@@ -82,7 +80,6 @@ class UpdateService:
 
     async def sync_data(self) -> dict:
         """Trigger a data sync (aircraft DB, routes, logos) via sync_data.py."""
-        from pathlib import Path
         import subprocess
         script = PROJECT_ROOT / "scripts" / "sync_data.py"
         result = subprocess.run(
