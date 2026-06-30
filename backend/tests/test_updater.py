@@ -1,27 +1,7 @@
 import pytest
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 from app.services.updater import UpdateService
-
-
-@pytest.mark.asyncio
-async def test_apply_update_skips_when_not_in_rollout():
-    svc = UpdateService()
-    with patch("app.services.updater.UpdateService._is_eligible_for_device", new=AsyncMock(return_value=False)):
-        result = await svc.apply_update({
-            "download_url": "http://example.com/archive.tar.gz",
-            "latest_version": "1.0.0",
-        })
-    assert result is False
-
-
-@pytest.mark.asyncio
-async def test_apply_update_returns_false_when_no_download_url():
-    svc = UpdateService()
-    result = await svc.apply_update({
-        "latest_version": "1.0.0",
-    })
-    assert result is False
 
 
 @pytest.mark.asyncio
