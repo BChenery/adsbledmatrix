@@ -18,12 +18,10 @@ async def check():
         from app.api.config import get_user_config_sync
         config = get_user_config_sync()
         if config and config.auto_update:
-            success = await updater.apply_update(result['download_url'])
+            success = await updater.apply_update(result)
             if success:
-                print('Running data sync after update...')
+                print('Update applied; running data sync...')
                 await updater.sync_data()
-                import subprocess
-                subprocess.run(['systemctl', 'restart', 'adsbledmatrix'])
     # Always sync data independently (in case data changed without a release)
     await updater.sync_data()
     await updater.close()

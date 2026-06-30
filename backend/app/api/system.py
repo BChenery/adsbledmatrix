@@ -58,9 +58,9 @@ async def apply_update():
     if not result.get("update_available"):
         return {"message": "No update available"}
 
-    success = await updater.apply_update(result["download_url"])
+    success = await updater.apply_update(result)
     if success:
-        return {"message": "Update applied. Please restart the device."}
+        return {"message": "Update applied and service restarted."}
     return {"message": "Update failed. Check logs for details."}
 
 
