@@ -73,3 +73,51 @@ def test_unknown_callsign_prefix_falls_back_to_operator_icao(fake_logos_dir):
     path = logo_manager.logo_path_for_aircraft("UTY", "XYZ987")
 
     assert path == fake_logos_dir / "UTY.png"
+
+
+def test_fd_callsign_vh_registration_uses_rfds_logo(fake_logos_dir):
+    """FD-prefixed callsigns on Australian-registered aircraft are RFDS."""
+    _make_logo(fake_logos_dir, "RFDS")
+    _make_logo(fake_logos_dir, "AIQ")
+
+    path = logo_manager.logo_path_for_aircraft("AIQ", "FD511", "VH-SZS")
+
+    assert path == fake_logos_dir / "RFDS.png"
+
+
+def test_fd_callsign_hs_registration_uses_thai_airasia_logo(fake_logos_dir):
+    """FD-prefixed callsigns on Thai-registered aircraft remain Thai AirAsia."""
+    _make_logo(fake_logos_dir, "RFDS")
+    _make_logo(fake_logos_dir, "AIQ")
+
+    path = logo_manager.logo_path_for_aircraft("AIQ", "FD511", "HS-ABC")
+
+    assert path == fake_logos_dir / "AIQ.png"
+
+
+def test_vh_registration_with_foreign_operator_uses_unknown(fake_logos_dir):
+    """VH- registered aircraft with bad foreign operator data show UNKNOWN."""
+    _make_logo(fake_logos_dir, "SAS")
+    _make_logo(fake_logos_dir, "UNKNOWN")
+
+    path = logo_manager.logo_path_for_aircraft("SAS", None, "VH-SZS")
+
+    assert path == fake_logos_dir / "UNKNOWN.png"
+
+
+def test_vh_registration_with_australian_operator_uses_logo(fake_logos_dir):
+    """VH- registered aircraft with a valid Australian operator show that logo."""
+    _make_logo(fake_logos_dir, "QFA")
+
+    path = logo_manager.logo_path_for_aircraft("QFA", None, "VH-OQI")
+
+    assert path == fake_logos_dir / "QFA.png"
+
+
+def test_vh_registration_operator_icao_override_is_allowed(fake_logos_dir):
+    """VH- aircraft with a wrong-code operator_icao should map to the real Australian ICAO."""
+    _make_logo(fake_logos_dir, "VOZ")
+
+    path = logo_manager.logo_path_for_aircraft("VA", None, "VH-VZZ")
+
+    assert path == fake_logos_dir / "VOZ.png"

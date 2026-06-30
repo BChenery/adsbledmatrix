@@ -272,7 +272,8 @@ class DisplayEngine:
         if not path and ctx.enriched:
             icao = ctx.enriched.get("operator_icao")
             callsign = ctx.aircraft.callsign if ctx.aircraft else None
-            logo_path = logo_manager.logo_path_for_aircraft(icao, callsign)
+            registration = ctx.enriched.get("registration")
+            logo_path = logo_manager.logo_path_for_aircraft(icao, callsign, registration)
             if logo_path and logo_path.exists():
                 path = str(logo_path)
             else:
@@ -532,7 +533,8 @@ class DisplayEngine:
         if condition == "has_logo":
             icao = (ctx.enriched or {}).get("operator_icao")
             callsign = ctx.aircraft.callsign if ctx.aircraft else None
-            logo_path = logo_manager.logo_path_for_aircraft(icao, callsign)
+            registration = (ctx.enriched or {}).get("registration")
+            logo_path = logo_manager.logo_path_for_aircraft(icao, callsign, registration)
             if logo_path and logo_path.exists():
                 return True
             # Fallback logo is always available

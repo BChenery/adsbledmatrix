@@ -17,7 +17,7 @@ async def main():
     parser.add_argument(
         "--overwrite",
         action="store_true",
-        help="Replace existing logos so FlightAware is preferred over Radarbox",
+        help="Replace existing logos with the Radarbox-first source priority",
     )
     args = parser.parse_args()
 

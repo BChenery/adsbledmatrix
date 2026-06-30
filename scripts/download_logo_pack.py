@@ -45,8 +45,8 @@ async def download_logo(
         return icao, False  # skipped
 
     sources = [
-        f"https://raw.githubusercontent.com/{SOURCE_OWNER}/{SOURCE_REPO}/{SOURCE_BRANCH}/flightaware_logos/{icao}.png",
         f"https://raw.githubusercontent.com/{SOURCE_OWNER}/{SOURCE_REPO}/{SOURCE_BRANCH}/radarbox_logos/{icao}.png",
+        f"https://raw.githubusercontent.com/{SOURCE_OWNER}/{SOURCE_REPO}/{SOURCE_BRANCH}/flightaware_logos/{icao}.png",
     ]
 
     async with sem:

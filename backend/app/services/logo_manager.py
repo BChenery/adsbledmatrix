@@ -41,6 +41,15 @@ _LOGO_ICAO_OVERRIDES: Dict[str, str] = {
     "NZ": "ANZ",      # Air New Zealand
 }
 
+# Operators expected on the VH- Australian aircraft register. Used as a sanity
+# check to avoid showing a foreign airline logo for a locally-registered aircraft
+# when only the callsign prefix or operator code is ambiguous.
+_AUSTRALIAN_OPERATOR_ICAOS: set[str] = {
+    "QFA", "QLK", "VOZ", "JST", "TGW", "RXA", "UTY",
+    "ANO", "ATM", "NJS", "SHA", "PEL", "MCK", "OZJ",
+    "ELA", "HZA", "AAA", "ORC", "FJI", "ANZ", "RFDS",
+}
+
 
 class LogoManager:
     """Downloads, resizes, and caches airline logos."""
@@ -125,7 +134,10 @@ class LogoManager:
         return None
 
     def logo_path_for_aircraft(
-        self, operator_icao: Optional[str], callsign: Optional[str]
+        self,
+        operator_icao: Optional[str],
+        callsign: Optional[str],
+        registration: Optional[str] = None,
     ) -> Optional[Path]:
         """Return the local logo path for an aircraft, using the callsign prefix first.
 
@@ -137,32 +149,56 @@ class LogoManager:
         Falls back to the operator ICAO logo when no callsign is available or the
         prefix cannot be resolved to a known airline.
         """
+        resolved_icao: Optional[str] = None
         if callsign:
-            prefix_icao = self._callsign_prefix_to_icao(callsign)
+            prefix_icao = self._callsign_prefix_to_icao(callsign, registration)
             if prefix_icao:
-                logo_icao = (
+                resolved_icao = (
                     _LOGO_DISPLAY_ALIASES.get(prefix_icao)
                     or _LOGO_ICAO_OVERRIDES.get(prefix_icao, prefix_icao)
                 )
-                path = settings.logos_dir / f"{logo_icao}.png"
+                path = settings.logos_dir / f"{resolved_icao}.png"
                 if path.exists():
                     return path
+
+        if registration and registration.upper().strip().startswith("VH-"):
+            candidate = resolved_icao
+            if not candidate and operator_icao:
+                # Normalise operator_icao the same way callsign prefixes are,
+                # so wrong-code entries like "VA" map to "VOZ" before the
+                # Australian-operator sanity check.
+                icao = operator_icao.upper()
+                candidate = _LOGO_ICAO_OVERRIDES.get(icao, icao)
+            if candidate and candidate.upper() not in _AUSTRALIAN_OPERATOR_ICAOS:
+                return self._unknown_path()
 
         if operator_icao:
             return self.logo_path_for_icao(operator_icao)
 
         return None
 
-    def _callsign_prefix_to_icao(self, callsign: str) -> Optional[str]:
+    def _callsign_prefix_to_icao(
+        self, callsign: str, registration: Optional[str] = None
+    ) -> Optional[str]:
         """Extract the airline code from a callsign and normalise it to ICAO.
 
         The prefix is the leading 2-3 alphabetic characters. If the prefix matches
         a known IATA code, the corresponding ICAO code is returned instead.
+
+        The FD prefix is ambiguous: Thai AirAsia uses FD callsigns with HS-
+        registrations, while the Royal Flying Doctor Service uses FD callsigns on
+        VH- registered aircraft.
         """
         match = re.match(r"^([A-Z]{2,3})", callsign.upper().strip())
         if not match:
             return None
         prefix = match.group(1)
+        if prefix == "FD":
+            reg = (registration or "").upper().strip()
+            if reg.startswith("HS-"):
+                return "AIQ"
+            if reg.startswith("VH-") or not reg:
+                return "RFDS"
         # IATA codes are two letters; ICAO codes are three letters.
         return self._iata_to_icao.get(prefix, prefix)
 
@@ -174,8 +210,8 @@ class LogoManager:
 
         urls = []
         # Primary: Jxck-S/airline-logos curated repo (GitHub raw, fast & reliable)
-        urls.append(f"https://raw.githubusercontent.com/Jxck-S/airline-logos/main/flightaware_logos/{icao}.png")
         urls.append(f"https://raw.githubusercontent.com/Jxck-S/airline-logos/main/radarbox_logos/{icao}.png")
+        urls.append(f"https://raw.githubusercontent.com/Jxck-S/airline-logos/main/flightaware_logos/{icao}.png")
         # Secondary: Google Flights CDN (high-quality)
         if iata:
             urls.append(f"https://www.gstatic.com/flights/airline_logos/70px/{iata}.png")
@@ -249,8 +285,8 @@ class LogoManager:
 
         Args:
             repo_url: URL of the Jxck-S/airline-logos repository.
-            overwrite: If True, replace existing local logos so FlightAware is
-                preferred over Radarbox. If False, skip existing files.
+            overwrite: If True, replace existing local logos with the
+                Radarbox-first source priority. If False, skip existing files.
         """
         import asyncio
 
@@ -278,9 +314,9 @@ class LogoManager:
             flightaware_dir = repo_root / "flightaware_logos"
             radarbox_dir = repo_root / "radarbox_logos"
 
-            # Build a per-ICAO lookup, preferring FlightAware over Radarbox.
+            # Build a per-ICAO lookup, preferring Radarbox over FlightAware.
             logo_choices: Dict[str, Path] = {}
-            for source in (flightaware_dir, radarbox_dir):
+            for source in (radarbox_dir, flightaware_dir):
                 if not source.exists():
                     continue
                 for png_file in source.glob("*.png"):
