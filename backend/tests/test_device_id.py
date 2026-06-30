@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -211,23 +212,21 @@ class TestGetDeviceId:
         net_dir = tmp_path / "sys-class-net-empty"
         net_dir.mkdir(parents=True)
 
-        readonly_dir = tmp_path / "readonly"
-        readonly_dir.mkdir(mode=0o555)
-
         monkeypatch.setattr(device_id_module, "MACHINE_ID_PATH", etc_machine_id)
         monkeypatch.setattr(device_id_module, "DBUS_MACHINE_ID_PATH", dbus_machine_id)
         monkeypatch.setattr(device_id_module, "SYS_CLASS_NET_PATH", net_dir)
-        monkeypatch.setattr(
-            device_id_module, "PERSISTED_ID_PATH", readonly_dir / ".device-id"
-        )
 
-        try:
+        persist_path = tmp_path / ".device-id"
+        monkeypatch.setattr(device_id_module, "PERSISTED_ID_PATH", persist_path)
+
+        def raise_oserror(*args, **kwargs):
+            raise OSError("read-only filesystem")
+
+        with patch.object(Path, "write_text", side_effect=raise_oserror):
             first = device_id_module.get_device_id()
             second = device_id_module.get_device_id()
-        finally:
-            readonly_dir.chmod(0o755)
 
         assert first == second
         assert len(first) == 32
         assert re.fullmatch(r"[0-9a-f]{32}", first)
-        assert not (readonly_dir / ".device-id").exists()
+        assert not persist_path.exists()
