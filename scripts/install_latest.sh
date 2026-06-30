@@ -165,7 +165,7 @@ wait_for_health() {
     local interval=5
     local elapsed=0
     while [ "$elapsed" -lt "$timeout_secs" ]; do
-        if curl -s --max-time 3 "$HEALTH_URL" | python3 -c "import sys,json; data=json.load(sys.stdin); sys.exit(0 if data.get('status')=='ok' else 1)"; then
+        if curl -fsS --max-time 3 "$HEALTH_URL" | python3 -c "import sys,json; data=json.load(sys.stdin); sys.exit(0 if data.get('status')=='ok' else 1)"; then
             log "Health check passed"
             return 0
         fi
@@ -201,7 +201,9 @@ rollback() {
 
 prune_backups() {
     log "Pruning old backups (keeping last 2)"
-    ls -1dt "${INSTALL_DIR}-backup-"* 2>/dev/null | tail -n +3 | while IFS= read -r dir; do
+    find "$(dirname "$INSTALL_DIR")" -maxdepth 1 -type d -name "$(basename "$INSTALL_DIR")-backup-*" -printf '%T@ %p\n' 2>/dev/null | \
+        sort -rn | tail -n +3 | while IFS= read -r line; do
+        dir="${line#* }"
         rm -rf "$dir"
     done
 }
