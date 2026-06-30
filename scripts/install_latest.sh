@@ -31,8 +31,16 @@ sudo rsync -a --delete \
   --exclude='venv' \
   --exclude='data/*.db' \
   --exclude='data/*.sqlite' \
+  --exclude='data/*.sqlite3' \
   --exclude='.env' \
   /tmp/adsbledmatrix/ "$INSTALL_DIR/"
+
+# The release tarball carries the GitHub Actions build user's UID. Once
+# rpi-rgb-led-matrix initialises it drops privileges from root to 'adsb',
+# so the data directory must be writable by that user or SQLite will fail
+# to create/open aircraft_db.sqlite3.
+echo "Setting data directory ownership to adsb:adsb..."
+sudo chown -R adsb:adsb "$INSTALL_DIR/data"
 
 echo "Starting service..."
 sudo systemctl start adsbledmatrix.service
