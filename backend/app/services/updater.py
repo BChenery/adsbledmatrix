@@ -130,13 +130,21 @@ class UpdateService:
             if not src_dir.exists():
                 raise RuntimeError("Expected 'adsbledmatrix' folder in tarball")
 
-            # Copy over existing installation
+            # Copy over existing installation, preserving local data and venv
+            def _ignore_data_db(dir: str, files: list[str]) -> list[str]:
+                return [f for f in files if f.endswith(('.db', '.sqlite', '.sqlite3'))]
+
             for item in src_dir.iterdir():
                 dest = PROJECT_ROOT / item.name
+                if item.name == 'venv':
+                    continue
                 if item.is_dir():
-                    if dest.exists():
-                        shutil.rmtree(dest)
-                    shutil.copytree(item, dest)
+                    if item.name == 'data':
+                        shutil.copytree(item, dest, dirs_exist_ok=True, ignore=_ignore_data_db)
+                    else:
+                        if dest.exists():
+                            shutil.rmtree(dest)
+                        shutil.copytree(item, dest)
                 else:
                     shutil.copy2(item, dest)
 
@@ -192,13 +200,15 @@ class UpdateService:
             logger.error("No backup available for rollback")
             return
         for item in PROJECT_ROOT.iterdir():
-            if item.name == "venv" or item.name == "data":
+            if item.name == backup_dir.name or item.name == "venv":
                 continue
             if item.is_dir():
                 shutil.rmtree(item)
             else:
                 item.unlink()
         for item in backup_dir.iterdir():
+            if item.name == "venv":
+                continue
             dest = PROJECT_ROOT / item.name
             if item.is_dir():
                 shutil.copytree(item, dest)
