@@ -183,6 +183,11 @@ prune_backups() {
 main() {
     fetch_release
 
+    if [ "$MODE" = "update" ]; then
+        log "Stopping adsbledmatrix.service for update"
+        systemctl stop adsbledmatrix.service || true
+    fi
+
     if [ "$MODE" = "fresh" ]; then
         ensure_service_user
         install_os_deps
