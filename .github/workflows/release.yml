@@ -2,14 +2,18 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -21,13 +25,31 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Bump VERSION
+        id: bump
+        run: |
+          VERSION=$(cat VERSION)
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "$NEW_VERSION" > VERSION
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add VERSION
+          git commit -m "chore(release): bump VERSION to $NEW_VERSION [skip ci]"
+          git push
+
       - name: Build frontend
-        working-directory: ./frontend
+        working-directory: ./adsbledmatrix/frontend
         run: |
           npm ci
           npm run build
 
       - name: Create release archive
+        working-directory: ./adsbledmatrix
         run: |
           mkdir -p release/adsbledmatrix
           cp -r backend release/adsbledmatrix/
@@ -39,10 +61,17 @@ jobs:
           cp README.md release/adsbledmatrix/
           cp VERSION release/adsbledmatrix/
           cd release
-          tar -czf adsbledmatrix-${GITHUB_REF_NAME}.tar.gz adsbledmatrix
+          tar -czf adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz adsbledmatrix
+          sha256sum adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz > adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz.sha256
+          echo '{"percentage": 100}' > rollout.json
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release/adsbledmatrix-*.tar.gz
+          tag_name: v${{ steps.bump.outputs.version }}
+          name: Release v${{ steps.bump.outputs.version }}
+          files: |
+            adsbledmatrix/release/adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz
+            adsbledmatrix/release/adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz.sha256
+            adsbledmatrix/release/rollout.json
           generate_release_notes: true
