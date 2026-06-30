@@ -1,11 +1,10 @@
 [Unit]
 Description=ADS-B LED Matrix update check
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot
 User=root
 Group=root
 ExecStart=/opt/adsbledmatrix/scripts/check_and_update.sh
-StandardOutput=append:/var/log/adsbledmatrix-update.log
-StandardError=append:/var/log/adsbledmatrix-update.log
