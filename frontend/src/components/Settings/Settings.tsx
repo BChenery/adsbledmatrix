@@ -38,9 +38,20 @@ export default function Settings() {
   const [powerAction, setPowerAction] = useState<'reboot' | 'shutdown' | null>(null);
   const [brightnessSaved, setBrightnessSaved] = useState(false);
   const brightnessTimer = useRef<number | null>(null);
+  type UpdateStatus = {
+    current_version: string;
+    latest_version: string;
+    update_available: boolean;
+    release_notes?: string;
+    published_at?: string;
+    error?: string;
+  };
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
 
   useEffect(() => {
     api.get<UserConfig>('/api/config').then(setConfig);
+    api.get<UpdateStatus>('/api/system/update').then(setUpdateStatus).catch(() => {});
   }, []);
 
   const update = (field: keyof UserConfig, value: unknown) => {
@@ -64,6 +75,27 @@ export default function Settings() {
         toast.error('Failed to update brightness');
       }
     }, 300);
+  };
+
+  const handleCheckUpdate = async () => {
+    setCheckingUpdate(true);
+    try {
+      const status = await api.get<UpdateStatus>('/api/system/update');
+      setUpdateStatus(status);
+    } catch {
+      toast.error('Failed to check for updates');
+    } finally {
+      setCheckingUpdate(false);
+    }
+  };
+
+  const handleApplyUpdate = async () => {
+    try {
+      const res = await api.post<{ message: string }>('/api/system/update');
+      toast.success(res.message || 'Update applied');
+    } catch {
+      toast.error('Failed to apply update');
+    }
   };
 
   const handlePowerAction = async () => {
@@ -486,7 +518,7 @@ export default function Settings() {
         <CardHeader>
           <CardTitle className="text-sm text-white/70">Updates</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-sm">Auto-update</span>
             <Switch
@@ -494,6 +526,47 @@ export default function Settings() {
               onCheckedChange={(v) => update('auto_update', v)}
             />
           </div>
+
+          {updateStatus ? (
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-white/60">Current</span>
+                <span className="font-medium">{updateStatus.current_version}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-white/60">Latest</span>
+                <span className="font-medium">{updateStatus.latest_version}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/60">Status</span>
+                {updateStatus.update_available ? (
+                  <span className="text-amber-400">Update available</span>
+                ) : (
+                  <span className="text-green-400">Up to date</span>
+                )}
+              </div>
+              {updateStatus.error && (
+                <div className="text-xs text-red-400">{updateStatus.error}</div>
+              )}
+              <div className="flex gap-2 pt-1">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleCheckUpdate}
+                  disabled={checkingUpdate}
+                >
+                  {checkingUpdate ? 'Checking...' : 'Check now'}
+                </Button>
+                {updateStatus.update_available && (
+                  <Button size="sm" onClick={handleApplyUpdate}>
+                    Apply update
+                  </Button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-white/50">Loading update status...</div>
+          )}
         </CardContent>
       </Card>
 
