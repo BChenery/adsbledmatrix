@@ -43,13 +43,12 @@ jobs:
           git push
 
       - name: Build frontend
-        working-directory: ./adsbledmatrix/frontend
+        working-directory: ./frontend
         run: |
           npm ci
           npm run build
 
       - name: Create release archive
-        working-directory: ./adsbledmatrix
         run: |
           mkdir -p release/adsbledmatrix
           cp -r backend release/adsbledmatrix/
@@ -71,7 +70,7 @@ jobs:
           tag_name: v${{ steps.bump.outputs.version }}
           name: Release v${{ steps.bump.outputs.version }}
           files: |
-            adsbledmatrix/release/adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz
-            adsbledmatrix/release/adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz.sha256
-            adsbledmatrix/release/rollout.json
+            release/adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz
+            release/adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz.sha256
+            release/rollout.json
           generate_release_notes: true
