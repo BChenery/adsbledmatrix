@@ -1,4 +1,5 @@
 import logging
+import subprocess
 from typing import Optional
 import httpx
 from app.config import settings, PROJECT_ROOT
@@ -7,7 +8,11 @@ logger = logging.getLogger(__name__)
 
 
 class UpdateService:
-    """Checks GitHub releases for updates and keeps data in sync."""
+    """Checks GitHub releases for updates and keeps data in sync.
+
+    Actual OTA updates are applied by the root systemd update service
+    (scripts/check_and_update.sh), not by this class.
+    """
 
     GITHUB_API = "https://api.github.com/repos/{repo}/releases/latest"
     RAW_URL = "https://raw.githubusercontent.com/{repo}/main/data/aircraft_db.csv"
@@ -80,7 +85,6 @@ class UpdateService:
 
     async def sync_data(self) -> dict:
         """Trigger a data sync (aircraft DB, routes, logos) via sync_data.py."""
-        import subprocess
         script = PROJECT_ROOT / "scripts" / "sync_data.py"
         result = subprocess.run(
             [str(PROJECT_ROOT / "venv" / "bin" / "python"), str(script)],
