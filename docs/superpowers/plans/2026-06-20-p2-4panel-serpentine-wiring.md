@@ -152,6 +152,7 @@ In `backend/app/config.py`, replace the existing Display section comment and def
     led_matrix_brightness: int = 70
     led_matrix_gpio_slowdown: int = 4
     led_matrix_limit_refresh: int = 0
+    led_matrix_flip_vertical: bool = True
 ```
 
 - [ ] **Step 2: Add a test for default settings**
@@ -170,10 +171,11 @@ def test_default_led_settings_match_pdf():
     assert settings.led_matrix_chain == 4
     assert settings.led_matrix_parallel == 1
     assert settings.led_matrix_pixel_mapper == "U-mapper"
-    assert settings.led_matrix_row_address_type == 3
+    assert settings.led_matrix_row_address_type == 0
     assert settings.led_matrix_pwm_bits == 7
     assert settings.led_matrix_brightness == 70
     assert settings.led_matrix_gpio_slowdown == 4
+    assert settings.led_matrix_flip_vertical is True
 ```
 
 - [ ] **Step 3: Run the test and confirm it passes**
@@ -420,10 +422,11 @@ ADSB_LED_MATRIX_COLS=128
 ADSB_LED_MATRIX_CHAIN=4
 ADSB_LED_MATRIX_PARALLEL=1
 ADSB_LED_MATRIX_PIXEL_MAPPER=U-mapper
-ADSB_LED_MATRIX_ROW_ADDRESS_TYPE=3
+ADSB_LED_MATRIX_ROW_ADDRESS_TYPE=0
 ADSB_LED_MATRIX_PWM_BITS=7
 ADSB_LED_MATRIX_BRIGHTNESS=70
 ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
+ADSB_LED_MATRIX_FLIP_VERTICAL=true
 ```
 
 - [ ] **Step 2: Commit**
@@ -468,8 +471,10 @@ Panel 4 (BL) ◄── Panel 3 (BR)
 ```
 
 - `rows=64`, `cols=128`, `chain=4`, `parallel=1`
+- `hardware_mapping=regular` (matches the single-channel adapter pinout)
 - `pixel_mapper=U-mapper` (handles the right-to-left bottom row)
-- `row_address_type=3` for ABC-addressed 1/32-scan panels
+- `row_address_type=0` for direct row addressing (these P2 panels are not ABC-decoded)
+- `flip_vertical=true` because the panels are mounted with the HUB75 input at the bottom, swapping the top and bottom panel rows
 
 Set these environment variables in `/opt/adsbledmatrix/.env`:
 
@@ -479,15 +484,19 @@ ADSB_LED_MATRIX_COLS=128
 ADSB_LED_MATRIX_CHAIN=4
 ADSB_LED_MATRIX_PARALLEL=1
 ADSB_LED_MATRIX_PIXEL_MAPPER=U-mapper
-ADSB_LED_MATRIX_ROW_ADDRESS_TYPE=3
+ADSB_LED_MATRIX_HARDWARE_MAPPING=regular
+ADSB_LED_MATRIX_ROW_ADDRESS_TYPE=0
 ADSB_LED_MATRIX_PWM_BITS=7
 ADSB_LED_MATRIX_BRIGHTNESS=70
 ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
+ADSB_LED_MATRIX_FLIP_VERTICAL=true
 ```
 
 > Note: some guides mention `--led-sba=1` for serpentine wiring. The standard
 > `hzeller/rpi-rgb-led-matrix` library does not have this flag; the `U-mapper`
 > option performs the same function.
+
+> If the image appears split with the bottom half at the top, `flip_vertical` is wrong for your mounting. Set `ADSB_LED_MATRIX_FLIP_VERTICAL=false` and restart the service.
 ```
 
 - [ ] **Step 3: Update the LED matrix troubleshooting example**
@@ -503,7 +512,7 @@ options.chain_length = 4
 options.parallel = 1
 options.hardware_mapping = "regular"
 options.pixel_mapper_config = "U-mapper"
-options.row_address_type = 3
+options.row_address_type = 0
 options.pwm_bits = 7
 options.brightness = 70
 options.gpio_slowdown = 4
@@ -559,11 +568,12 @@ Expected JSON contains:
   "chain": 4,
   "parallel": 1,
   "pixel_mapper": "U-mapper",
-  "row_address_type": 3,
+  "row_address_type": 0,
   "multiplexing": 0,
   "pwm_bits": 7,
   "brightness": 70,
-  "gpio_slowdown": 4
+  "gpio_slowdown": 4,
+  "flip_vertical": true
 }
 ```
 
@@ -580,6 +590,7 @@ If any fixes were required, commit them with a clear message.
 | New default LED settings from PDF | Task 2 |
 | Correct 256×128 logical dimensions | Tasks 1, 4, 5, 6 |
 | U-mapper default | Tasks 2, 3 |
+| `flip_vertical=true` for bottom-fed HUB75 wiring | Tasks 2, 8, 9 |
 | No `--led-sba` support | Note in Task 9 docs |
 | Updated `.env.example` | Task 8 |
 | Updated `docs/SETUP.md` | Task 9 |

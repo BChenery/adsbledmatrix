@@ -65,7 +65,12 @@ class Settings(BaseSettings):
     led_matrix_brightness: int = 70
     led_matrix_gpio_slowdown: int = 4
     led_matrix_limit_refresh: int = 0
-    led_matrix_flip_vertical: bool = False
+    # Flip vertical is required for the default P2 4-panel serpentine wiring
+    # documented in docs/New Wiring diagram and setup.pdf. Panels are typically
+    # mounted with the HUB75 input at the bottom, so the top/bottom panel rows
+    # are swapped relative to the logical canvas. Set to false if your chain
+    # starts at the top panel instead.
+    led_matrix_flip_vertical: bool = True
     led_matrix_rgb_sequence: str = "RGB"  # Use "BGR" if red and blue are swapped
 
     # Update

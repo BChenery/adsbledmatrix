@@ -238,12 +238,13 @@ Environment variables (all prefixed with `ADSB_`):
 | `ADSB_LED_MATRIX_PARALLEL` | `1` | Parallel chains (max 3 on a standard Pi) |
 | `ADSB_LED_MATRIX_HARDWARE_MAPPING` | `regular` | HUB75 mapping (`regular`, `adafruit-hat`, `adafruit-hat-pwm`) |
 | `ADSB_LED_MATRIX_PIXEL_MAPPER` | `U-mapper` | Pixel mapper, e.g. `U-mapper` for serpentine chained grids |
-| `ADSB_LED_MATRIX_ROW_ADDRESS_TYPE` | `3` | Row address type (0–5) |
+| `ADSB_LED_MATRIX_ROW_ADDRESS_TYPE` | `0` | Row address type (0–5) |
 | `ADSB_LED_MATRIX_MULTIPLEXING` | `0` | Multiplexing type (0–17) |
 | `ADSB_LED_MATRIX_PANEL_TYPE` | `""` | Panel type, e.g. `FM6126A` |
 | `ADSB_LED_MATRIX_PWM_BITS` | `7` | PWM bits (1–11) |
 | `ADSB_LED_MATRIX_BRIGHTNESS` | `70` | Brightness (0–100) |
 | `ADSB_LED_MATRIX_GPIO_SLOWDOWN` | `4` | GPIO slowdown (0–4) |
+| `ADSB_LED_MATRIX_FLIP_VERTICAL` | `true` | Swap top/bottom panel rows for bottom-fed HUB75 wiring |
 | `ADSB_GITHUB_REPO` | `BChenery/adsbledmatrix` | Update source repo |
 
 ---

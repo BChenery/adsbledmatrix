@@ -35,6 +35,7 @@ Panel 4 (BL) ◄── Panel 3 (BR)
 - `hardware_mapping=regular` (matches the single-channel adapter pinout)
 - `pixel_mapper=U-mapper` (handles the right-to-left bottom row)
 - `row_address_type=0` for direct row addressing (these P2 panels are not ABC-decoded)
+- `flip_vertical=true` because the panels are mounted with the HUB75 input at the bottom, swapping the top and bottom panel rows
 
 Set these environment variables in `/opt/adsbledmatrix/.env`:
 
@@ -49,11 +50,14 @@ ADSB_LED_MATRIX_ROW_ADDRESS_TYPE=0
 ADSB_LED_MATRIX_PWM_BITS=7
 ADSB_LED_MATRIX_BRIGHTNESS=70
 ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
+ADSB_LED_MATRIX_FLIP_VERTICAL=true
 ```
 
 > Note: some guides mention `--led-sba=1` for serpentine wiring. The standard
 > `hzeller/rpi-rgb-led-matrix` library does not have this flag; the `U-mapper`
 > option performs the same function.
+
+> If the image appears split with the bottom half at the top, `flip_vertical` is wrong for your mounting. Set `ADSB_LED_MATRIX_FLIP_VERTICAL=false` and restart the service.
 
 > ⚠️ `rpi-rgb-led-matrix` supports a maximum of **3 parallel chains** on a standard 40-pin Raspberry Pi. A 512×256 arrangement using sixteen 128×64 panels (4 wide × 4 tall) requires a Raspberry Pi Compute Module or an active adapter board that provides 4+ parallel chains. It will not work on a Pi 4 with a single-channel adapter using `parallel=4`.
 >

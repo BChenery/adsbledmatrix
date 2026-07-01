@@ -43,6 +43,7 @@ LED_MATRIX_CONFIG = {
     "brightness": 70,
     "gpio_slowdown": 4,
     "limit_refresh": 0,
+    "flip_vertical": True,
 }
 
 # 128x64 panels in a single 1x4 chain (512x64)
