@@ -42,6 +42,26 @@ echo "--- WiFi Manager Status ---"
 sudo systemctl status adsbledmatrix-wifi --no-pager || true
 echo ""
 
+echo "--- WiFi Manager Logs (last 50 lines) ---"
+sudo journalctl -u adsbledmatrix-wifi --no-pager -n 50 || true
+echo ""
+
+echo "--- Saved WiFi Config ---"
+sqlite3 /opt/adsbledmatrix/data/aircraft_db.sqlite3 "SELECT onboarding_complete, wifi_ssid, wifi_password FROM user_config;" 2>/dev/null || echo "DB query failed"
+echo ""
+
+echo "--- NetworkManager Connections ---"
+nmcli connection show 2>/dev/null || echo "nmcli not available"
+echo ""
+
+echo "--- Active Network Connections ---"
+nmcli connection show --active 2>/dev/null || echo "nmcli not available"
+echo ""
+
+echo "--- Wireless Device State ---"
+nmcli device show wlan0 2>/dev/null | grep -E "(GENERAL.STATE|GENERAL.MTU|IP4.ADDRESS|IP4.GATEWAY)" || echo "wlan0 not managed by NM"
+echo ""
+
 echo "--- Database Check ---"
 sqlite3 /opt/adsbledmatrix/data/aircraft_db.sqlite3 "SELECT COUNT(*) FROM aircraft;" 2>/dev/null || echo "DB query failed"
 echo ""

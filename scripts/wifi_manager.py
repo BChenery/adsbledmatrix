@@ -74,6 +74,20 @@ def using_network_manager():
     return result.returncode == 0
 
 
+def nm_wait_for_ready(timeout=30):
+    """Wait until NetworkManager daemon is accepting commands."""
+    for i in range(timeout):
+        result = run(["nmcli", "general", "status"], check=False)
+        if result.returncode == 0:
+            logger.info("NetworkManager is ready")
+            return True
+        if i % 5 == 0:
+            logger.info("Waiting for NetworkManager to be ready... (%d/%d)", i, timeout)
+        time.sleep(1)
+    logger.warning("NetworkManager did not become ready within %d seconds", timeout)
+    return False
+
+
 def nm_get_connection_uuid(name):
     result = run(["nmcli", "-g", "NAME,UUID", "connection", "show"], check=False)
     for line in result.stdout.strip().splitlines():
@@ -94,28 +108,58 @@ def nm_connect_home(ssid, password):
     """Connect to home WiFi using NetworkManager."""
     iface = get_wlan_interface()
 
+    # NetworkManager may still be initialising at boot; wait for it.
+    nm_wait_for_ready(timeout=30)
+
     # Ensure NM manages the interface and clear any hostapd/dnsmasq static IP config
     _nm_set_managed(iface)
     _remove_dhcpcd_static(iface)
 
-    # Remove stale connections
+    # Remove stale hotspot connection
     nm_delete_connection("adsb-hotspot")
-    nm_delete_connection("adsb-home")
 
     # Stop hostapd/dnsmasq if they were running
     run(["systemctl", "stop", "hostapd"], check=False)
     run(["systemctl", "disable", "hostapd"], check=False)
     run(["systemctl", "stop", "dnsmasq"], check=False)
 
-    # Add home connection
-    run([
-        "nmcli", "connection", "add", "type", "wifi",
-        "ifname", iface, "con-name", "adsb-home", "autoconnect", "yes",
-        "wifi.ssid", ssid,
-        "wifi-sec.key-mgmt", "wpa-psk", "wifi-sec.psk", password,
-    ])
+    # If an adsb-home profile already exists with the same SSID, reuse it.
+    # Deleting and recreating it every boot races with NM startup and wastes time.
+    existing_uuid = nm_get_connection_uuid("adsb-home")
+    reuse = False
+    if existing_uuid:
+        ssid_result = run(
+            ["nmcli", "-g", "802-11-wireless.ssid", "connection", "show", existing_uuid],
+            check=False,
+        )
+        if ssid_result.stdout.strip() == ssid:
+            reuse = True
+            logger.info("Reusing existing adsb-home connection for SSID %s", ssid)
+        else:
+            nm_delete_connection("adsb-home")
 
-    run(["nmcli", "connection", "up", "adsb-home"])
+    if not reuse:
+        nm_delete_connection("adsb-home")
+        run([
+            "nmcli", "connection", "add", "type", "wifi",
+            "ifname", iface, "con-name", "adsb-home", "autoconnect", "yes",
+            "wifi.ssid", ssid,
+            "wifi-sec.key-mgmt", "wpa-psk", "wifi-sec.psk", password,
+        ])
+
+    # Retry bringing the connection up — at boot the interface may need a moment.
+    activated = False
+    for attempt in range(1, 4):
+        result = run(["nmcli", "connection", "up", "adsb-home"], check=False)
+        if result.returncode == 0:
+            activated = True
+            logger.info("adsb-home activated on attempt %d", attempt)
+            break
+        logger.warning("Failed to activate adsb-home on attempt %d: %s", attempt, result.stderr.strip())
+        time.sleep(2)
+    if not activated:
+        raise subprocess.CalledProcessError(1, ["nmcli", "connection", "up", "adsb-home"])
+
     setup_port_redirect()
     logger.info("Home WiFi connection started (NetworkManager): SSID=%s", ssid)
 
@@ -419,7 +463,7 @@ def cmd_setup_ap(_args):
     setup_port_redirect()
 
 
-def cmd_connect_home(args):
+def cmd_connect_home(args, timeout=60):
     config = read_config_from_db()
     ssid = getattr(args, "ssid", None) or config.get("wifi_ssid")
     password = getattr(args, "password", None) or config.get("wifi_password")
@@ -427,25 +471,32 @@ def cmd_connect_home(args):
         logger.error("No WiFi credentials provided. Pass --ssid / --password or store them in the DB.")
         sys.exit(1)
 
-    if using_network_manager():
-        nm_connect_home(ssid, password)
-        if not nm_wait_for_connection(timeout=60):
-            logger.warning("Home WiFi failed, falling back to AP mode")
-            cmd_setup_ap(args)
-            sys.exit(1)
-    else:
-        legacy_connect_home(ssid, password)
-        if not legacy_wait_for_connection(timeout=60):
-            logger.warning("Home WiFi failed, falling back to AP mode")
-            cmd_setup_ap(args)
-            sys.exit(1)
+    try:
+        if using_network_manager():
+            nm_connect_home(ssid, password)
+            if not nm_wait_for_connection(timeout=timeout):
+                logger.warning("Home WiFi failed, falling back to AP mode")
+                cmd_setup_ap(args)
+                sys.exit(1)
+        else:
+            legacy_connect_home(ssid, password)
+            if not legacy_wait_for_connection(timeout=timeout):
+                logger.warning("Home WiFi failed, falling back to AP mode")
+                cmd_setup_ap(args)
+                sys.exit(1)
+    except subprocess.CalledProcessError as exc:
+        logger.error("Home WiFi connection error: %s", exc)
+        logger.warning("Falling back to AP mode")
+        cmd_setup_ap(args)
+        sys.exit(1)
 
 
 def cmd_auto(_args):
     config = read_config_from_db()
     if config["onboarding_complete"] and config.get("wifi_ssid") and config.get("wifi_password"):
         logger.info("Onboarding complete with home WiFi configured; attempting connection")
-        cmd_connect_home(_args)
+        # At boot give NetworkManager plenty of time to scan, authenticate and DHCP.
+        cmd_connect_home(_args, timeout=120)
     else:
         logger.info("Onboarding incomplete or no home WiFi stored; starting AP mode")
         cmd_setup_ap(_args)
