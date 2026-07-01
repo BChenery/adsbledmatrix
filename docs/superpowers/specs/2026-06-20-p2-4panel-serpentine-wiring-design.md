@@ -45,6 +45,7 @@ Data flows left-to-right on the top row and right-to-left on the bottom row (ser
 | `--led-pwm-bits` | 7 | Reduce flicker on long chain |
 | `--led-brightness` | 70 | Indoor brightness |
 | `--led-flip-vertical` | `true` | Swap top/bottom panel rows for bottom-fed HUB75 wiring |
+| `--led-rgb-sequence` | `BGR` | P2 panels wire colour channels as BGR |
 
 ### Note on `--led-sba`
 
@@ -78,9 +79,10 @@ led_matrix_brightness: int = 70
 led_matrix_gpio_slowdown: int = 4
 led_matrix_limit_refresh: int = 0
 led_matrix_flip_vertical: bool = True
+led_matrix_rgb_sequence: str = "BGR"
 ```
 
-Update the comment block above these settings to describe the P2 4-panel serpentine layout, including that `flip_vertical` compensates for the bottom-fed HUB75 input on the target panels.
+Update the comment block above these settings to describe the P2 4-panel serpentine layout, including that `flip_vertical` compensates for the bottom-fed HUB75 input and `rgb_sequence=BGR` matches the target panels' colour channel wiring.
 
 ### 2. Display dimension calculation
 
@@ -121,6 +123,7 @@ ADSB_LED_MATRIX_PWM_BITS=7
 ADSB_LED_MATRIX_BRIGHTNESS=70
 ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
 ADSB_LED_MATRIX_FLIP_VERTICAL=true
+ADSB_LED_MATRIX_RGB_SEQUENCE=BGR
 ```
 
 ### 5. `docs/SETUP.md`
@@ -171,7 +174,7 @@ sudo journalctl -u adsbledmatrix -f
 
 # Or via API:
 curl http://adsb-display.local/api/diagnostics | python3 -m json.tool
-# Expected: width 256, height 128, pixel_mapper U-mapper, rows 64, cols 128, chain 4, parallel 1, flip_vertical true
+# Expected: width 256, height 128, pixel_mapper U-mapper, rows 64, cols 128, chain 4, parallel 1, flip_vertical true, rgb_sequence BGR
 ```
 
 ## Out of scope

@@ -36,6 +36,7 @@ Panel 4 (BL) ◄── Panel 3 (BR)
 - `pixel_mapper=U-mapper` (handles the right-to-left bottom row)
 - `row_address_type=0` for direct row addressing (these P2 panels are not ABC-decoded)
 - `flip_vertical=true` because the panels are mounted with the HUB75 input at the bottom, swapping the top and bottom panel rows
+- `rgb_sequence=BGR` because the target P2 panels wire their colour channels as BGR
 
 Set these environment variables in `/opt/adsbledmatrix/.env`:
 
@@ -51,6 +52,7 @@ ADSB_LED_MATRIX_PWM_BITS=7
 ADSB_LED_MATRIX_BRIGHTNESS=70
 ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
 ADSB_LED_MATRIX_FLIP_VERTICAL=true
+ADSB_LED_MATRIX_RGB_SEQUENCE=BGR
 ```
 
 > Note: some guides mention `--led-sba=1` for serpentine wiring. The standard

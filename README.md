@@ -245,6 +245,7 @@ Environment variables (all prefixed with `ADSB_`):
 | `ADSB_LED_MATRIX_BRIGHTNESS` | `70` | Brightness (0–100) |
 | `ADSB_LED_MATRIX_GPIO_SLOWDOWN` | `4` | GPIO slowdown (0–4) |
 | `ADSB_LED_MATRIX_FLIP_VERTICAL` | `true` | Swap top/bottom panel rows for bottom-fed HUB75 wiring |
+| `ADSB_LED_MATRIX_RGB_SEQUENCE` | `BGR` | RGB channel order (`RGB` or `BGR`) |
 | `ADSB_GITHUB_REPO` | `BChenery/adsbledmatrix` | Update source repo |
 
 ---

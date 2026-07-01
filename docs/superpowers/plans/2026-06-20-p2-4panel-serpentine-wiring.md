@@ -153,6 +153,7 @@ In `backend/app/config.py`, replace the existing Display section comment and def
     led_matrix_gpio_slowdown: int = 4
     led_matrix_limit_refresh: int = 0
     led_matrix_flip_vertical: bool = True
+    led_matrix_rgb_sequence: str = "BGR"
 ```
 
 - [ ] **Step 2: Add a test for default settings**
@@ -176,6 +177,7 @@ def test_default_led_settings_match_pdf():
     assert settings.led_matrix_brightness == 70
     assert settings.led_matrix_gpio_slowdown == 4
     assert settings.led_matrix_flip_vertical is True
+    assert settings.led_matrix_rgb_sequence == "BGR"
 ```
 
 - [ ] **Step 3: Run the test and confirm it passes**
@@ -427,6 +429,7 @@ ADSB_LED_MATRIX_PWM_BITS=7
 ADSB_LED_MATRIX_BRIGHTNESS=70
 ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
 ADSB_LED_MATRIX_FLIP_VERTICAL=true
+ADSB_LED_MATRIX_RGB_SEQUENCE=BGR
 ```
 
 - [ ] **Step 2: Commit**
@@ -475,6 +478,7 @@ Panel 4 (BL) ◄── Panel 3 (BR)
 - `pixel_mapper=U-mapper` (handles the right-to-left bottom row)
 - `row_address_type=0` for direct row addressing (these P2 panels are not ABC-decoded)
 - `flip_vertical=true` because the panels are mounted with the HUB75 input at the bottom, swapping the top and bottom panel rows
+- `rgb_sequence=BGR` because the target P2 panels wire their colour channels as BGR
 
 Set these environment variables in `/opt/adsbledmatrix/.env`:
 
@@ -490,6 +494,7 @@ ADSB_LED_MATRIX_PWM_BITS=7
 ADSB_LED_MATRIX_BRIGHTNESS=70
 ADSB_LED_MATRIX_GPIO_SLOWDOWN=4
 ADSB_LED_MATRIX_FLIP_VERTICAL=true
+ADSB_LED_MATRIX_RGB_SEQUENCE=BGR
 ```
 
 > Note: some guides mention `--led-sba=1` for serpentine wiring. The standard
@@ -573,7 +578,8 @@ Expected JSON contains:
   "pwm_bits": 7,
   "brightness": 70,
   "gpio_slowdown": 4,
-  "flip_vertical": true
+  "flip_vertical": true,
+  "rgb_sequence": "BGR"
 }
 ```
 
@@ -591,6 +597,7 @@ If any fixes were required, commit them with a clear message.
 | Correct 256×128 logical dimensions | Tasks 1, 4, 5, 6 |
 | U-mapper default | Tasks 2, 3 |
 | `flip_vertical=true` for bottom-fed HUB75 wiring | Tasks 2, 8, 9 |
+| `rgb_sequence=BGR` for target P2 panels | Tasks 2, 8, 9 |
 | No `--led-sba` support | Note in Task 9 docs |
 | Updated `.env.example` | Task 8 |
 | Updated `docs/SETUP.md` | Task 9 |

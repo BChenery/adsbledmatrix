@@ -71,7 +71,10 @@ class Settings(BaseSettings):
     # are swapped relative to the logical canvas. Set to false if your chain
     # starts at the top panel instead.
     led_matrix_flip_vertical: bool = True
-    led_matrix_rgb_sequence: str = "RGB"  # Use "BGR" if red and blue are swapped
+    # The target P2 panels wire their colour channels as BGR, so red/blue are
+    # swapped when using the library's default RGB order. Use RGB only if your
+    # particular panels have the conventional channel order.
+    led_matrix_rgb_sequence: str = "BGR"
 
     # Update
     github_repo: str = "BChenery/adsbledmatrix"

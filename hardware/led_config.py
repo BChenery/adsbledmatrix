@@ -44,6 +44,7 @@ LED_MATRIX_CONFIG = {
     "gpio_slowdown": 4,
     "limit_refresh": 0,
     "flip_vertical": True,
+    "rgb_sequence": "BGR",
 }
 
 # 128x64 panels in a single 1x4 chain (512x64)
