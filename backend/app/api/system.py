@@ -53,15 +53,14 @@ async def check_update():
 
 
 @router.post("/update")
-async def apply_update():
-    result = await updater.check_for_update()
-    if not result.get("update_available"):
-        return {"message": "No update available"}
+async def trigger_update():
+    """Manual update is handled by the root systemd update service.
 
-    success = await updater.apply_update(result)
-    if success:
-        return {"message": "Update applied and service restarted."}
-    return {"message": "Update failed. Check logs for details."}
+    This endpoint exists for backwards compatibility but does not apply
+    updates from the app process (which lacks privileges after the LED
+    matrix drops to the adsb user).
+    """
+    return {"status": "manual updates are applied by systemd; check status with GET /api/system/update"}
 
 
 @router.post("/restart")

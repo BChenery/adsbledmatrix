@@ -91,10 +91,10 @@ export default function Settings() {
 
   const handleApplyUpdate = async () => {
     try {
-      const res = await api.post<{ message: string }>('/api/system/update');
-      toast.success(res.message || 'Update applied');
+      const res = await api.post<{ status: string }>('/api/system/update');
+      toast.success(res.status || 'Update check triggered');
     } catch {
-      toast.error('Failed to apply update');
+      toast.error('Failed to trigger update');
     }
   };
 
@@ -559,7 +559,7 @@ export default function Settings() {
                 </Button>
                 {updateStatus.update_available && (
                   <Button size="sm" onClick={handleApplyUpdate}>
-                    Apply update
+                    Trigger update
                   </Button>
                 )}
               </div>

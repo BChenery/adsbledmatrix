@@ -1,29 +1,10 @@
 [Unit]
-Description=ADS-B LED Display Update Checker
-After=network.target
+Description=ADS-B LED Matrix update check
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot
-User=adsb
-Group=adsb
-WorkingDirectory=/opt/adsbledmatrix
-Environment=PYTHONPATH=/opt/adsbledmatrix/backend
-ExecStart=/opt/adsbledmatrix/venv/bin/python -c "
-import asyncio
-from app.services.updater import updater
-async def check():
-    result = await updater.check_for_update()
-    if result.get('update_available'):
-        print(f'Update available: {result[\"latest_version\"]}')
-        from app.api.config import get_user_config_sync
-        config = get_user_config_sync()
-        if config and config.auto_update:
-            success = await updater.apply_update(result)
-            if success:
-                print('Update applied; running data sync...')
-                await updater.sync_data()
-    # Always sync data independently (in case data changed without a release)
-    await updater.sync_data()
-    await updater.close()
-asyncio.run(check())
-"
+User=root
+Group=root
+ExecStart=/opt/adsbledmatrix/scripts/check_and_update.sh
