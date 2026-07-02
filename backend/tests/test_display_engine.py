@@ -64,3 +64,54 @@ def test_set_brightness_clamps_and_updates(engine):
 
     engine.set_brightness(45)
     assert engine.get_brightness() == 45
+
+
+def test_draw_text_clips_to_box_width(engine):
+    """Long text must not render past the declared box width."""
+    from PIL import Image, ImageDraw
+
+    img = Image.new("RGB", (100, 32), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    engine._draw_text(draw, 10, 0, 40, "VERYLONGCALLSIGN", (255, 255, 255), None, 16)
+
+    # No non-black pixel may appear beyond x=50 (10 + 40).
+    pixels = img.load()
+    for py in range(32):
+        for px in range(50, 100):
+            assert pixels[px, py] == (0, 0, 0), f"text overflow at ({px},{py})"
+
+
+def test_draw_text_keeps_short_text_inside_box(engine):
+    """Short text should render normally inside its box."""
+    from PIL import Image, ImageDraw
+
+    img = Image.new("RGB", (100, 32), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    engine._draw_text(draw, 0, 0, 100, "ABC", (255, 255, 255), None, 16)
+
+    bbox = img.getbbox()
+    assert bbox is not None
+    assert bbox[2] <= 100
+
+
+def test_distance_bar_does_not_draw_label_below_bar(engine):
+    """The distance bar must not render its value label below the bar area."""
+    from unittest.mock import MagicMock
+    from app.services.display_engine import RenderContext
+    from PIL import Image, ImageDraw
+
+    aircraft = MagicMock()
+    aircraft.distance_km = 12.5
+
+    ctx = RenderContext(aircraft=aircraft)
+
+    img = Image.new("RGB", (256, 128), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    engine._draw_distance_bar(draw, 4, 118, 248, 6, ctx, (0, 212, 255))
+
+    # The area below the bar (y >= 126, where the old label was drawn) must remain black.
+    pixels = img.load()
+    for py in range(126, 128):
+        for px in range(256):
+            assert pixels[px, py] == (0, 0, 0), f"non-black pixel below bar at ({px},{py})"

@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.api import layouts
 from app.api.layouts import router, get_db
 from app.models import Base, Layout, UserConfig
+from scripts.validate_layouts import validate
 
 
 @pytest_asyncio.fixture
@@ -122,3 +123,9 @@ async def test_radar_element_settings_persist(app, db_session, monkeypatch):
     assert el["user_dot_color"] == "#ff00ff"
     assert el["show_rings"] is False
     assert el["show_ticks"] is False
+
+
+def test_default_layouts_validate():
+    """All layouts shipped in data/default_layouts.json must pass the design-system validator."""
+    errors = validate()
+    assert errors == [], "Default layouts failed validation: " + "; ".join(errors)

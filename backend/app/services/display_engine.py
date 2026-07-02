@@ -188,48 +188,53 @@ class DisplayEngine:
 
     def _render_element(self, draw: ImageDraw.Draw, img: Image.Image, element: Any, ctx: RenderContext):
         # Visibility check
-        if element.show_if and not self._evaluate_condition(element.show_if, ctx):
+        show_if = getattr(element, "show_if", None)
+        if show_if and not self._evaluate_condition(show_if, ctx):
             return
 
         x, y = element.x, element.y
-        w = element.width or 100
-        h = element.height or 20
-        color = self._parse_color(element.color) or (255, 255, 255)
-        bg_color = self._parse_color(element.bg_color)
+        w = getattr(element, "width", None) or 100
+        h = getattr(element, "height", None) or 20
+        color = self._parse_color(getattr(element, "color", None)) or (255, 255, 255)
+        bg_color = self._parse_color(getattr(element, "bg_color", None))
 
         if bg_color:
             draw.rectangle([x, y, x + w, y + h], fill=bg_color)
 
-        if element.element_type == "text":
-            text = element.format_str or ""
-            self._draw_text(draw, x, y, w, text, color, element.font_family, element.font_size)
+        element_type = element.element_type
+        font_family = getattr(element, "font_family", None)
+        font_size = getattr(element, "font_size", None)
 
-        elif element.element_type == "data_field":
-            text = self._resolve_data_field(element.data_field, element.format_str, ctx)
-            self._draw_text(draw, x, y, w, text, color, element.font_family, element.font_size)
+        if element_type == "text":
+            text = getattr(element, "format_str", None) or ""
+            self._draw_text(draw, x, y, w, text, color, font_family, font_size)
 
-        elif element.element_type == "image":
+        elif element_type == "data_field":
+            text = self._resolve_data_field(getattr(element, "data_field", None), getattr(element, "format_str", None), ctx)
+            self._draw_text(draw, x, y, w, text, color, font_family, font_size)
+
+        elif element_type == "image":
             self._draw_image(img, x, y, w, h, element, ctx)
 
-        elif element.element_type == "shape":
+        elif element_type == "shape":
             self._draw_shape(draw, x, y, w, h, element, color)
 
-        elif element.element_type == "heading_arrow":
+        elif element_type == "heading_arrow":
             self._draw_heading_arrow(draw, x, y, w, h, ctx, color)
 
-        elif element.element_type == "vertical_rate":
+        elif element_type == "vertical_rate":
             self._draw_vertical_rate(draw, x, y, w, h, ctx, color)
 
-        elif element.element_type == "distance_bar":
+        elif element_type == "distance_bar":
             self._draw_distance_bar(draw, x, y, w, h, ctx, color)
 
-        elif element.element_type == "radar":
+        elif element_type == "radar":
             self._draw_radar(draw, img, element, ctx)
 
-        elif element.element_type == "radar_blip":
+        elif element_type == "radar_blip":
             self._draw_radar_blip(draw, x, y, w, h, ctx, color)
 
-        elif element.element_type == "aircraft_list":
+        elif element_type == "aircraft_list":
             self._draw_aircraft_list(draw, x, y, w, h, element, ctx, color)
 
     def _draw_text(
@@ -257,15 +262,31 @@ class DisplayEngine:
 
         font = self._font_cache[key]
         text = str(text)
-        bbox = draw.textbbox((0, 0), text, font=font)
+        bbox = font.getbbox(text)
         text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+
         if align == "center":
             draw_x = x + max(0, (width - text_width) // 2)
         elif align == "right":
             draw_x = x + max(0, width - text_width)
         else:
             draw_x = x
-        draw.text((draw_x, y), text, fill=color, font=font)
+
+        # Vertically centre the glyph bounding box inside the declared box so
+        # cap-height sits near the top and descenders do not spill out.
+        draw_y = y + max(0, (size - text_height) // 2)
+
+        if text_width > width:
+            # Long text is cropped to the declared width and left-aligned so the
+            # start of the value (e.g. callsign prefix) remains readable.
+            tmp = Image.new("RGBA", (text_width, text_height + 2), (0, 0, 0, 0))
+            tmp_draw = ImageDraw.Draw(tmp)
+            tmp_draw.text((0, 0), text, fill=color, font=font)
+            cropped = tmp.crop((0, 0, width, text_height + 2))
+            draw._image.paste(cropped, (x, draw_y), cropped)
+        else:
+            draw.text((draw_x, draw_y), text, fill=color, font=font)
 
     def _draw_image(self, img: Image.Image, x: int, y: int, w: int, h: int, element: Any, ctx: RenderContext):
         path = element.image_path
@@ -342,8 +363,8 @@ class DisplayEngine:
         bar_w = int(w * (1.0 - ratio))
         draw.rectangle([x, y, x + w, y + h], outline=(50, 50, 50))
         draw.rectangle([x, y, x + bar_w, y + h], fill=color)
-        label = f"{dist:.1f} km"
-        self._draw_text(draw, x, y + h + 2, w, label, color, None, 10)
+        # The distance value is rendered by a separate data_field element in the
+        # redesigned layouts; do not draw a label here to avoid clipping the margin.
 
     def _draw_radar_blip(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, ctx: RenderContext, color: Tuple[int, int, int]):
         import random
