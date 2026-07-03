@@ -170,6 +170,7 @@ async def main():
     localadsb_script = Path(__file__).resolve().parent / "import_localadsb.py"
     flights_db_local = settings.data_dir / "localadsb" / "flights.db"
     flights_db_rel = "data/localadsb/flights.db"
+    localadsb_updated = False
     if localadsb_script.exists() and flights_db_local.exists() and (flights_db_rel in updated or args.force):
         print()
         print("[5/5] Importing localadsb databases...")
@@ -188,6 +189,22 @@ async def main():
                 file=sys.stderr,
             )
             sys.exit(1)
+        localadsb_updated = True
+
+    # The display service caches route lookups in memory. If localadsb data
+    # changed, restart the service so new routes are picked up immediately.
+    if localadsb_updated:
+        print()
+        print("[6/5] Restarting display service to clear route cache...")
+        result = subprocess.run(
+            ["sudo", "systemctl", "restart", "adsbledmatrix"],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0:
+            print("  ✓ Display service restarted")
+        else:
+            print(f"  ⚠ Could not restart display service: {result.stderr.strip()}")
 
     # Write sync timestamp
     sync_file = settings.data_dir / ".last_sync"

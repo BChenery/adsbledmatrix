@@ -209,7 +209,7 @@ systemctl enable avahi-daemon.service
 
 # Allow the adsb service user to manage WiFi and reboot without a password
 echo "adsb ALL=(ALL) NOPASSWD: /opt/adsbledmatrix/venv/bin/python3 /opt/adsbledmatrix/scripts/wifi_manager.py *" > /etc/sudoers.d/adsbledmatrix
-echo "adsb ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/reboot, /sbin/shutdown, /usr/sbin/shutdown, /usr/sbin/nmcli, /usr/sbin/iptables, /usr/sbin/netfilter-persistent" >> /etc/sudoers.d/adsbledmatrix
+echo "adsb ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/reboot, /sbin/shutdown, /usr/sbin/shutdown, /usr/sbin/nmcli, /usr/sbin/iptables, /usr/sbin/netfilter-persistent, /bin/systemctl restart adsbledmatrix" >> /etc/sudoers.d/adsbledmatrix
 chmod 440 /etc/sudoers.d/adsbledmatrix
 
 # Set permissions
