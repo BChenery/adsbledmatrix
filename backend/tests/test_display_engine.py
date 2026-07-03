@@ -94,6 +94,22 @@ def test_draw_text_keeps_short_text_inside_box(engine):
     assert bbox[2] <= 100
 
 
+def test_draw_text_clips_to_box_height(engine):
+    """An oversized font must not render past the declared box height."""
+    from PIL import Image, ImageDraw
+
+    img = Image.new("RGB", (100, 64), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    # Font size 24 in a 14px-tall box will overflow without clipping.
+    engine._draw_text(draw, 0, 10, 100, "ALT: 145", (255, 255, 255), None, 24, height=14)
+
+    # No non-black pixel may appear below y=24 (10 + 14).
+    pixels = img.load()
+    for py in range(24, 64):
+        for px in range(100):
+            assert pixels[px, py] == (0, 0, 0), f"text overflow below box at ({px},{py})"
+
+
 def test_distance_bar_does_not_draw_label_below_bar(engine):
     """The distance bar must not render its value label below the bar area."""
     from unittest.mock import MagicMock

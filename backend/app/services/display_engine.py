@@ -207,11 +207,11 @@ class DisplayEngine:
 
         if element_type == "text":
             text = getattr(element, "format_str", None) or ""
-            self._draw_text(draw, x, y, w, text, color, font_family, font_size)
+            self._draw_text(draw, x, y, w, text, color, font_family, font_size, height=h)
 
         elif element_type == "data_field":
             text = self._resolve_data_field(getattr(element, "data_field", None), getattr(element, "format_str", None), ctx)
-            self._draw_text(draw, x, y, w, text, color, font_family, font_size)
+            self._draw_text(draw, x, y, w, text, color, font_family, font_size, height=h)
 
         elif element_type == "image":
             self._draw_image(img, x, y, w, h, element, ctx)
@@ -248,6 +248,7 @@ class DisplayEngine:
         font_family: Optional[str],
         font_size: Optional[int],
         align: str = "center",
+        height: Optional[int] = None,
     ):
         size = font_size or 12
         family = font_family or "default"
@@ -277,14 +278,24 @@ class DisplayEngine:
         # cap-height sits near the top and descenders do not spill out.
         draw_y = y + max(0, (size - text_height) // 2)
 
-        if text_width > width:
-            # Long text is cropped to the declared width and left-aligned so the
-            # start of the value (e.g. callsign prefix) remains readable.
-            tmp = Image.new("RGBA", (text_width, text_height + 2), (0, 0, 0, 0))
+        # Determine whether the text would spill below the declared element box.
+        overflow_bottom = 0
+        if height and height > 0:
+            overflow_bottom = max(0, (draw_y - y) + bbox[3] - height)
+
+        if text_width > width or overflow_bottom > 0:
+            # Long or tall text is rendered into a temporary buffer and cropped
+            # to the declared box so it cannot bleed into neighbouring elements.
+            render_w = max(text_width, width)
+            render_h = height if height and height > 0 else text_height + 2
+            tmp = Image.new("RGBA", (render_w, render_h), (0, 0, 0, 0))
             tmp_draw = ImageDraw.Draw(tmp)
-            tmp_draw.text((0, 0), text, fill=color, font=font)
-            cropped = tmp.crop((0, 0, width, text_height + 2))
-            draw._image.paste(cropped, (x, draw_y), cropped)
+            # Long text is left-aligned so the start of the value remains readable;
+            # short text honours the horizontal alignment inside the temp buffer.
+            offset_x = 0 if text_width > width else max(0, draw_x - x)
+            tmp_draw.text((offset_x, draw_y - y), text, fill=color, font=font)
+            cropped = tmp.crop((0, 0, width, render_h))
+            draw._image.paste(cropped, (x, y), cropped)
         else:
             draw.text((draw_x, draw_y), text, fill=color, font=font)
 
@@ -352,7 +363,7 @@ class DisplayEngine:
             text = f"▼ {abs(rate)}"
         else:
             text = "→ level"
-        self._draw_text(draw, x, y, w, text, color, None, h - 4)
+        self._draw_text(draw, x, y, w, text, color, None, h - 4, height=h)
 
     def _draw_distance_bar(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, ctx: RenderContext, color: Tuple[int, int, int]):
         dist = ctx.aircraft.distance_km if ctx.aircraft else None
@@ -392,14 +403,14 @@ class DisplayEngine:
 
         closest = receiver.get_closest(n=max_rows)
         if not closest:
-            self._draw_text(draw, x, y, w, "No aircraft", color, None, font_size, align="left")
+            self._draw_text(draw, x, y, w, "No aircraft", color, None, font_size, align="left", height=h)
             return
 
         # Header
         row_y = y + 4
         if show_header:
             header_text = "  ".join(col.upper()[:8] for col in columns)
-            self._draw_text(draw, x + 4, row_y, w - 8, header_text, color, None, font_size, align="left")
+            self._draw_text(draw, x + 4, row_y, w - 8, header_text, color, None, font_size, align="left", height=row_height)
             row_y += row_height
             # Separator line
             draw.line([x + 4, row_y - 4, x + w - 4, row_y - 4], fill=(50, 50, 50), width=1)
@@ -435,7 +446,7 @@ class DisplayEngine:
                 row_parts.append(str(val)[:10])
             row_text = "  ".join(row_parts)
 
-            self._draw_text(draw, x + 4, row_y, w - 8, row_text, color, None, font_size, align="left")
+            self._draw_text(draw, x + 4, row_y, w - 8, row_text, color, None, font_size, align="left", height=row_height)
             row_y += row_height
             if row_y > y + h:
                 break
