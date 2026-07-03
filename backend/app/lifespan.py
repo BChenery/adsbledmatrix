@@ -71,6 +71,8 @@ async def lifespan(app: FastAPI):
 
             if layout.name == "Idle / Scanning":
                 idle_layout = layout
+            elif layout_data.get("is_default"):
+                active_layout = layout
             elif active_layout is None:
                 active_layout = layout
 

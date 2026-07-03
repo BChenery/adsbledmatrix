@@ -1,10 +1,112 @@
 [
   {
+    "name": "BC",
+    "description": "Clean callsign-first layout with logo, route, registration, altitude, type, speed and distance",
+    "width": 256,
+    "height": 128,
+    "is_default": true,
+    "elements": [
+      {
+        "element_type": "image",
+        "x": 27,
+        "y": 8,
+        "width": 54,
+        "height": 55,
+        "z_index": 0,
+        "show_if": "has_logo"
+      },
+      {
+        "element_type": "data_field",
+        "x": 90,
+        "y": 4,
+        "width": 161,
+        "height": 33,
+        "z_index": 1,
+        "data_field": "callsign",
+        "format_str": "{callsign}",
+        "font_size": 29,
+        "color": "#00d4ff"
+      },
+      {
+        "element_type": "data_field",
+        "x": 98,
+        "y": 38,
+        "width": 154,
+        "height": 23,
+        "z_index": 4,
+        "data_field": "route",
+        "format_str": "{route}",
+        "font_size": 18,
+        "color": "#ffb347"
+      },
+      {
+        "element_type": "data_field",
+        "x": 5,
+        "y": 56,
+        "width": 107,
+        "height": 23,
+        "z_index": 5,
+        "data_field": "registration",
+        "format_str": "{registration}",
+        "font_size": 19,
+        "color": "#a0aec0"
+      },
+      {
+        "element_type": "data_field",
+        "x": 117,
+        "y": 63,
+        "width": 131,
+        "height": 29,
+        "z_index": 5,
+        "data_field": "altitude",
+        "format_str": "ALT: {altitude}ft",
+        "font_size": 20,
+        "color": "#a0aec0"
+      },
+      {
+        "element_type": "data_field",
+        "x": 4,
+        "y": 78,
+        "width": 102,
+        "height": 25,
+        "z_index": 6,
+        "data_field": "type_code",
+        "format_str": "{type_code}",
+        "font_size": 20,
+        "color": "#a0aec0"
+      },
+      {
+        "element_type": "data_field",
+        "x": 120,
+        "y": 94,
+        "width": 131,
+        "height": 24,
+        "z_index": 6,
+        "data_field": "ground_speed",
+        "format_str": "SPD: {ground_speed} kts",
+        "font_size": 20,
+        "color": "#a0aec0"
+      },
+      {
+        "element_type": "data_field",
+        "x": 7,
+        "y": 102,
+        "width": 105,
+        "height": 21,
+        "z_index": 7,
+        "data_field": "distance",
+        "format_str": "{distance} km",
+        "font_size": 16,
+        "color": "#00d4ff"
+      }
+    ]
+  },
+  {
     "name": "Aviation Enthusiast",
     "description": "Full aircraft details with callsign, altitude, speed, heading, and distance",
     "width": 256,
     "height": 128,
-    "is_default": true,
+    "is_default": false,
     "elements": [
       {
         "element_type": "image",
