@@ -283,21 +283,30 @@ class DisplayEngine:
         if height and height > 0:
             overflow_bottom = max(0, (draw_y - y) + bbox[3] - height)
 
-        if text_width > width or overflow_bottom > 0:
-            # Long or tall text is rendered into a temporary buffer and cropped
-            # to the declared box so it cannot bleed into neighbouring elements.
-            render_w = max(text_width, width)
-            render_h = height if height and height > 0 else text_height + 2
-            tmp = Image.new("RGBA", (render_w, render_h), (0, 0, 0, 0))
-            tmp_draw = ImageDraw.Draw(tmp)
-            # Long text is left-aligned so the start of the value remains readable;
-            # short text honours the horizontal alignment inside the temp buffer.
-            offset_x = 0 if text_width > width else max(0, draw_x - x)
-            tmp_draw.text((offset_x, draw_y - y), text, fill=color, font=font)
-            cropped = tmp.crop((0, 0, width, render_h))
-            draw._image.paste(cropped, (x, y), cropped)
-        else:
-            draw.text((draw_x, draw_y), text, fill=color, font=font)
+        # Render text into a temporary RGBA buffer so we can threshold the
+        # anti-aliased alpha channel.  TrueType fonts produce translucent edge
+        # pixels that pick up colour tints on low-resolution LED matrices;
+        # converting those edges to fully opaque or fully transparent removes
+        # the colour fringing (e.g. blue pixels in grey text) while keeping
+        # glyph shapes crisp.
+        render_w = max(text_width, width)
+        render_h = height if height and height > 0 else text_height + 2
+        tmp = Image.new("RGBA", (render_w, render_h), (0, 0, 0, 0))
+        tmp_draw = ImageDraw.Draw(tmp)
+        # Long text is left-aligned so the start of the value remains readable;
+        # short text honours the horizontal alignment inside the temp buffer.
+        offset_x = 0 if text_width > width else max(0, draw_x - x)
+        tmp_draw.text((offset_x, draw_y - y), text, fill=color, font=font)
+
+        # Threshold anti-aliased edges to solid pixels.
+        alpha = tmp.split()[3]
+        alpha = alpha.point(lambda p: 255 if p > 128 else 0)
+
+        # Build a solid-colour image and paste it through the thresholded mask.
+        solid = Image.new("RGB", (render_w, render_h), color)
+        output = Image.new("RGB", (width, render_h), (0, 0, 0))
+        output.paste(solid, (0, 0), alpha)
+        draw._image.paste(output, (x, y), alpha.crop((0, 0, width, render_h)))
 
     def _draw_image(self, img: Image.Image, x: int, y: int, w: int, h: int, element: Any, ctx: RenderContext):
         path = element.image_path
