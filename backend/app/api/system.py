@@ -1,7 +1,7 @@
 import platform
-from typing import Optional
 from pydantic import BaseModel
 from fastapi import APIRouter
+from app.api.config import get_user_config_sync
 from app.config import settings
 from app.services.updater import updater
 
@@ -38,7 +38,6 @@ async def health_check():
 @router.get("/status", response_model=SystemStatus)
 async def get_status():
     from app.services.adsb_receiver import receiver
-    from app.api.config import get_user_config_sync
 
     config = get_user_config_sync()
     host, port = receiver.endpoint
