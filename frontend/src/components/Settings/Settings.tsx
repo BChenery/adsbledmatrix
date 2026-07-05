@@ -604,20 +604,12 @@ export default function Settings() {
           </div>
           {config.night_mode && (
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Sleep display (off) at night</span>
-                <Switch
-                  checked={config.night_mode_sleep}
-                  onCheckedChange={(v) => update('night_mode_sleep', v)}
-                />
-              </div>
               <p className="text-xs text-white/50">
-                When off, the display dims to 20% brightness during night hours.
-                When on, the display turns off completely.
+                During these hours the display dims to 20% brightness.
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label>Start Time</Label>
+                  <Label>Dim Start Time</Label>
                   <Input
                     type="time"
                     value={config.night_mode_start || '22:00'}
@@ -625,11 +617,48 @@ export default function Settings() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>End Time</Label>
+                  <Label>Dim End Time</Label>
                   <Input
                     type="time"
                     value={config.night_mode_end || '06:00'}
                     onChange={(e) => update('night_mode_end', e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {config.sleep_mode ? <Moon size={16} /> : <Sun size={16} />}
+              <span className="text-sm">Sleep Display</span>
+            </div>
+            <Switch
+              checked={config.sleep_mode}
+              onCheckedChange={(v) => update('sleep_mode', v)}
+            />
+          </div>
+
+          {config.sleep_mode && (
+            <div className="space-y-3">
+              <p className="text-xs text-white/50">
+                During these hours the display turns off completely. Sleep overrides dim if windows overlap.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Sleep Start Time</Label>
+                  <Input
+                    type="time"
+                    value={config.sleep_mode_start || '23:00'}
+                    onChange={(e) => update('sleep_mode_start', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Sleep End Time</Label>
+                  <Input
+                    type="time"
+                    value={config.sleep_mode_end || '06:00'}
+                    onChange={(e) => update('sleep_mode_end', e.target.value)}
                   />
                 </div>
               </div>

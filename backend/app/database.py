@@ -70,6 +70,18 @@ async def migrate_db():
                 sync_conn.execute(
                     text("ALTER TABLE user_config ADD COLUMN night_mode_sleep BOOLEAN NOT NULL DEFAULT 0")
                 )
+            if "sleep_mode" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN sleep_mode BOOLEAN NOT NULL DEFAULT 0")
+                )
+            if "sleep_mode_start" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN sleep_mode_start VARCHAR(5)")
+                )
+            if "sleep_mode_end" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN sleep_mode_end VARCHAR(5)")
+                )
 
             # Radar element settings added after initial schema
             result = sync_conn.execute(

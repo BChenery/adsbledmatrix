@@ -66,50 +66,69 @@ def test_set_brightness_clamps_and_updates(engine):
     assert engine.get_brightness() == 45
 
 
-def test_night_mode_within_hours(engine):
-    """Night mode is active when current time lies between start and end."""
-    from unittest.mock import MagicMock, patch
+def test_time_window_detection(engine):
+    """Window detection works for both same-day and wrap-around intervals."""
+    from unittest.mock import patch
     from datetime import time, datetime, date
-
-    config = MagicMock()
-    config.night_mode = True
-    config.night_mode_start = "22:00"
-    config.night_mode_end = "06:00"
-
-    assert engine._is_night_mode(config) is False
 
     with patch("app.services.display_engine.datetime") as mock_dt:
         mock_dt.strptime = datetime.strptime
         mock_dt.now.return_value = datetime.combine(date.today(), time(23, 30))
-        assert engine._is_night_mode(config) is True
+        assert engine._is_in_time_window("22:00", "06:00") is True
 
         mock_dt.now.return_value = datetime.combine(date.today(), time(3, 0))
-        assert engine._is_night_mode(config) is True
+        assert engine._is_in_time_window("22:00", "06:00") is True
 
         mock_dt.now.return_value = datetime.combine(date.today(), time(12, 0))
-        assert engine._is_night_mode(config) is False
+        assert engine._is_in_time_window("22:00", "06:00") is False
+
+        mock_dt.now.return_value = datetime.combine(date.today(), time(2, 0))
+        assert engine._is_in_time_window("22:00", "23:00") is False
 
 
-def test_night_mode_sleep_blanks_display(engine):
-    """Sleep mode clears the matrix and stops rendering."""
+def test_sleep_window_blanks_display(engine):
+    """Sleep window clears the matrix and stops rendering."""
     from unittest.mock import MagicMock, patch
     from datetime import datetime, date, time
 
     config = MagicMock()
-    config.night_mode = True
-    config.night_mode_start = "22:00"
-    config.night_mode_end = "06:00"
-    config.night_mode_sleep = True
+    config.night_mode = False
+    config.sleep_mode = True
+    config.sleep_mode_start = "23:00"
+    config.sleep_mode_end = "06:00"
 
     engine._night_mode_active = False
     engine._matrix = MagicMock()
 
     with patch("app.services.display_engine.datetime") as mock_dt:
         mock_dt.strptime = datetime.strptime
-        mock_dt.now.return_value = datetime.combine(date.today(), time(23, 0))
+        mock_dt.now.return_value = datetime.combine(date.today(), time(0, 30))
         assert engine._handle_night_mode(config) is True
         engine._matrix.clear.assert_called_once()
         assert engine._night_mode_active is True
+
+
+def test_sleep_window_overrides_dim_window(engine):
+    """If sleep and dim windows overlap, sleep takes precedence."""
+    from unittest.mock import MagicMock, patch
+    from datetime import datetime, date, time
+
+    config = MagicMock()
+    config.night_mode = True
+    config.night_mode_start = "22:00"
+    config.night_mode_end = "07:00"
+    config.sleep_mode = True
+    config.sleep_mode_start = "23:00"
+    config.sleep_mode_end = "06:00"
+
+    engine._night_mode_active = False
+    engine._matrix = MagicMock()
+
+    with patch("app.services.display_engine.datetime") as mock_dt:
+        mock_dt.strptime = datetime.strptime
+        mock_dt.now.return_value = datetime.combine(date.today(), time(0, 30))
+        assert engine._handle_night_mode(config) is True
+        engine._matrix.clear.assert_called_once()
 
 
 def test_draw_text_clips_to_box_width(engine):

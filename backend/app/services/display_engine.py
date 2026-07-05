@@ -605,12 +605,8 @@ class DisplayEngine:
             )
         return None
 
-    def _is_night_mode(self, config: Optional[Any]) -> bool:
-        """Return True if the current local time falls within configured night hours."""
-        if not config or not config.night_mode:
-            return False
-        start = config.night_mode_start
-        end = config.night_mode_end
+    def _is_in_time_window(self, start: Optional[str], end: Optional[str]) -> bool:
+        """Return True if the current local time falls within the HH:MM window."""
         if not start or not end:
             return False
         try:
@@ -630,20 +626,25 @@ class DisplayEngine:
             self._matrix.set_brightness(max(0, min(100, brightness)))
 
     def _handle_night_mode(self, config: Optional[Any]) -> bool:
-        """Apply night-mode dim or sleep. Returns True when rendering should be skipped."""
-        in_night_mode = self._is_night_mode(config)
+        """Apply sleep or dim windows. Returns True when rendering should be skipped."""
+        in_sleep_window = bool(
+            config and config.sleep_mode and self._is_in_time_window(config.sleep_mode_start, config.sleep_mode_end)
+        )
+        in_dim_window = bool(
+            config and config.night_mode and self._is_in_time_window(config.night_mode_start, config.night_mode_end)
+        )
 
-        if in_night_mode:
-            if config and config.night_mode_sleep:
-                # Sleep: blank the matrix and skip rendering entirely.
-                if not self._night_mode_active:
-                    logger.info("Night mode sleep active — turning display off")
-                    self._night_mode_active = True
-                if self._matrix:
-                    self._matrix.clear()
-                self._framebuffer = None
-                return True
+        if in_sleep_window:
+            # Sleep: blank the matrix and skip rendering entirely.
+            if not self._night_mode_active:
+                logger.info("Sleep window active — turning display off")
+                self._night_mode_active = True
+            if self._matrix:
+                self._matrix.clear()
+            self._framebuffer = None
+            return True
 
+        if in_dim_window:
             # Dim: drop to 20% of the configured brightness (min 5%).
             night_brightness = max(5, int(self._brightness * 0.2))
             if not self._night_mode_active:
