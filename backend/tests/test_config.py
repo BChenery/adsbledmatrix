@@ -3,7 +3,7 @@ from httpx import AsyncClient, ASGITransport, HTTPStatusError, RequestError, Res
 from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import create_async_engine
-from app.api.config import router
+from app.api.config import ConfigUpdate, router
 from app import database as database_module
 
 
@@ -246,3 +246,28 @@ async def test_user_config_has_receiver_columns(monkeypatch):
             await conn.run_sync(_check)
     finally:
         await test_engine.dispose()
+
+
+def test_network_config_requires_host():
+    with pytest.raises(ValueError, match="network_readsb_host is required"):
+        ConfigUpdate(receiver_source="network", network_readsb_host="")
+
+
+def test_network_config_accepts_valid_host():
+    update = ConfigUpdate(
+        receiver_source="network",
+        network_readsb_host="10.0.0.158",
+        network_readsb_port=30003,
+    )
+    assert update.receiver_source == "network"
+    assert update.network_readsb_host == "10.0.0.158"
+
+
+def test_invalid_receiver_source_rejected():
+    with pytest.raises(ValueError, match="receiver_source must be"):
+        ConfigUpdate(receiver_source="satellite")
+
+
+def test_invalid_port_rejected():
+    with pytest.raises(ValueError, match="network_readsb_port"):
+        ConfigUpdate(receiver_source="network", network_readsb_host="10.0.0.158", network_readsb_port=70000)
