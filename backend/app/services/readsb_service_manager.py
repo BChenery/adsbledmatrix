@@ -72,10 +72,10 @@ def set_network_flag(enabled: bool) -> None:
         NETWORK_FLAG_FILE.unlink(missing_ok=True)
 
 
-def apply_receiver_source(config: UserConfig) -> None:
+async def apply_receiver_source(config: UserConfig) -> None:
     """Apply receiver source configuration: endpoint + local service state + flag file."""
     host, port = _resolve_receiver_config(config)
-    receiver.set_endpoint(host, port)
+    await receiver.set_endpoint(host, port)
 
     if config.receiver_source == "network":
         set_network_flag(True)

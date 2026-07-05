@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.database import get_db
 from app.models import UserConfig, Layout
+from app.services.readsb_service_manager import apply_receiver_source
 
 router = APIRouter(prefix="/api/config", tags=["config"])
 
@@ -101,6 +102,9 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
 
     # Refresh cache
     await refresh_config_cache(session)
+
+    # Apply receiver source / endpoint changes
+    await apply_receiver_source(config)
 
     # Notify receiver of location change
     if "latitude" in update_data or "longitude" in update_data:

@@ -62,13 +62,14 @@ class ADSBReceiver:
     def endpoint(self) -> tuple[str, int]:
         return self._readsb_host, self._readsb_port
 
-    def set_endpoint(self, host: str, port: int) -> None:
+    async def set_endpoint(self, host: str, port: int) -> None:
         if host == self._readsb_host and port == self._readsb_port:
             return
         self._readsb_host = host
         self._readsb_port = port
         if self._running and self._task is not None:
-            self._task.cancel()
+            await self.stop()
+            await self.start()
 
     def set_user_location(self, lat: Optional[float], lon: Optional[float]):
         self._user_lat = lat
@@ -106,6 +107,7 @@ class ADSBReceiver:
 
     async def _read_loop(self):
         while self._running:
+            writer = None
             try:
                 reader, writer = await asyncio.open_connection(
                     self._readsb_host, self._readsb_port
@@ -137,6 +139,9 @@ class ADSBReceiver:
                 await asyncio.sleep(5)
             finally:
                 self._connected = False
+                if writer is not None:
+                    writer.close()
+                    await writer.wait_closed()
 
     def _parse_line(self, line: str):
         # SBS/BaseStation format (CSV)
