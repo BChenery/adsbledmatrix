@@ -124,8 +124,12 @@ export default function Settings() {
         return;
       }
     }
-    await api.put('/api/config', config);
-    toast.success('Settings saved');
+    try {
+      await api.put('/api/config', config);
+      toast.success('Settings saved');
+    } catch {
+      toast.error('Failed to save settings');
+    }
   };
 
   const handleResetOnboarding = async () => {
@@ -293,7 +297,7 @@ export default function Settings() {
                   min={1}
                   max={65535}
                   value={config.network_readsb_port}
-                  onChange={(e) => update('network_readsb_port', parseInt(e.target.value, 10))}
+                  onChange={(e) => update('network_readsb_port', parseInt(e.target.value, 10) || 0)}
                 />
               </div>
               <Button
@@ -678,7 +682,14 @@ export default function Settings() {
       </Card>
 
       <div className="flex gap-3 pt-4">
-        <Button onClick={handleSave} className="flex-1 gap-2">
+        <Button
+          onClick={handleSave}
+          className="flex-1 gap-2"
+          disabled={
+            config.receiver_source === 'network' &&
+            (!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port))
+          }
+        >
           <Save size={16} />
           Save Settings
         </Button>
