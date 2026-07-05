@@ -1,7 +1,10 @@
 import pytest
 from httpx import AsyncClient, ASGITransport, HTTPStatusError, RequestError, Response
 from fastapi import FastAPI
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
 from app.api.config import router
+from app import database as database_module
 
 
 app = FastAPI()
@@ -208,3 +211,38 @@ def test_settings_version_env_override(monkeypatch, tmp_path):
 
     settings = Settings()
     assert settings.version == "9.9.9"
+
+
+@pytest.mark.asyncio
+async def test_user_config_has_receiver_columns(monkeypatch):
+    """UserConfig receiver columns should exist with correct null/default rules."""
+    test_engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    monkeypatch.setattr(database_module, "engine", test_engine)
+
+    try:
+        await database_module.init_db()
+        await database_module.migrate_db()
+
+        async with test_engine.begin() as conn:
+            def _check(sync_conn):
+                result = sync_conn.execute(text("PRAGMA table_info(user_config)"))
+                columns = {row[1]: row for row in result}
+
+                assert "receiver_source" in columns
+                assert "network_readsb_host" in columns
+                assert "network_readsb_port" in columns
+
+                rs = columns["receiver_source"]
+                assert rs[3] == 1, "receiver_source should be NOT NULL"
+                assert rs[4] == "'local'", "receiver_source should default to 'local'"
+
+                port = columns["network_readsb_port"]
+                assert port[3] == 1, "network_readsb_port should be NOT NULL"
+                assert port[4] == "30003", "network_readsb_port should default to 30003"
+
+                host = columns["network_readsb_host"]
+                assert host[3] == 0, "network_readsb_host should be nullable"
+
+            await conn.run_sync(_check)
+    finally:
+        await test_engine.dispose()

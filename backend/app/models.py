@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from sqlalchemy import Column, Integer, String, Float, Boolean, Text, ForeignKey, DateTime, JSON, event
+from sqlalchemy import Column, Integer, String, Float, Boolean, Text, ForeignKey, DateTime, JSON, event, text
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -49,6 +49,11 @@ class UserConfig(Base):
     night_mode_start = Column(String(5))
     night_mode_end = Column(String(5))
     led_matrix_brightness = Column(Integer, nullable=False, default=70)
+
+    # Receiver source
+    receiver_source = Column(String(20), nullable=False, default="local", server_default=text("'local'"))
+    network_readsb_host = Column(String(255))
+    network_readsb_port = Column(Integer, nullable=False, default=30003, server_default=text("30003"))
 
     active_layout = relationship("Layout", foreign_keys=[active_layout_id])
     idle_layout = relationship("Layout", foreign_keys=[idle_layout_id])
