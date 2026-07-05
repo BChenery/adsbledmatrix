@@ -60,6 +60,7 @@ class DisplayEngine:
         self._cycle_time = datetime.utcnow()
         self._test_color: Optional[Tuple[int, int, int]] = None
         self._brightness = settings.led_matrix_brightness
+        self._night_mode_active = False
 
         from hardware import create_matrix
         self._matrix = create_matrix(self.width, self.height)
@@ -109,6 +110,10 @@ class DisplayEngine:
             return
 
         user_config = get_user_config_sync()
+
+        # Night mode handling: dim or sleep the display during configured hours.
+        if self._handle_night_mode(user_config):
+            return
 
         # Determine what to display
         closest = receiver.get_closest(n=3)
@@ -600,6 +605,58 @@ class DisplayEngine:
             )
         return None
 
+    def _is_night_mode(self, config: Optional[Any]) -> bool:
+        """Return True if the current local time falls within configured night hours."""
+        if not config or not config.night_mode:
+            return False
+        start = config.night_mode_start
+        end = config.night_mode_end
+        if not start or not end:
+            return False
+        try:
+            now = datetime.now().time()
+            start_time = datetime.strptime(start, "%H:%M").time()
+            end_time = datetime.strptime(end, "%H:%M").time()
+        except ValueError:
+            return False
+        if start_time < end_time:
+            return start_time <= now < end_time
+        # Interval wraps past midnight (e.g. 22:00 -> 06:00).
+        return now >= start_time or now < end_time
+
+    def _apply_matrix_brightness(self, brightness: int):
+        """Apply a brightness value directly to the matrix hardware."""
+        if self._matrix and hasattr(self._matrix, "set_brightness"):
+            self._matrix.set_brightness(max(0, min(100, brightness)))
+
+    def _handle_night_mode(self, config: Optional[Any]) -> bool:
+        """Apply night-mode dim or sleep. Returns True when rendering should be skipped."""
+        in_night_mode = self._is_night_mode(config)
+
+        if in_night_mode:
+            if config and config.night_mode_sleep:
+                # Sleep: blank the matrix and skip rendering entirely.
+                if not self._night_mode_active:
+                    logger.info("Night mode sleep active — turning display off")
+                    self._night_mode_active = True
+                if self._matrix:
+                    self._matrix.clear()
+                self._framebuffer = None
+                return True
+
+            # Dim: drop to 20% of the configured brightness (min 5%).
+            night_brightness = max(5, int(self._brightness * 0.2))
+            if not self._night_mode_active:
+                logger.info(f"Night mode dim active — brightness {self._brightness} -> {night_brightness}")
+                self._night_mode_active = True
+                self._apply_matrix_brightness(night_brightness)
+        else:
+            if self._night_mode_active:
+                logger.info(f"Night mode ended — restoring brightness {self._brightness}")
+                self._night_mode_active = False
+                self._apply_matrix_brightness(self._brightness)
+        return False
+
     def _output_to_matrix(self, img: Image.Image):
         with self._lock:
             self._framebuffer = img.copy()
@@ -610,10 +667,13 @@ class DisplayEngine:
         return getattr(self._matrix, "is_hardware", False)
 
     def set_brightness(self, brightness: int):
+        """Set the user's target brightness.  During night mode the matrix stays
+        dimmed until the period ends, but the target is updated so the correct
+        level is restored afterwards."""
         brightness = max(0, min(100, brightness))
         self._brightness = brightness
-        if self._matrix and hasattr(self._matrix, "set_brightness"):
-            self._matrix.set_brightness(brightness)
+        if not self._night_mode_active:
+            self._apply_matrix_brightness(brightness)
 
     def get_brightness(self) -> int:
         return self._brightness

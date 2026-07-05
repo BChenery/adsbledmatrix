@@ -48,6 +48,7 @@ class UserConfig(Base):
     night_mode = Column(Boolean, nullable=False, default=False)
     night_mode_start = Column(String(5))
     night_mode_end = Column(String(5))
+    night_mode_sleep = Column(Boolean, nullable=False, default=False)
     led_matrix_brightness = Column(Integer, nullable=False, default=70)
 
     # Receiver source

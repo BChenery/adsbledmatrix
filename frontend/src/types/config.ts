@@ -14,6 +14,7 @@ export interface UserConfig {
   night_mode: boolean;
   night_mode_start?: string;
   night_mode_end?: string;
+  night_mode_sleep: boolean;
   led_matrix_brightness: number;
   receiver_source: 'local' | 'network';
   network_readsb_host?: string;

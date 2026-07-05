@@ -66,6 +66,52 @@ def test_set_brightness_clamps_and_updates(engine):
     assert engine.get_brightness() == 45
 
 
+def test_night_mode_within_hours(engine):
+    """Night mode is active when current time lies between start and end."""
+    from unittest.mock import MagicMock, patch
+    from datetime import time, datetime, date
+
+    config = MagicMock()
+    config.night_mode = True
+    config.night_mode_start = "22:00"
+    config.night_mode_end = "06:00"
+
+    assert engine._is_night_mode(config) is False
+
+    with patch("app.services.display_engine.datetime") as mock_dt:
+        mock_dt.strptime = datetime.strptime
+        mock_dt.now.return_value = datetime.combine(date.today(), time(23, 30))
+        assert engine._is_night_mode(config) is True
+
+        mock_dt.now.return_value = datetime.combine(date.today(), time(3, 0))
+        assert engine._is_night_mode(config) is True
+
+        mock_dt.now.return_value = datetime.combine(date.today(), time(12, 0))
+        assert engine._is_night_mode(config) is False
+
+
+def test_night_mode_sleep_blanks_display(engine):
+    """Sleep mode clears the matrix and stops rendering."""
+    from unittest.mock import MagicMock, patch
+    from datetime import datetime, date, time
+
+    config = MagicMock()
+    config.night_mode = True
+    config.night_mode_start = "22:00"
+    config.night_mode_end = "06:00"
+    config.night_mode_sleep = True
+
+    engine._night_mode_active = False
+    engine._matrix = MagicMock()
+
+    with patch("app.services.display_engine.datetime") as mock_dt:
+        mock_dt.strptime = datetime.strptime
+        mock_dt.now.return_value = datetime.combine(date.today(), time(23, 0))
+        assert engine._handle_night_mode(config) is True
+        engine._matrix.clear.assert_called_once()
+        assert engine._night_mode_active is True
+
+
 def test_draw_text_clips_to_box_width(engine):
     """Long text must not render past the declared box width."""
     from PIL import Image, ImageDraw

@@ -603,22 +603,35 @@ export default function Settings() {
             />
           </div>
           {config.night_mode && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>Start Time</Label>
-                <Input
-                  type="time"
-                  value={config.night_mode_start || '22:00'}
-                  onChange={(e) => update('night_mode_start', e.target.value)}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Sleep display (off) at night</span>
+                <Switch
+                  checked={config.night_mode_sleep}
+                  onCheckedChange={(v) => update('night_mode_sleep', v)}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>End Time</Label>
-                <Input
-                  type="time"
-                  value={config.night_mode_end || '06:00'}
-                  onChange={(e) => update('night_mode_end', e.target.value)}
-                />
+              <p className="text-xs text-white/50">
+                When off, the display dims to 20% brightness during night hours.
+                When on, the display turns off completely.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Start Time</Label>
+                  <Input
+                    type="time"
+                    value={config.night_mode_start || '22:00'}
+                    onChange={(e) => update('night_mode_start', e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>End Time</Label>
+                  <Input
+                    type="time"
+                    value={config.night_mode_end || '06:00'}
+                    onChange={(e) => update('night_mode_end', e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           )}

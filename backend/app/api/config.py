@@ -29,6 +29,7 @@ class ConfigResponse(BaseModel):
     night_mode: bool
     night_mode_start: Optional[str]
     night_mode_end: Optional[str]
+    night_mode_sleep: bool
     led_matrix_brightness: int
     receiver_source: str
     network_readsb_host: Optional[str]
@@ -54,6 +55,7 @@ class ConfigUpdate(BaseModel):
     night_mode: Optional[bool] = None
     night_mode_start: Optional[str] = None
     night_mode_end: Optional[str] = None
+    night_mode_sleep: Optional[bool] = None
     led_matrix_brightness: Optional[int] = None
     receiver_source: Optional[str] = None
     network_readsb_host: Optional[str] = None

@@ -66,6 +66,10 @@ async def migrate_db():
                 sync_conn.execute(
                     text("ALTER TABLE user_config ADD COLUMN network_readsb_port INTEGER NOT NULL DEFAULT 30003")
                 )
+            if "night_mode_sleep" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN night_mode_sleep BOOLEAN NOT NULL DEFAULT 0")
+                )
 
             # Radar element settings added after initial schema
             result = sync_conn.execute(
