@@ -50,6 +50,25 @@ class ADSBReceiver:
         self._user_lat: Optional[float] = None
         self._user_lon: Optional[float] = None
         self._mock_defs: List[dict] = []
+        self._readsb_host = settings.readsb_host
+        self._readsb_port = settings.readsb_port
+        self._connected = False
+
+    @property
+    def connected(self) -> bool:
+        return self._connected
+
+    @property
+    def endpoint(self) -> tuple[str, int]:
+        return self._readsb_host, self._readsb_port
+
+    def set_endpoint(self, host: str, port: int) -> None:
+        if host == self._readsb_host and port == self._readsb_port:
+            return
+        self._readsb_host = host
+        self._readsb_port = port
+        if self._running and self._task is not None:
+            self._task.cancel()
 
     def set_user_location(self, lat: Optional[float], lon: Optional[float]):
         self._user_lat = lat
@@ -89,10 +108,11 @@ class ADSBReceiver:
         while self._running:
             try:
                 reader, writer = await asyncio.open_connection(
-                    settings.readsb_host, settings.readsb_port
+                    self._readsb_host, self._readsb_port
                 )
+                self._connected = True
                 logger.info(
-                    f"Connected to readsb at {settings.readsb_host}:{settings.readsb_port}"
+                    f"Connected to readsb at {self._readsb_host}:{self._readsb_port}"
                 )
                 buffer = ""
                 while self._running:
@@ -109,10 +129,14 @@ class ADSBReceiver:
                     except asyncio.TimeoutError:
                         continue
             except asyncio.CancelledError:
+                self._connected = False
                 raise
             except Exception as e:
+                self._connected = False
                 logger.warning(f"readsb connection error: {e}, retrying in 5s...")
                 await asyncio.sleep(5)
+            finally:
+                self._connected = False
 
     def _parse_line(self, line: str):
         # SBS/BaseStation format (CSV)

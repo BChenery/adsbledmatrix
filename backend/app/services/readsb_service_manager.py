@@ -1,9 +1,9 @@
 import logging
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 from app.config import settings
+from app.models import UserConfig
 from app.services.adsb_receiver import receiver
 
 logger = logging.getLogger(__name__)
@@ -22,7 +22,11 @@ def _run_systemctl(*args: str) -> subprocess.CompletedProcess:
 
 def is_readsb_available() -> bool:
     """Return True if systemctl and readsb.service are present."""
-    result = _run_systemctl("status", "readsb.service")
+    try:
+        result = _run_systemctl("status", "readsb.service")
+    except FileNotFoundError:
+        logger.debug("systemctl not found; readsb.service unavailable")
+        return False
     # status returns 0 if active, 3 if inactive but unit exists, 4 if unit missing
     return result.returncode in (0, 3)
 
@@ -32,7 +36,11 @@ def start_readsb() -> None:
         logger.info("readsb.service not available; skipping start")
         return
     logger.info("Starting readsb.service")
-    result = _run_systemctl("start", "readsb.service")
+    try:
+        result = _run_systemctl("start", "readsb.service")
+    except FileNotFoundError:
+        logger.debug("systemctl not found; skipping start")
+        return
     if result.returncode != 0:
         logger.warning(f"Failed to start readsb.service: {result.stderr.strip()}")
 
@@ -42,15 +50,19 @@ def stop_readsb() -> None:
         logger.info("readsb.service not available; skipping stop")
         return
     logger.info("Stopping readsb.service")
-    result = _run_systemctl("stop", "readsb.service")
+    try:
+        result = _run_systemctl("stop", "readsb.service")
+    except FileNotFoundError:
+        logger.debug("systemctl not found; skipping stop")
+        return
     if result.returncode != 0:
         logger.warning(f"Failed to stop readsb.service: {result.stderr.strip()}")
 
 
-def _resolve_receiver_config(config) -> tuple[str, int]:
+def _resolve_receiver_config(config: UserConfig) -> tuple[str, int]:
     if config.receiver_source == "network" and config.network_readsb_host:
         return config.network_readsb_host, config.network_readsb_port
-    return "127.0.0.1", 30003
+    return settings.readsb_host, settings.readsb_port
 
 
 def set_network_flag(enabled: bool) -> None:
@@ -60,7 +72,7 @@ def set_network_flag(enabled: bool) -> None:
         NETWORK_FLAG_FILE.unlink(missing_ok=True)
 
 
-def apply_receiver_source(config) -> None:
+def apply_receiver_source(config: UserConfig) -> None:
     """Apply receiver source configuration: endpoint + local service state + flag file."""
     host, port = _resolve_receiver_config(config)
     receiver.set_endpoint(host, port)
