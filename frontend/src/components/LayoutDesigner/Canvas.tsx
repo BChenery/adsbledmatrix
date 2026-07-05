@@ -252,6 +252,16 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         }
       }
 
+      // Faint bounding box on every element so overlaps are visible in the
+      // designer before they cause colour-bleed or ghosting on the matrix.
+      if (!isSelected) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        ctx.strokeRect(x, y, w, h);
+        ctx.setLineDash([]);
+      }
+
       // Selection outline
       if (isSelected) {
         ctx.strokeStyle = '#00d4ff';

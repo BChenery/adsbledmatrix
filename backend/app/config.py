@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     led_matrix_panel_type: str = ""  # e.g. "FM6126A"
     led_matrix_pwm_bits: int = 7
     led_matrix_brightness: int = 70
-    led_matrix_gpio_slowdown: int = 4
+    led_matrix_gpio_slowdown: int = 5
     led_matrix_limit_refresh: int = 0
     # Flip vertical is required for the default P2 4-panel serpentine wiring
     # documented in docs/New Wiring diagram and setup.pdf. Panels are typically

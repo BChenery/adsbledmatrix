@@ -41,7 +41,7 @@ LED_MATRIX_CONFIG = {
     "row_address_type": 0,
     "pwm_bits": 7,
     "brightness": 70,
-    "gpio_slowdown": 4,
+    "gpio_slowdown": 5,
     "limit_refresh": 0,
     "flip_vertical": True,
     "rgb_sequence": "BGR",

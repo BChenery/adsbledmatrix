@@ -48,6 +48,6 @@ def test_default_led_settings_match_working_config():
     assert settings.led_matrix_row_address_type == 0
     assert settings.led_matrix_pwm_bits == 7
     assert settings.led_matrix_brightness == 70
-    assert settings.led_matrix_gpio_slowdown == 4
+    assert settings.led_matrix_gpio_slowdown == 5
     assert settings.led_matrix_flip_vertical is True
     assert settings.led_matrix_rgb_sequence == "BGR"
