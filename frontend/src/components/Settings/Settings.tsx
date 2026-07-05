@@ -306,11 +306,11 @@ export default function Settings() {
                 className="w-full gap-2 text-xs"
                 onClick={async () => {
                   try {
-                    const res = await api.post<{ success: boolean; message: string }>('/api/config/test-receiver', {
-                      network_readsb_host: config.network_readsb_host,
-                      network_readsb_port: config.network_readsb_port,
+                    const res = await api.post<{ reachable: boolean; message: string }>('/api/config/test-receiver', {
+                      host: config.network_readsb_host,
+                      port: config.network_readsb_port,
                     });
-                    if (res.success) {
+                    if (res.reachable) {
                       toast.success(res.message);
                     } else {
                       toast.error(res.message);
