@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from app.database import init_db, migrate_db
 from app.services.adsb_receiver import receiver
 from app.services.display_engine import engine
+from app.services.readsb_service_manager import apply_receiver_source
 from app.services.updater import updater
 from app.api.websocket import broadcast_aircraft
 from app.config import settings
@@ -31,6 +32,7 @@ async def lifespan(app: FastAPI):
         config = await get_or_create_config(session)
         await refresh_config_cache(session)
         receiver.set_user_location(config.latitude, config.longitude)
+        await apply_receiver_source(config)
 
         # Seed / merge default layouts
         with open(settings.default_layouts_path) as f:

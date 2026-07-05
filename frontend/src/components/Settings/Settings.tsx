@@ -31,6 +31,7 @@ import { useDisplayPreview } from '@/hooks/useDisplayPreview';
 import { useDisplayDiagnostics } from '@/hooks/useDisplayDiagnostics';
 import { useLayouts } from '@/hooks/useLayout';
 import { useAircraft } from '@/hooks/useAircraft';
+import { useReceiverStatus } from '@/hooks/useReceiverStatus';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
 
 export default function Settings() {
@@ -117,8 +118,18 @@ export default function Settings() {
 
   const handleSave = async () => {
     if (!config) return;
-    await api.put('/api/config', config);
-    toast.success('Settings saved');
+    if (config.receiver_source === 'network') {
+      if (!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port)) {
+        toast.error('Please enter a valid network receiver host and port');
+        return;
+      }
+    }
+    try {
+      await api.put('/api/config', config);
+      toast.success('Settings saved');
+    } catch {
+      toast.error('Failed to save settings');
+    }
   };
 
   const handleResetOnboarding = async () => {
@@ -131,6 +142,7 @@ export default function Settings() {
   const diagnostics = useDisplayDiagnostics();
   const { layouts } = useLayouts();
   const aircraft = useAircraft();
+  const receiverStatus = useReceiverStatus();
 
   const activeLayout = layouts.find((l) => l.id === config?.active_layout_id);
   const idleLayout = layouts.find((l) => l.id === config?.idle_layout_id);
@@ -235,6 +247,105 @@ export default function Settings() {
               </Button>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
+            <Radio size={14} />
+            Receiver
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>ADS-B source</Label>
+            <Select
+              value={config.receiver_source}
+              onValueChange={(v) => update('receiver_source', v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="local">Local RTL-SDR</SelectItem>
+                <SelectItem value="network">Network receiver</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-white/40">
+              {config.receiver_source === 'local'
+                ? 'Use the RTL-SDR receiver connected directly to this device.'
+                : 'Connect to a remote readsb receiver over the network.'}
+            </p>
+          </div>
+
+          {config.receiver_source === 'network' && (
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label>Host</Label>
+                <Input
+                  type="text"
+                  placeholder="10.0.0.158"
+                  value={config.network_readsb_host || ''}
+                  onChange={(e) => update('network_readsb_host', e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Port</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={65535}
+                  value={config.network_readsb_port}
+                  onChange={(e) => update('network_readsb_port', parseInt(e.target.value, 10) || 0)}
+                />
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="w-full gap-2 text-xs"
+                onClick={async () => {
+                  try {
+                    const res = await api.post<{ reachable: boolean; message: string }>('/api/config/test-receiver', {
+                      host: config.network_readsb_host,
+                      port: config.network_readsb_port,
+                    });
+                    if (res.reachable) {
+                      toast.success(res.message);
+                    } else {
+                      toast.error(res.message);
+                    }
+                  } catch {
+                    toast.error('Failed to test receiver connection');
+                  }
+                }}
+                disabled={!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port)}
+              >
+                <Activity size={14} />
+                Test connection
+              </Button>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between text-xs border-t border-white/10 pt-3">
+            <span className="text-white/40">
+              {receiverStatus
+                ? `${receiverStatus.readsb_host}:${receiverStatus.readsb_port}`
+                : 'Checking status...'}
+            </span>
+            {receiverStatus && (
+              <span
+                className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full ${
+                  receiverStatus.receiver_connected
+                    ? 'bg-green-500/20 text-green-400'
+                    : 'bg-red-500/20 text-red-400'
+                }`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${receiverStatus.receiver_connected ? 'bg-green-400' : 'bg-red-400'}`} />
+                {receiverStatus.receiver_connected ? 'Connected' : 'Disconnected'}
+              </span>
+            )}
+          </div>
         </CardContent>
       </Card>
 
@@ -571,7 +682,14 @@ export default function Settings() {
       </Card>
 
       <div className="flex gap-3 pt-4">
-        <Button onClick={handleSave} className="flex-1 gap-2">
+        <Button
+          onClick={handleSave}
+          className="flex-1 gap-2"
+          disabled={
+            config.receiver_source === 'network' &&
+            (!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port))
+          }
+        >
           <Save size={16} />
           Save Settings
         </Button>
@@ -643,6 +761,14 @@ export default function Settings() {
       </Dialog>
     </div>
   );
+}
+
+function isValidHost(host: string | undefined): boolean {
+  return !!host && host.trim().length > 0;
+}
+
+function isValidPort(port: number): boolean {
+  return Number.isInteger(port) && port >= 1 && port <= 65535;
 }
 
 function SelectField({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {

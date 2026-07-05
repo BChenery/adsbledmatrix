@@ -53,6 +53,20 @@ async def migrate_db():
                     text("ALTER TABLE user_config ADD COLUMN led_matrix_brightness INTEGER NOT NULL DEFAULT 70")
                 )
 
+            # Network receiver settings
+            if "receiver_source" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN receiver_source VARCHAR(20) NOT NULL DEFAULT 'local'")
+                )
+            if "network_readsb_host" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN network_readsb_host TEXT")
+                )
+            if "network_readsb_port" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN network_readsb_port INTEGER NOT NULL DEFAULT 30003")
+                )
+
             # Radar element settings added after initial schema
             result = sync_conn.execute(
                 text("SELECT name FROM sqlite_master WHERE type='table' AND name='layout_elements'")

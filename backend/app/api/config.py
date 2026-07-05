@@ -1,12 +1,14 @@
+import asyncio
 import json
 from typing import Optional
 import httpx
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.database import get_db
 from app.models import UserConfig, Layout
+from app.services.readsb_service_manager import apply_receiver_source
 
 router = APIRouter(prefix="/api/config", tags=["config"])
 
@@ -28,6 +30,9 @@ class ConfigResponse(BaseModel):
     night_mode_start: Optional[str]
     night_mode_end: Optional[str]
     led_matrix_brightness: int
+    receiver_source: str
+    network_readsb_host: Optional[str]
+    network_readsb_port: int
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -50,12 +55,53 @@ class ConfigUpdate(BaseModel):
     night_mode_start: Optional[str] = None
     night_mode_end: Optional[str] = None
     led_matrix_brightness: Optional[int] = None
+    receiver_source: Optional[str] = None
+    network_readsb_host: Optional[str] = None
+    network_readsb_port: Optional[int] = None
+
+    @field_validator("receiver_source")
+    @classmethod
+    def validate_receiver_source(cls, v):
+        if v is not None and v not in ("local", "network"):
+            raise ValueError("receiver_source must be 'local' or 'network'")
+        return v
+
+    @field_validator("network_readsb_port")
+    @classmethod
+    def validate_port(cls, v):
+        if v is not None and not (1 <= v <= 65535):
+            raise ValueError("network_readsb_port must be between 1 and 65535")
+        return v
 
 
 class GeocodeResponse(BaseModel):
     display_name: str
     latitude: float
     longitude: float
+
+
+class ProbeReceiverRequest(BaseModel):
+    host: str
+    port: int
+
+    @field_validator("host")
+    @classmethod
+    def validate_host(cls, v):
+        if v is None or not v.strip():
+            raise ValueError("host must not be empty")
+        return v
+
+    @field_validator("port")
+    @classmethod
+    def validate_port(cls, v):
+        if not (1 <= v <= 65535):
+            raise ValueError("port must be between 1 and 65535")
+        return v
+
+
+class ProbeReceiverResponse(BaseModel):
+    reachable: bool
+    message: str
 
 
 async def get_or_create_config(session: AsyncSession) -> UserConfig:
@@ -96,6 +142,12 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
     for field, value in update_data.items():
         setattr(config, field, value)
 
+    if config.receiver_source == "network" and (not config.network_readsb_host or not config.network_readsb_host.strip()):
+        raise HTTPException(
+            status_code=422,
+            detail="network_readsb_host is required when receiver_source is 'network'",
+        )
+
     await session.commit()
     await session.refresh(config)
 
@@ -126,6 +178,11 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
     if "led_matrix_brightness" in update_data:
         from app.services.display_engine import engine
         engine.set_brightness(config.led_matrix_brightness)
+
+    # Apply receiver source changes
+    receiver_fields = {"receiver_source", "network_readsb_host", "network_readsb_port"}
+    if receiver_fields & set(update_data.keys()):
+        await apply_receiver_source(config)
 
     return ConfigResponse.model_validate(config)
 
@@ -172,3 +229,43 @@ async def geocode_address(q: str = Query(..., min_length=1, max_length=200)):
             status_code=502,
             detail=f"Unexpected response from geocoding service: {e}",
         )
+
+
+@router.post("/test-receiver", response_model=ProbeReceiverResponse)
+async def test_receiver(req: ProbeReceiverRequest):
+    """Open a TCP connection to the proposed network receiver and verify SBS data if available."""
+    try:
+        reader, writer = await asyncio.wait_for(
+            asyncio.open_connection(req.host, req.port),
+            timeout=5.0,
+        )
+    except (OSError, asyncio.TimeoutError) as e:
+        return ProbeReceiverResponse(
+            reachable=False,
+            message=f"Cannot connect to {req.host}:{req.port}: {e}",
+        )
+
+    try:
+        line = await asyncio.wait_for(reader.readline(), timeout=5.0)
+        if line.startswith(b"MSG,"):
+            return ProbeReceiverResponse(
+                reachable=True,
+                message="Connected and receiving SBS data.",
+            )
+        if line:
+            return ProbeReceiverResponse(
+                reachable=True,
+                message="Connected — unexpected data format.",
+            )
+        return ProbeReceiverResponse(
+            reachable=True,
+            message="Connected — no data yet.",
+        )
+    except (OSError, asyncio.TimeoutError):
+        return ProbeReceiverResponse(
+            reachable=True,
+            message="Connected — no data yet.",
+        )
+    finally:
+        writer.close()
+        await writer.wait_closed()

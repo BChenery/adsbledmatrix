@@ -199,6 +199,11 @@ python3 scripts/wifi_manager.py setup-ap || echo "WiFi manager failed, continuin
 echo "[7.5/8] Installing systemd services..."
 cp systemd/*.service /etc/systemd/system/
 cp systemd/*.timer /etc/systemd/system/ 2>/dev/null || true
+
+# Install readsb drop-in to disable it when network receiver mode is active
+mkdir -p /etc/systemd/system/readsb.service.d
+cp "${INSTALL_DIR}/systemd/readsb.service.d/10-network-mode.conf" /etc/systemd/system/readsb.service.d/
+chmod 644 /etc/systemd/system/readsb.service.d/10-network-mode.conf
 systemctl daemon-reload
 systemctl enable readsb.service
 systemctl enable adsbledmatrix-wifi.service
