@@ -1,4 +1,5 @@
 import platform
+from typing import Optional
 from pydantic import BaseModel
 from fastapi import APIRouter
 from app.config import settings
@@ -16,6 +17,8 @@ class SystemStatus(BaseModel):
     led_matrix_enabled: bool
     readsb_host: str
     readsb_port: int
+    receiver_source: str
+    receiver_connected: bool
 
 
 class UpdateStatus(BaseModel):
@@ -34,6 +37,11 @@ async def health_check():
 
 @router.get("/status", response_model=SystemStatus)
 async def get_status():
+    from app.services.adsb_receiver import receiver
+    from app.api.config import get_user_config_sync
+
+    config = get_user_config_sync()
+    host, port = receiver.endpoint
     return SystemStatus(
         app_name=settings.app_name,
         version=settings.version,
@@ -41,8 +49,10 @@ async def get_status():
         python_version=platform.python_version(),
         debug=settings.debug,
         led_matrix_enabled=settings.led_matrix_brightness > 0,
-        readsb_host=settings.readsb_host,
-        readsb_port=settings.readsb_port,
+        readsb_host=host,
+        readsb_port=port,
+        receiver_source=config.receiver_source if config else "local",
+        receiver_connected=receiver.connected,
     )
 
 
