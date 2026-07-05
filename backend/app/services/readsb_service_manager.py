@@ -38,8 +38,8 @@ def start_readsb() -> None:
     logger.info("Starting readsb.service")
     try:
         result = _run_systemctl("start", "readsb.service")
-    except FileNotFoundError:
-        logger.debug("systemctl not found; skipping start")
+    except OSError as e:
+        logger.warning(f"Failed to run systemctl start readsb.service: {e}")
         return
     if result.returncode != 0:
         logger.warning(f"Failed to start readsb.service: {result.stderr.strip()}")
@@ -52,8 +52,8 @@ def stop_readsb() -> None:
     logger.info("Stopping readsb.service")
     try:
         result = _run_systemctl("stop", "readsb.service")
-    except FileNotFoundError:
-        logger.debug("systemctl not found; skipping stop")
+    except OSError as e:
+        logger.warning(f"Failed to run systemctl stop readsb.service: {e}")
         return
     if result.returncode != 0:
         logger.warning(f"Failed to stop readsb.service: {result.stderr.strip()}")
@@ -66,10 +66,13 @@ def _resolve_receiver_config(config: UserConfig) -> tuple[str, int]:
 
 
 def set_network_flag(enabled: bool) -> None:
-    if enabled:
-        NETWORK_FLAG_FILE.touch(exist_ok=True)
-    else:
-        NETWORK_FLAG_FILE.unlink(missing_ok=True)
+    try:
+        if enabled:
+            NETWORK_FLAG_FILE.touch(exist_ok=True)
+        else:
+            NETWORK_FLAG_FILE.unlink(missing_ok=True)
+    except OSError as e:
+        logger.warning(f"Failed to update network receiver flag file: {e}")
 
 
 async def apply_receiver_source(config: UserConfig) -> None:

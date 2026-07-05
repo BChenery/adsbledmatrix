@@ -55,6 +55,38 @@ def test_set_network_flag_creates_and_removes_file(clear_flag_file):
     assert not clear_flag_file.exists()
 
 
+def test_set_network_flag_touch_failure_does_not_raise(monkeypatch, caplog):
+    mock_flag = MagicMock()
+    mock_flag.touch.side_effect = OSError("permission denied")
+    monkeypatch.setattr(manager, "NETWORK_FLAG_FILE", mock_flag)
+    manager.set_network_flag(True)
+    mock_flag.touch.assert_called_once_with(exist_ok=True)
+    assert "Failed to update network receiver flag file" in caplog.text
+
+
+def test_set_network_flag_unlink_failure_does_not_raise(monkeypatch, caplog):
+    mock_flag = MagicMock()
+    mock_flag.unlink.side_effect = OSError("read-only filesystem")
+    monkeypatch.setattr(manager, "NETWORK_FLAG_FILE", mock_flag)
+    manager.set_network_flag(False)
+    mock_flag.unlink.assert_called_once_with(missing_ok=True)
+    assert "Failed to update network receiver flag file" in caplog.text
+
+
+def test_start_readsb_subprocess_oserror_does_not_raise(caplog):
+    with patch.object(manager, "_run_systemctl") as mock_run:
+        mock_run.side_effect = [MagicMock(returncode=0), OSError("permission denied")]
+        manager.start_readsb()
+    assert "Failed to run systemctl start readsb.service" in caplog.text
+
+
+def test_stop_readsb_subprocess_oserror_does_not_raise(caplog):
+    with patch.object(manager, "_run_systemctl") as mock_run:
+        mock_run.side_effect = [MagicMock(returncode=0), OSError("permission denied")]
+        manager.stop_readsb()
+    assert "Failed to run systemctl stop readsb.service" in caplog.text
+
+
 @pytest.mark.asyncio
 async def test_apply_local_config_starts_service_and_clears_flag(mock_receiver, clear_flag_file):
     c = fake_config("local")
