@@ -87,6 +87,12 @@ def test_stop_readsb_subprocess_oserror_does_not_raise(caplog):
     assert "Failed to run systemctl stop readsb.service" in caplog.text
 
 
+def test_is_readsb_available_subprocess_permission_error_returns_false(caplog):
+    with patch.object(manager, "_run_systemctl") as mock_run:
+        mock_run.side_effect = PermissionError("permission denied")
+        assert manager.is_readsb_available() is False
+
+
 @pytest.mark.asyncio
 async def test_apply_local_config_starts_service_and_clears_flag(mock_receiver, clear_flag_file):
     c = fake_config("local")

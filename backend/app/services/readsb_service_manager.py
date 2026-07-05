@@ -24,8 +24,8 @@ def is_readsb_available() -> bool:
     """Return True if systemctl and readsb.service are present."""
     try:
         result = _run_systemctl("status", "readsb.service")
-    except FileNotFoundError:
-        logger.debug("systemctl not found; readsb.service unavailable")
+    except OSError:
+        logger.debug("systemctl is not available; readsb.service unavailable")
         return False
     # status returns 0 if active, 3 if inactive but unit exists, 4 if unit missing
     return result.returncode in (0, 3)
