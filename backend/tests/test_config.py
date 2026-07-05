@@ -1,10 +1,17 @@
+import asyncio
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient, ASGITransport, HTTPStatusError, RequestError, Response
 from fastapi import FastAPI
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import create_async_engine
-from app.api.config import ConfigUpdate, router
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+
+from app.api import config as config_module
+from app.api.config import ConfigUpdate, ProbeReceiverRequest, router, get_db
 from app import database as database_module
+from app.models import Base, UserConfig
 
 
 app = FastAPI()
@@ -54,6 +61,38 @@ def fake_httpx_client(monkeypatch):
         monkeypatch.setattr("httpx.AsyncClient", _factory)
 
     return _patch
+
+
+@pytest_asyncio.fixture
+async def db_session():
+    """Create a fresh in-memory SQLite database for each test."""
+    test_engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    async with test_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    SessionLocal = async_sessionmaker(test_engine, expire_on_commit=False)
+    async with SessionLocal() as session:
+        yield session
+
+    await test_engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def app_with_db(db_session):
+    """FastAPI app with the config router and an overridden DB dependency."""
+    test_app = FastAPI()
+
+    async def override_get_db():
+        yield db_session
+
+    test_app.dependency_overrides[get_db] = override_get_db
+    test_app.include_router(router)
+
+    config = UserConfig(id=1)
+    db_session.add(config)
+    await db_session.commit()
+
+    return test_app
 
 
 @pytest.mark.asyncio
@@ -248,21 +287,6 @@ async def test_user_config_has_receiver_columns(monkeypatch):
         await test_engine.dispose()
 
 
-def test_network_config_requires_host():
-    with pytest.raises(ValueError, match="network_readsb_host is required"):
-        ConfigUpdate(receiver_source="network", network_readsb_host="")
-
-
-def test_network_config_accepts_valid_host():
-    update = ConfigUpdate(
-        receiver_source="network",
-        network_readsb_host="10.0.0.158",
-        network_readsb_port=30003,
-    )
-    assert update.receiver_source == "network"
-    assert update.network_readsb_host == "10.0.0.158"
-
-
 def test_invalid_receiver_source_rejected():
     with pytest.raises(ValueError, match="receiver_source must be"):
         ConfigUpdate(receiver_source="satellite")
@@ -271,3 +295,158 @@ def test_invalid_receiver_source_rejected():
 def test_invalid_port_rejected():
     with pytest.raises(ValueError, match="network_readsb_port"):
         ConfigUpdate(receiver_source="network", network_readsb_host="10.0.0.158", network_readsb_port=70000)
+
+
+def test_port_boundary_values():
+    assert ConfigUpdate(network_readsb_port=1).network_readsb_port == 1
+    assert ConfigUpdate(network_readsb_port=65535).network_readsb_port == 65535
+
+    with pytest.raises(ValueError, match="network_readsb_port"):
+        ConfigUpdate(network_readsb_port=0)
+
+    with pytest.raises(ValueError, match="network_readsb_port"):
+        ConfigUpdate(network_readsb_port=65536)
+
+
+def test_probe_receiver_request_validates_empty_host():
+    with pytest.raises(ValueError, match="host must not be empty"):
+        ProbeReceiverRequest(host="", port=30003)
+
+    with pytest.raises(ValueError, match="host must not be empty"):
+        ProbeReceiverRequest(host="   ", port=30003)
+
+
+def test_probe_receiver_request_validates_port():
+    with pytest.raises(ValueError, match="port must be between"):
+        ProbeReceiverRequest(host="10.0.0.1", port=0)
+
+    with pytest.raises(ValueError, match="port must be between"):
+        ProbeReceiverRequest(host="10.0.0.1", port=70000)
+
+
+@pytest.mark.asyncio
+async def test_test_receiver_success_with_sbs_data():
+    reader = AsyncMock()
+    writer = AsyncMock()
+    writer.close = MagicMock()
+    writer.wait_closed = AsyncMock()
+    reader.readline = AsyncMock(return_value=b"MSG,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22")
+
+    with patch("app.api.config.asyncio.open_connection", new_callable=AsyncMock, return_value=(reader, writer)):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.post("/api/config/test-receiver", json={"host": "10.0.0.1", "port": 30003})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["reachable"] is True
+    assert "SBS" in data["message"]
+
+
+@pytest.mark.asyncio
+async def test_test_reader_connection_failure():
+    with patch(
+        "app.api.config.asyncio.open_connection",
+        new_callable=AsyncMock,
+        side_effect=ConnectionRefusedError("Connection refused"),
+    ):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.post("/api/config/test-receiver", json={"host": "10.0.0.1", "port": 30003})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["reachable"] is False
+    assert "Cannot connect" in data["message"]
+
+
+@pytest.mark.asyncio
+async def test_test_receiver_invalid_port_returns_422():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response_zero = await client.post("/api/config/test-receiver", json={"host": "10.0.0.1", "port": 0})
+        response_high = await client.post("/api/config/test-receiver", json={"host": "10.0.0.1", "port": 70000})
+
+    assert response_zero.status_code == 422
+    assert response_high.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_test_receiver_empty_host_returns_422():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response_empty = await client.post("/api/config/test-receiver", json={"host": "", "port": 30003})
+        response_whitespace = await client.post("/api/config/test-receiver", json={"host": "   ", "port": 30003})
+
+    assert response_empty.status_code == 422
+    assert response_whitespace.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_config_applies_receiver_source_when_changed(app_with_db, monkeypatch):
+    calls = []
+
+    async def fake_apply(config):
+        calls.append(config.receiver_source)
+
+    monkeypatch.setattr(config_module, "apply_receiver_source", fake_apply)
+
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put(
+            "/api/config",
+            json={"receiver_source": "network", "network_readsb_host": "10.0.0.1", "network_readsb_port": 30003},
+        )
+
+    assert response.status_code == 200
+    assert len(calls) == 1
+    assert calls[0] == "network"
+
+
+@pytest.mark.asyncio
+async def test_update_config_does_not_apply_receiver_source_for_unrelated_changes(app_with_db, monkeypatch):
+    calls = []
+
+    async def fake_apply(config):
+        calls.append(config.receiver_source)
+
+    monkeypatch.setattr(config_module, "apply_receiver_source", fake_apply)
+
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put("/api/config", json={"latitude": 12.34})
+
+    assert response.status_code == 200
+    assert len(calls) == 0
+
+
+@pytest.mark.asyncio
+async def test_update_config_rejects_network_without_host(app_with_db):
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put("/api/config", json={"receiver_source": "network"})
+
+    assert response.status_code == 422
+    assert "network_readsb_host is required" in response.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_update_config_allows_network_when_host_already_persisted(app_with_db, db_session):
+    from sqlalchemy import update
+    from app.models import UserConfig as ConfigModel
+
+    await db_session.execute(update(ConfigModel).where(ConfigModel.id == 1).values(network_readsb_host="10.0.0.1"))
+    await db_session.commit()
+
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put("/api/config", json={"receiver_source": "network"})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["receiver_source"] == "network"
+    assert data["network_readsb_host"] == "10.0.0.1"
+
+
+@pytest.mark.asyncio
+async def test_get_config_response_schema(app_with_db):
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.get("/api/config")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "receiver_source" in data
+    assert "network_readsb_host" in data
+    assert "network_readsb_port" in data

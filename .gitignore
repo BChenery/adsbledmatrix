@@ -36,6 +36,7 @@ data/*.sqlite3-journal
 # Environment
 .env
 data/.last_sync
+data/.network_receiver_enabled
 
 # Worktrees
 .worktrees/
