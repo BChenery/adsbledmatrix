@@ -400,6 +400,16 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
               />
               <Label htmlFor="show_ticks" className="cursor-pointer">Show N/E/S/W Ticks</Label>
             </div>
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="use_plane_symbol"
+                checked={element.use_plane_symbol ?? false}
+                onChange={(e) => update('use_plane_symbol', e.target.checked)}
+                className="w-4 h-4 rounded border-gray-600"
+              />
+              <Label htmlFor="use_plane_symbol" className="cursor-pointer">Use Plane Symbol</Label>
+            </div>
           </>
         )}
 
