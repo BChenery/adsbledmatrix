@@ -76,7 +76,7 @@ Add a test in `frontend/src/components/LayoutDesigner/PropertyPanel.test.tsx` (n
 
 ### Backend
 
-Add a test in `backend/tests/test_display_engine.py` that draws a `vertical_rate` element with a large `font_size` and verifies the rendered text occupies more pixels than the default `h - 4` size.
+Add a test in `backend/tests/test_display_engine.py` that draws two `vertical_rate` elements with explicit font sizes 12 and 24 and verifies that the larger size renders more non-black pixels.
 
 ## Acceptance Criteria
 
