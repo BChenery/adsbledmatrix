@@ -35,6 +35,7 @@ import { useReceiverStatus } from '@/hooks/useReceiverStatus';
 import { useUpdateProgress } from '@/hooks/useUpdateProgress';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
 import SettingsSection from './SettingsSection';
+import FormGrid from './FormGrid';
 
 export default function Settings() {
   const [config, setConfig] = useState<UserConfig | null>(null);
@@ -266,37 +267,31 @@ export default function Settings() {
         </div>
       </SettingsSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Radio size={14} />
-            Receiver
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>ADS-B source</Label>
-            <Select
-              value={config.receiver_source}
-              onValueChange={(v) => update('receiver_source', v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="local">Local RTL-SDR</SelectItem>
-                <SelectItem value="network">Network receiver</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-white/40">
-              {config.receiver_source === 'local'
-                ? 'Use the RTL-SDR receiver connected directly to this device.'
-                : 'Connect to a remote readsb receiver over the network.'}
-            </p>
-          </div>
+      <SettingsSection title="Receiver" icon={Radio} description="Choose and configure the ADS-B data source.">
+        <div className="space-y-2">
+          <Label>ADS-B source</Label>
+          <Select
+            value={config.receiver_source}
+            onValueChange={(v) => update('receiver_source', v)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="local">Local RTL-SDR</SelectItem>
+              <SelectItem value="network">Network receiver</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-white/40">
+            {config.receiver_source === 'local'
+              ? 'Use the RTL-SDR receiver connected directly to this device.'
+              : 'Connect to a remote readsb receiver over the network.'}
+          </p>
+        </div>
 
-          {config.receiver_source === 'network' && (
-            <div className="space-y-3">
+        {config.receiver_source === 'network' && (
+          <div className="space-y-3">
+            <FormGrid>
               <div className="space-y-2">
                 <Label>Host</Label>
                 <Input
@@ -316,54 +311,54 @@ export default function Settings() {
                   onChange={(e) => update('network_readsb_port', parseInt(e.target.value, 10) || 0)}
                 />
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="w-full gap-2 text-xs"
-                onClick={async () => {
-                  try {
-                    const res = await api.post<{ reachable: boolean; message: string }>('/api/config/test-receiver', {
-                      host: config.network_readsb_host,
-                      port: config.network_readsb_port,
-                    });
-                    if (res.reachable) {
-                      toast.success(res.message);
-                    } else {
-                      toast.error(res.message);
-                    }
-                  } catch {
-                    toast.error('Failed to test receiver connection');
+            </FormGrid>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full gap-2 text-xs"
+              onClick={async () => {
+                try {
+                  const res = await api.post<{ reachable: boolean; message: string }>('/api/config/test-receiver', {
+                    host: config.network_readsb_host,
+                    port: config.network_readsb_port,
+                  });
+                  if (res.reachable) {
+                    toast.success(res.message);
+                  } else {
+                    toast.error(res.message);
                   }
-                }}
-                disabled={!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port)}
-              >
-                <Activity size={14} />
-                Test connection
-              </Button>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between text-xs border-t border-white/10 pt-3">
-            <span className="text-white/40">
-              {receiverStatus
-                ? `${receiverStatus.readsb_host}:${receiverStatus.readsb_port}`
-                : 'Checking status...'}
-            </span>
-            {receiverStatus && (
-              <span
-                className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full ${
-                  receiverStatus.receiver_connected
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'bg-red-500/20 text-red-400'
-                }`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${receiverStatus.receiver_connected ? 'bg-green-400' : 'bg-red-400'}`} />
-                {receiverStatus.receiver_connected ? 'Connected' : 'Disconnected'}
-              </span>
-            )}
+                } catch {
+                  toast.error('Failed to test receiver connection');
+                }
+              }}
+              disabled={!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port)}
+            >
+              <Activity size={14} />
+              Test connection
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        )}
+
+        <div className="flex items-center justify-between text-xs border-t border-white/10 pt-3">
+          <span className="text-white/40">
+            {receiverStatus
+              ? `${receiverStatus.readsb_host}:${receiverStatus.readsb_port}`
+              : 'Checking status...'}
+          </span>
+          {receiverStatus && (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full ${
+                receiverStatus.receiver_connected
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'bg-red-500/20 text-red-400'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${receiverStatus.receiver_connected ? 'bg-green-400' : 'bg-red-400'}`} />
+              {receiverStatus.receiver_connected ? 'Connected' : 'Disconnected'}
+            </span>
+          )}
+        </div>
+      </SettingsSection>
 
       <Card>
         <CardHeader>
@@ -430,70 +425,58 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70">Location</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <LocationLookup
-            latitude={config.latitude}
-            longitude={config.longitude}
-            onChange={(lat, lon) => {
-              update('latitude', lat);
-              update('longitude', lon);
-            }}
+      <SettingsSection title="Location & Units" icon={Monitor} description="Set your receiver location and preferred units.">
+        <LocationLookup
+          latitude={config.latitude}
+          longitude={config.longitude}
+          onChange={(lat, lon) => {
+            update('latitude', lat);
+            update('longitude', lon);
+          }}
+        />
+
+        <FormGrid>
+          <div className="space-y-2">
+            <Label>Latitude</Label>
+            <Input
+              type="number"
+              step="any"
+              value={config.latitude}
+              onChange={(e) => update('latitude', parseFloat(e.target.value))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Longitude</Label>
+            <Input
+              type="number"
+              step="any"
+              value={config.longitude}
+              onChange={(e) => update('longitude', parseFloat(e.target.value))}
+            />
+          </div>
+        </FormGrid>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <SelectField
+            label="Distance"
+            value={config.distance_unit}
+            options={['km', 'nm', 'mi']}
+            onChange={(v) => update('distance_unit', v)}
           />
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label>Latitude</Label>
-              <Input
-                type="number"
-                step="any"
-                value={config.latitude}
-                onChange={(e) => update('latitude', parseFloat(e.target.value))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Longitude</Label>
-              <Input
-                type="number"
-                step="any"
-                value={config.longitude}
-                onChange={(e) => update('longitude', parseFloat(e.target.value))}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70">Units</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-3 gap-3">
-            <SelectField
-              label="Distance"
-              value={config.distance_unit}
-              options={['km', 'nm', 'mi']}
-              onChange={(v) => update('distance_unit', v)}
-            />
-            <SelectField
-              label="Altitude"
-              value={config.altitude_unit}
-              options={['ft', 'm']}
-              onChange={(v) => update('altitude_unit', v)}
-            />
-            <SelectField
-              label="Speed"
-              value={config.speed_unit}
-              options={['kts', 'kmh', 'mph']}
-              onChange={(v) => update('speed_unit', v)}
-            />
-          </div>
-        </CardContent>
-      </Card>
+          <SelectField
+            label="Altitude"
+            value={config.altitude_unit}
+            options={['ft', 'm']}
+            onChange={(v) => update('altitude_unit', v)}
+          />
+          <SelectField
+            label="Speed"
+            value={config.speed_unit}
+            options={['kts', 'kmh', 'mph']}
+            onChange={(v) => update('speed_unit', v)}
+          />
+        </div>
+      </SettingsSection>
 
       <Card>
         <CardHeader>
