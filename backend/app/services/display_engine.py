@@ -377,8 +377,8 @@ class DisplayEngine:
             text = f"▼ {abs(rate)}"
         else:
             text = "→ level"
-        font_size = getattr(element, "font_size", None)
-        font_family = getattr(element, "font_family", None)
+        font_size = element.font_size
+        font_family = element.font_family
         self._draw_text(draw, x, y, w, text, color, font_family, font_size or h - 4, height=h)
 
     def _draw_distance_bar(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, ctx: RenderContext, color: Tuple[int, int, int]):
