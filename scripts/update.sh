@@ -20,6 +20,12 @@ cp -r "$INSTALL_DIR" "$BACKUP_DIR"
 echo "Pulling latest code..."
 cd "$INSTALL_DIR"
 repo_owner=$(stat -c '%U' "$INSTALL_DIR")
+
+# Fix ownership drift that can happen when previous updates or installs were
+# run as root. Git needs to be able to write objects and update tracked files.
+echo "Ensuring install directory is owned by $repo_owner..."
+chown -R "$repo_owner":"$repo_owner" "$INSTALL_DIR"
+
 if [ "$repo_owner" = "$(whoami)" ]; then
   git pull origin main
 else
