@@ -2,6 +2,11 @@ import pytest
 from app.services.display_engine import DisplayEngine
 
 
+def _count_non_black_pixels(img):
+    """Count pixels that are not exactly black."""
+    return sum(1 for px in img.get_flattened_data() if px != (0, 0, 0))
+
+
 @pytest.fixture
 def engine():
     """Return a DisplayEngine using the inline mock matrix fallback."""
@@ -335,3 +340,41 @@ def test_draw_radar_plane_symbol_falls_back_when_no_heading(engine):
         if img.getpixel((px, py)) == (255, 0, 0)
     ]
     assert not red_pixels_east, "Did not expect plane pixels east of the aircraft position"
+
+
+def test_vertical_rate_uses_custom_font_size(engine):
+    """A larger explicit font_size should render more text pixels than the default."""
+    from unittest.mock import MagicMock
+    from app.services.display_engine import RenderContext
+    from PIL import Image, ImageDraw
+
+    aircraft = MagicMock()
+    aircraft.vertical_rate = 1200
+
+    ctx = RenderContext(aircraft=aircraft)
+
+    element_small = MagicMock()
+    element_small.element_type = 'vertical_rate'
+    element_small.font_size = 12
+    element_small.font_family = None
+
+    element_large = MagicMock()
+    element_large.element_type = 'vertical_rate'
+    element_large.font_size = 24
+    element_large.font_family = None
+
+    img_small = Image.new('RGB', (64, 32), (0, 0, 0))
+    draw_small = ImageDraw.Draw(img_small)
+    engine._draw_vertical_rate(draw_small, 0, 0, 64, 32, element_small, ctx, (255, 255, 255))
+
+    img_large = Image.new('RGB', (64, 32), (0, 0, 0))
+    draw_large = ImageDraw.Draw(img_large)
+    engine._draw_vertical_rate(draw_large, 0, 0, 64, 32, element_large, ctx, (255, 255, 255))
+
+    small_pixels = _count_non_black_pixels(img_small)
+    large_pixels = _count_non_black_pixels(img_large)
+
+    assert small_pixels > 0, "Expected the small font to render some text"
+    assert large_pixels > small_pixels, (
+        f"Expected larger font_size to render more pixels, got {large_pixels} <= {small_pixels}"
+    )

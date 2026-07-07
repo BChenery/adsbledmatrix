@@ -228,7 +228,7 @@ class DisplayEngine:
             self._draw_heading_arrow(draw, x, y, w, h, ctx, color)
 
         elif element_type == "vertical_rate":
-            self._draw_vertical_rate(draw, x, y, w, h, ctx, color)
+            self._draw_vertical_rate(draw, x, y, w, h, element, ctx, color)
 
         elif element_type == "distance_bar":
             self._draw_distance_bar(draw, x, y, w, h, ctx, color)
@@ -367,7 +367,7 @@ class DisplayEngine:
         draw.polygon([tip, left, right], fill=color)
         draw.ellipse([cx - 2, cy - 2, cx + 2, cy + 2], fill=color)
 
-    def _draw_vertical_rate(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, ctx: RenderContext, color: Tuple[int, int, int]):
+    def _draw_vertical_rate(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, element: Any, ctx: RenderContext, color: Tuple[int, int, int]):
         rate = ctx.aircraft.vertical_rate if ctx.aircraft else None
         if rate is None:
             text = "---"
@@ -377,7 +377,9 @@ class DisplayEngine:
             text = f"▼ {abs(rate)}"
         else:
             text = "→ level"
-        self._draw_text(draw, x, y, w, text, color, None, h - 4, height=h)
+        font_size = getattr(element, "font_size", None)
+        font_family = getattr(element, "font_family", None)
+        self._draw_text(draw, x, y, w, text, color, font_family, font_size or h - 4, height=h)
 
     def _draw_distance_bar(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, ctx: RenderContext, color: Tuple[int, int, int]):
         dist = ctx.aircraft.distance_km if ctx.aircraft else None
