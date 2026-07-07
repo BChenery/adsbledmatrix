@@ -570,95 +570,90 @@ export default function Settings() {
         </div>
       </SettingsSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70">Night Mode</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {config.night_mode ? <Moon size={16} /> : <Sun size={16} />}
-              <span className="text-sm">Enable Night Mode</span>
-            </div>
-            <Switch
-              checked={config.night_mode}
-              onCheckedChange={(v) => update('night_mode', v)}
-            />
+      <SettingsSection title="Night Mode" icon={Moon} description="Dim or turn off the display during scheduled hours.">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {config.night_mode ? <Moon size={16} /> : <Sun size={16} />}
+            <span className="text-sm">Enable Night Mode</span>
           </div>
-          {config.night_mode && (
-            <div className="space-y-3">
-              <p className="text-xs text-white/50">
-                During these hours the display dims to 20% brightness.
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Dim Start Time</Label>
-                  <Input
-                    type="time"
-                    value={config.night_mode_start || '22:00'}
-                    onChange={(e) => update('night_mode_start', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Dim End Time</Label>
-                  <Input
-                    type="time"
-                    value={config.night_mode_end || '06:00'}
-                    onChange={(e) => update('night_mode_end', e.target.value)}
-                  />
-                </div>
+          <Switch
+            checked={config.night_mode}
+            onCheckedChange={(v) => update('night_mode', v)}
+          />
+        </div>
+        {config.night_mode && (
+          <div className="space-y-3">
+            <p className="text-xs text-white/50">
+              During these hours the display dims to 20% brightness.
+            </p>
+            <FormGrid>
+              <div className="space-y-2">
+                <Label>Dim Start Time</Label>
+                <Input
+                  type="time"
+                  value={config.night_mode_start || '22:00'}
+                  onChange={(e) => update('night_mode_start', e.target.value)}
+                />
               </div>
-              {config.timezone && (
-                <p className="text-xs text-white/40">
-                  Detected timezone: <span className="text-white/60">{config.timezone}</span>
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {config.sleep_mode ? <Moon size={16} /> : <Sun size={16} />}
-              <span className="text-sm">Sleep Display</span>
-            </div>
-            <Switch
-              checked={config.sleep_mode}
-              onCheckedChange={(v) => update('sleep_mode', v)}
-            />
+              <div className="space-y-2">
+                <Label>Dim End Time</Label>
+                <Input
+                  type="time"
+                  value={config.night_mode_end || '06:00'}
+                  onChange={(e) => update('night_mode_end', e.target.value)}
+                />
+              </div>
+            </FormGrid>
+            {config.timezone && (
+              <p className="text-xs text-white/40">
+                Detected timezone: <span className="text-white/60">{config.timezone}</span>
+              </p>
+            )}
           </div>
+        )}
 
-          {config.sleep_mode && (
-            <div className="space-y-3">
-              <p className="text-xs text-white/50">
-                During these hours the display turns off completely. Sleep overrides dim if windows overlap.
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Sleep Start Time</Label>
-                  <Input
-                    type="time"
-                    value={config.sleep_mode_start || '23:00'}
-                    onChange={(e) => update('sleep_mode_start', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Sleep End Time</Label>
-                  <Input
-                    type="time"
-                    value={config.sleep_mode_end || '06:00'}
-                    onChange={(e) => update('sleep_mode_end', e.target.value)}
-                  />
-                </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {config.sleep_mode ? <Moon size={16} /> : <Sun size={16} />}
+            <span className="text-sm">Sleep Display</span>
+          </div>
+          <Switch
+            checked={config.sleep_mode}
+            onCheckedChange={(v) => update('sleep_mode', v)}
+          />
+        </div>
+
+        {config.sleep_mode && (
+          <div className="space-y-3">
+            <p className="text-xs text-white/50">
+              During these hours the display turns off completely. Sleep overrides dim if windows overlap.
+            </p>
+            <FormGrid>
+              <div className="space-y-2">
+                <Label>Sleep Start Time</Label>
+                <Input
+                  type="time"
+                  value={config.sleep_mode_start || '23:00'}
+                  onChange={(e) => update('sleep_mode_start', e.target.value)}
+                />
               </div>
-              {config.timezone && (
-                <p className="text-xs text-white/40">
-                  Detected timezone: <span className="text-white/60">{config.timezone}</span>
-                </p>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label>Sleep End Time</Label>
+                <Input
+                  type="time"
+                  value={config.sleep_mode_end || '06:00'}
+                  onChange={(e) => update('sleep_mode_end', e.target.value)}
+                />
+              </div>
+            </FormGrid>
+            {config.timezone && (
+              <p className="text-xs text-white/40">
+                Detected timezone: <span className="text-white/60">{config.timezone}</span>
+              </p>
+            )}
+          </div>
+        )}
+      </SettingsSection>
 
       <Card>
         <CardHeader>
@@ -740,10 +735,10 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      <div className="flex gap-3 pt-4">
+      <div className="flex flex-col sm:flex-row gap-3 pt-4">
         <Button
           onClick={handleSave}
-          className="flex-1 gap-2"
+          className="w-full sm:flex-1 gap-2"
           disabled={
             config.receiver_source === 'network' &&
             (!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port))
@@ -754,37 +749,26 @@ export default function Settings() {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Power size={14} />
-            System Power
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-xs text-white/40">
-            Reboot or shut down the Raspberry Pi. These actions disconnect the device from the network.
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="secondary"
-              className="w-full gap-2"
-              onClick={() => setPowerAction('reboot')}
-            >
-              <RotateCcw size={16} />
-              Reboot Pi
-            </Button>
-            <Button
-              variant="destructive"
-              className="w-full gap-2"
-              onClick={() => setPowerAction('shutdown')}
-            >
-              <PowerOff size={16} />
-              Shut Down Pi
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <SettingsSection title="System" icon={Power} description="Update, reboot, or reset the device.">
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            variant="secondary"
+            className="w-full gap-2"
+            onClick={() => setPowerAction('reboot')}
+          >
+            <RotateCcw size={16} />
+            Reboot Pi
+          </Button>
+          <Button
+            variant="destructive"
+            className="w-full gap-2"
+            onClick={() => setPowerAction('shutdown')}
+          >
+            <PowerOff size={16} />
+            Shut Down Pi
+          </Button>
+        </div>
+      </SettingsSection>
 
       <Separator />
 
