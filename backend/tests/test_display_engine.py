@@ -241,8 +241,8 @@ def test_draw_radar_plane_symbol_rotates_with_heading(engine):
     ]
     assert red_pixels_east, "Expected red plane pixels east of the aircraft position"
 
-    # Confirm no red pixel remains directly north of the aircraft; the nose has rotated east.
-    assert img.getpixel((50, 20)) == (0, 0, 0), "Expected no red pixel directly north of the aircraft"
+    # Confirm no red pixel where the unrotated nose would be; the plane has rotated east.
+    assert img.getpixel((50, 22)) == (0, 0, 0), "Expected no red pixel at the unrotated nose position"
 
 
 def test_draw_radar_plane_symbol_disabled_uses_dot(engine):

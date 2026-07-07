@@ -525,7 +525,7 @@ class DisplayEngine:
             dot_x = cx + radius * ratio * math.cos(angle)
             dot_y = cy + radius * ratio * math.sin(angle)
 
-            use_plane = getattr(element, 'use_plane_symbol', False)
+            use_plane = getattr(element, "use_plane_symbol", False)
             heading = getattr(ac, 'heading', None)
 
             if use_plane and heading is not None:
