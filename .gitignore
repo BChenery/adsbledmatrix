@@ -41,6 +41,9 @@ data/.network_receiver_enabled
 # Worktrees
 .worktrees/
 
+# Superpowers brainstorming artifacts
+.superpowers/
+
 # Windows alternate data streams
 *Zone.Identifier
 
