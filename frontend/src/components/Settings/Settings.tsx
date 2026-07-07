@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { api } from '@/api/client';
 import { UserConfig } from '@/types/config';
 import { Layout } from '@/types/layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +33,8 @@ import { useAircraft } from '@/hooks/useAircraft';
 import { useReceiverStatus } from '@/hooks/useReceiverStatus';
 import { useUpdateProgress } from '@/hooks/useUpdateProgress';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
+import SettingsSection from './SettingsSection';
+import FormGrid from './FormGrid';
 
 export default function Settings() {
   const [config, setConfig] = useState<UserConfig | null>(null);
@@ -166,17 +167,16 @@ export default function Settings() {
   if (!config) return <div className="p-6 text-white/50">Loading...</div>;
 
   return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-lg font-semibold">Settings</h1>
+    <main className="max-w-3xl mx-auto px-4 py-6 pb-24 space-y-4 md:space-y-6">
+      <header className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Settings</h1>
+        {brightnessSaved && (
+          <span className="text-xs text-led-accent">Brightness saved</span>
+        )}
+      </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Cpu size={14} />
-            LED Matrix Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      <SettingsSection title="LED Matrix Status" icon={Cpu}>
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm">Connection</span>
             {displayStatus ? (
@@ -263,40 +263,57 @@ export default function Settings() {
               </Button>
             </div>
           )}
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Radio size={14} />
-            Receiver
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>ADS-B source</Label>
-            <Select
-              value={config.receiver_source}
-              onValueChange={(v) => update('receiver_source', v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="local">Local RTL-SDR</SelectItem>
-                <SelectItem value="network">Network receiver</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-white/40">
-              {config.receiver_source === 'local'
-                ? 'Use the RTL-SDR receiver connected directly to this device.'
-                : 'Connect to a remote readsb receiver over the network.'}
-            </p>
+          <div className="space-y-2 pt-2 border-t border-white/10">
+            <div className="text-sm text-white/70 flex items-center gap-2">
+              <Monitor size={14} />
+              Live Matrix Preview
+            </div>
+            {preview.url ? (
+              <div className="rounded border border-white/10 overflow-hidden bg-black">
+                <img
+                  src={preview.url}
+                  alt="Live LED matrix preview"
+                  className="w-full h-auto object-contain"
+                  style={{ imageRendering: 'pixelated' }}
+                />
+              </div>
+            ) : (
+              <div className="rounded border border-white/10 bg-black flex items-center justify-center h-32">
+                <span className="text-xs text-white/30">
+                  {preview.error ? 'No framebuffer available yet' : 'Loading preview...'}
+                </span>
+              </div>
+            )}
           </div>
+        </div>
+      </SettingsSection>
 
-          {config.receiver_source === 'network' && (
-            <div className="space-y-3">
+      <SettingsSection title="Receiver" icon={Radio} description="Choose and configure the ADS-B data source.">
+        <div className="space-y-2">
+          <Label>ADS-B source</Label>
+          <Select
+            value={config.receiver_source}
+            onValueChange={(v) => update('receiver_source', v)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="local">Local RTL-SDR</SelectItem>
+              <SelectItem value="network">Network receiver</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-white/40">
+            {config.receiver_source === 'local'
+              ? 'Use the RTL-SDR receiver connected directly to this device.'
+              : 'Connect to a remote readsb receiver over the network.'}
+          </p>
+        </div>
+
+        {config.receiver_source === 'network' && (
+          <div className="space-y-3">
+            <FormGrid>
               <div className="space-y-2">
                 <Label>Host</Label>
                 <Input
@@ -316,63 +333,57 @@ export default function Settings() {
                   onChange={(e) => update('network_readsb_port', parseInt(e.target.value, 10) || 0)}
                 />
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="w-full gap-2 text-xs"
-                onClick={async () => {
-                  try {
-                    const res = await api.post<{ reachable: boolean; message: string }>('/api/config/test-receiver', {
-                      host: config.network_readsb_host,
-                      port: config.network_readsb_port,
-                    });
-                    if (res.reachable) {
-                      toast.success(res.message);
-                    } else {
-                      toast.error(res.message);
-                    }
-                  } catch {
-                    toast.error('Failed to test receiver connection');
+            </FormGrid>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full gap-2 text-xs"
+              onClick={async () => {
+                try {
+                  const res = await api.post<{ reachable: boolean; message: string }>('/api/config/test-receiver', {
+                    host: config.network_readsb_host,
+                    port: config.network_readsb_port,
+                  });
+                  if (res.reachable) {
+                    toast.success(res.message);
+                  } else {
+                    toast.error(res.message);
                   }
-                }}
-                disabled={!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port)}
-              >
-                <Activity size={14} />
-                Test connection
-              </Button>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between text-xs border-t border-white/10 pt-3">
-            <span className="text-white/40">
-              {receiverStatus
-                ? `${receiverStatus.readsb_host}:${receiverStatus.readsb_port}`
-                : 'Checking status...'}
-            </span>
-            {receiverStatus && (
-              <span
-                className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full ${
-                  receiverStatus.receiver_connected
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'bg-red-500/20 text-red-400'
-                }`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${receiverStatus.receiver_connected ? 'bg-green-400' : 'bg-red-400'}`} />
-                {receiverStatus.receiver_connected ? 'Connected' : 'Disconnected'}
-              </span>
-            )}
+                } catch {
+                  toast.error('Failed to test receiver connection');
+                }
+              }}
+              disabled={!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port)}
+            >
+              <Activity size={14} />
+              Test connection
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Sun size={14} />
-            LED Matrix Brightness
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <div className="flex items-center justify-between text-xs border-t border-white/10 pt-3">
+          <span className="text-white/40">
+            {receiverStatus
+              ? `${receiverStatus.readsb_host}:${receiverStatus.readsb_port}`
+              : 'Checking status...'}
+          </span>
+          {receiverStatus && (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full ${
+                receiverStatus.receiver_connected
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'bg-red-500/20 text-red-400'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${receiverStatus.receiver_connected ? 'bg-green-400' : 'bg-red-400'}`} />
+              {receiverStatus.receiver_connected ? 'Connected' : 'Disconnected'}
+            </span>
+          )}
+        </div>
+      </SettingsSection>
+
+      <SettingsSection title="Display" icon={LayoutTemplate} description="Choose what appears on the matrix when aircraft are detected or when idle.">
+        <div className="space-y-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-white/60">Brightness</span>
             <span className="font-medium tabular-nums">{config.led_matrix_brightness}%</span>
@@ -400,304 +411,249 @@ export default function Settings() {
               <span className="text-led-accent transition-opacity duration-500">Saved</span>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Monitor size={14} />
-            Live Matrix Preview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {preview.url ? (
-            <div className="rounded border border-white/10 overflow-hidden bg-black">
-              <img
-                src={preview.url}
-                alt="Live LED matrix preview"
-                className="w-full h-auto object-contain"
-                style={{ imageRendering: 'pixelated' }}
-              />
-            </div>
-          ) : (
-            <div className="rounded border border-white/10 bg-black flex items-center justify-center h-32">
-              <span className="text-xs text-white/30">
-                {preview.error ? 'No framebuffer available yet' : 'Loading preview...'}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        <Separator />
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70">Location</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <LocationLookup
-            latitude={config.latitude}
-            longitude={config.longitude}
-            onChange={(lat, lon) => {
-              update('latitude', lat);
-              update('longitude', lon);
-            }}
-          />
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label>Latitude</Label>
-              <Input
-                type="number"
-                step="any"
-                value={config.latitude}
-                onChange={(e) => update('latitude', parseFloat(e.target.value))}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Longitude</Label>
-              <Input
-                type="number"
-                step="any"
-                value={config.longitude}
-                onChange={(e) => update('longitude', parseFloat(e.target.value))}
-              />
-            </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3">
+            <Label className="flex items-center gap-2">
+              <Plane size={14} className="text-white/50" />
+              When aircraft are detected
+            </Label>
+            <Badge variant="outline" className="text-xs px-1.5 py-0 gap-1">
+              <Radio size={10} />
+              {aircraft.length} in range
+            </Badge>
           </div>
-        </CardContent>
-      </Card>
+          <Select
+            value={config.display_mode}
+            onValueChange={(v) => update('display_mode', v)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="closest">Closest aircraft only</SelectItem>
+              <SelectItem value="cycle3">Cycle up to 3 nearest aircraft</SelectItem>
+              <SelectItem value="list">Show list of nearby aircraft</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-white/40">
+            {config.display_mode === 'closest' && (aircraft.length <= 1 ? 'Only one aircraft in range, so the display stays on it.' : 'Keeps the display focused on the single closest aircraft.')}
+            {config.display_mode === 'cycle3' && (aircraft.length <= 1 ? 'Cycle mode is on, but only one aircraft is in range. It will switch when more are detected.' : `Rotates through the ${Math.min(3, aircraft.length)} nearest aircraft every ${config.cycle_interval_sec} seconds.`)}
+            {config.display_mode === 'list' && 'Uses a layout that can show multiple aircraft at once. Pick a list-capable layout below.'}
+          </p>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70">Units</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-3 gap-3">
-            <SelectField
-              label="Distance"
-              value={config.distance_unit}
-              options={['km', 'nm', 'mi']}
-              onChange={(v) => update('distance_unit', v)}
-            />
-            <SelectField
-              label="Altitude"
-              value={config.altitude_unit}
-              options={['ft', 'm']}
-              onChange={(v) => update('altitude_unit', v)}
-            />
-            <SelectField
-              label="Speed"
-              value={config.speed_unit}
-              options={['kts', 'kmh', 'mph']}
-              onChange={(v) => update('speed_unit', v)}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Monitor size={14} />
-            Display Behaviour
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
+        {config.display_mode === 'cycle3' && (
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-3">
+            <Label>Switch aircraft every</Label>
+            <div className="flex items-center gap-3">
+              <Input
+                type="number"
+                min={1}
+                max={60}
+                value={config.cycle_interval_sec}
+                onChange={(e) => update('cycle_interval_sec', parseInt(e.target.value))}
+                className="w-24"
+              />
+              <span className="text-sm text-white/60">seconds</span>
+            </div>
+          </div>
+        )}
+
+        <Separator />
+
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
               <Label className="flex items-center gap-2">
-                <Plane size={14} className="text-white/50" />
-                When aircraft are detected
+                <LayoutTemplate size={14} className="text-white/50" />
+                Aircraft layout
               </Label>
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1">
-                <Radio size={10} />
-                {aircraft.length} in range
-              </Badge>
+              <p className="text-xs text-white/40 mt-0.5">
+                Shown when at least one aircraft is in range.
+              </p>
             </div>
-            <Select
-              value={config.display_mode}
-              onValueChange={(v) => update('display_mode', v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="closest">Closest aircraft only</SelectItem>
-                <SelectItem value="cycle3">Cycle up to 3 nearest aircraft</SelectItem>
-                <SelectItem value="list">Show list of nearby aircraft</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-white/40">
-              {config.display_mode === 'closest' && (aircraft.length <= 1 ? 'Only one aircraft in range, so the display stays on it.' : 'Keeps the display focused on the single closest aircraft.')}
-              {config.display_mode === 'cycle3' && (aircraft.length <= 1 ? 'Cycle mode is on, but only one aircraft is in range. It will switch when more are detected.' : `Rotates through the ${Math.min(3, aircraft.length)} nearest aircraft every ${config.cycle_interval_sec} seconds.`)}
-              {config.display_mode === 'list' && 'Uses a layout that can show multiple aircraft at once. Pick a list-capable layout below.'}
+            {activeLayout && (
+              <Badge variant="default" className="shrink-0">Active</Badge>
+            )}
+          </div>
+          <LayoutPicker
+            layouts={layouts}
+            selectedId={config.active_layout_id}
+            onSelect={(id) => update('active_layout_id', id)}
+            highlightMode="active"
+          />
+        </div>
+
+        <Separator />
+
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <Label className="flex items-center gap-2">
+                <Crosshair size={14} className="text-white/50" />
+                Idle / scanning layout
+              </Label>
+              <p className="text-xs text-white/40 mt-0.5">
+                Shown when no aircraft are detected.
+              </p>
+            </div>
+            {idleLayout && (
+              <Badge variant="secondary" className="shrink-0">Idle</Badge>
+            )}
+          </div>
+          <LayoutPicker
+            layouts={layouts}
+            selectedId={config.idle_layout_id}
+            onSelect={(id) => update('idle_layout_id', id)}
+            highlightMode="idle"
+          />
+        </div>
+      </SettingsSection>
+
+      <SettingsSection title="Location & Units" icon={Monitor} description="Set your receiver location and preferred units.">
+        <LocationLookup
+          latitude={config.latitude}
+          longitude={config.longitude}
+          onChange={(lat, lon) => {
+            update('latitude', lat);
+            update('longitude', lon);
+          }}
+        />
+
+        <FormGrid>
+          <div className="space-y-2">
+            <Label>Latitude</Label>
+            <Input
+              type="number"
+              step="any"
+              value={config.latitude}
+              onChange={(e) => update('latitude', parseFloat(e.target.value))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Longitude</Label>
+            <Input
+              type="number"
+              step="any"
+              value={config.longitude}
+              onChange={(e) => update('longitude', parseFloat(e.target.value))}
+            />
+          </div>
+        </FormGrid>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <SelectField
+            label="Distance"
+            value={config.distance_unit}
+            options={['km', 'nm', 'mi']}
+            onChange={(v) => update('distance_unit', v)}
+          />
+          <SelectField
+            label="Altitude"
+            value={config.altitude_unit}
+            options={['ft', 'm']}
+            onChange={(v) => update('altitude_unit', v)}
+          />
+          <SelectField
+            label="Speed"
+            value={config.speed_unit}
+            options={['kts', 'kmh', 'mph']}
+            onChange={(v) => update('speed_unit', v)}
+          />
+        </div>
+      </SettingsSection>
+
+      <SettingsSection title="Night Mode" icon={Moon} description="Dim or turn off the display during scheduled hours.">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {config.night_mode ? <Moon size={16} /> : <Sun size={16} />}
+            <span className="text-sm">Enable Night Mode</span>
+          </div>
+          <Switch
+            checked={config.night_mode}
+            onCheckedChange={(v) => update('night_mode', v)}
+          />
+        </div>
+        {config.night_mode && (
+          <div className="space-y-3">
+            <p className="text-xs text-white/50">
+              During these hours the display dims to 20% brightness.
             </p>
-          </div>
-
-          {config.display_mode === 'cycle3' && (
-            <div className="space-y-2">
-              <Label>Switch aircraft every</Label>
-              <div className="flex items-center gap-3">
+            <FormGrid>
+              <div className="space-y-2">
+                <Label>Dim Start Time</Label>
                 <Input
-                  type="number"
-                  min={1}
-                  max={60}
-                  value={config.cycle_interval_sec}
-                  onChange={(e) => update('cycle_interval_sec', parseInt(e.target.value))}
-                  className="w-24"
+                  type="time"
+                  value={config.night_mode_start || '22:00'}
+                  onChange={(e) => update('night_mode_start', e.target.value)}
                 />
-                <span className="text-sm text-white/60">seconds</span>
               </div>
-            </div>
-          )}
-
-          <Separator />
-
-          <div className="space-y-3">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <Label className="flex items-center gap-2">
-                  <LayoutTemplate size={14} className="text-white/50" />
-                  Aircraft layout
-                </Label>
-                <p className="text-xs text-white/40 mt-0.5">
-                  Shown when at least one aircraft is in range.
-                </p>
+              <div className="space-y-2">
+                <Label>Dim End Time</Label>
+                <Input
+                  type="time"
+                  value={config.night_mode_end || '06:00'}
+                  onChange={(e) => update('night_mode_end', e.target.value)}
+                />
               </div>
-              {activeLayout && (
-                <Badge variant="default" className="shrink-0">Active</Badge>
-              )}
-            </div>
-            <LayoutPicker
-              layouts={layouts}
-              selectedId={config.active_layout_id}
-              onSelect={(id) => update('active_layout_id', id)}
-              highlightMode="active"
-            />
-          </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <Label className="flex items-center gap-2">
-                  <Crosshair size={14} className="text-white/50" />
-                  Idle / scanning layout
-                </Label>
-                <p className="text-xs text-white/40 mt-0.5">
-                  Shown when no aircraft are detected.
-                </p>
-              </div>
-              {idleLayout && (
-                <Badge variant="secondary" className="shrink-0">Idle</Badge>
-              )}
-            </div>
-            <LayoutPicker
-              layouts={layouts}
-              selectedId={config.idle_layout_id}
-              onSelect={(id) => update('idle_layout_id', id)}
-              highlightMode="idle"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70">Night Mode</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {config.night_mode ? <Moon size={16} /> : <Sun size={16} />}
-              <span className="text-sm">Enable Night Mode</span>
-            </div>
-            <Switch
-              checked={config.night_mode}
-              onCheckedChange={(v) => update('night_mode', v)}
-            />
-          </div>
-          {config.night_mode && (
-            <div className="space-y-3">
-              <p className="text-xs text-white/50">
-                During these hours the display dims to 20% brightness.
+            </FormGrid>
+            {config.timezone && (
+              <p className="text-xs text-white/40">
+                Detected timezone: <span className="text-white/60">{config.timezone}</span>
               </p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Dim Start Time</Label>
-                  <Input
-                    type="time"
-                    value={config.night_mode_start || '22:00'}
-                    onChange={(e) => update('night_mode_start', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Dim End Time</Label>
-                  <Input
-                    type="time"
-                    value={config.night_mode_end || '06:00'}
-                    onChange={(e) => update('night_mode_end', e.target.value)}
-                  />
-                </div>
-              </div>
-              {config.timezone && (
-                <p className="text-xs text-white/40">
-                  Detected timezone: <span className="text-white/60">{config.timezone}</span>
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {config.sleep_mode ? <Moon size={16} /> : <Sun size={16} />}
-              <span className="text-sm">Sleep Display</span>
-            </div>
-            <Switch
-              checked={config.sleep_mode}
-              onCheckedChange={(v) => update('sleep_mode', v)}
-            />
+            )}
           </div>
+        )}
 
-          {config.sleep_mode && (
-            <div className="space-y-3">
-              <p className="text-xs text-white/50">
-                During these hours the display turns off completely. Sleep overrides dim if windows overlap.
-              </p>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Sleep Start Time</Label>
-                  <Input
-                    type="time"
-                    value={config.sleep_mode_start || '23:00'}
-                    onChange={(e) => update('sleep_mode_start', e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Sleep End Time</Label>
-                  <Input
-                    type="time"
-                    value={config.sleep_mode_end || '06:00'}
-                    onChange={(e) => update('sleep_mode_end', e.target.value)}
-                  />
-                </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {config.sleep_mode ? <Moon size={16} /> : <Sun size={16} />}
+            <span className="text-sm">Sleep Display</span>
+          </div>
+          <Switch
+            checked={config.sleep_mode}
+            onCheckedChange={(v) => update('sleep_mode', v)}
+          />
+        </div>
+
+        {config.sleep_mode && (
+          <div className="space-y-3">
+            <p className="text-xs text-white/50">
+              During these hours the display turns off completely. Sleep overrides dim if windows overlap.
+            </p>
+            <FormGrid>
+              <div className="space-y-2">
+                <Label>Sleep Start Time</Label>
+                <Input
+                  type="time"
+                  value={config.sleep_mode_start || '23:00'}
+                  onChange={(e) => update('sleep_mode_start', e.target.value)}
+                />
               </div>
-              {config.timezone && (
-                <p className="text-xs text-white/40">
-                  Detected timezone: <span className="text-white/60">{config.timezone}</span>
-                </p>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <Label>Sleep End Time</Label>
+                <Input
+                  type="time"
+                  value={config.sleep_mode_end || '06:00'}
+                  onChange={(e) => update('sleep_mode_end', e.target.value)}
+                />
+              </div>
+            </FormGrid>
+            {config.timezone && (
+              <p className="text-xs text-white/40">
+                Detected timezone: <span className="text-white/60">{config.timezone}</span>
+              </p>
+            )}
+          </div>
+        )}
+      </SettingsSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70">Updates</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <SettingsSection title="System" icon={Power} description="Update, reboot, or reset the device.">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-sm">Auto-update</span>
             <Switch
@@ -770,13 +726,37 @@ export default function Settings() {
           ) : (
             <div className="text-sm text-white/50">Loading update status...</div>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
-      <div className="flex gap-3 pt-4">
+        <div className="grid grid-cols-2 gap-3">
+          <Button
+            variant="secondary"
+            className="w-full gap-2"
+            onClick={() => setPowerAction('reboot')}
+          >
+            <RotateCcw size={16} />
+            Reboot Pi
+          </Button>
+          <Button
+            variant="destructive"
+            className="w-full gap-2"
+            onClick={() => setPowerAction('shutdown')}
+          >
+            <PowerOff size={16} />
+            Shut Down Pi
+          </Button>
+        </div>
+
+        <Button variant="destructive" onClick={handleResetOnboarding} className="w-full gap-2">
+          <RotateCcw size={16} />
+          Reset Onboarding
+        </Button>
+      </SettingsSection>
+
+      <div className="flex flex-col sm:flex-row gap-3 pt-4">
         <Button
           onClick={handleSave}
-          className="flex-1 gap-2"
+          className="w-full sm:flex-1 gap-2"
           disabled={
             config.receiver_source === 'network' &&
             (!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port))
@@ -786,45 +766,6 @@ export default function Settings() {
           Save Settings
         </Button>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Power size={14} />
-            System Power
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-xs text-white/40">
-            Reboot or shut down the Raspberry Pi. These actions disconnect the device from the network.
-          </p>
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="secondary"
-              className="w-full gap-2"
-              onClick={() => setPowerAction('reboot')}
-            >
-              <RotateCcw size={16} />
-              Reboot Pi
-            </Button>
-            <Button
-              variant="destructive"
-              className="w-full gap-2"
-              onClick={() => setPowerAction('shutdown')}
-            >
-              <PowerOff size={16} />
-              Shut Down Pi
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Separator />
-
-      <Button variant="destructive" onClick={handleResetOnboarding} className="w-full gap-2">
-        <RotateCcw size={16} />
-        Reset Onboarding
-      </Button>
 
       <Dialog open={!!powerAction} onOpenChange={() => setPowerAction(null)}>
         <DialogContent>
@@ -851,7 +792,7 @@ export default function Settings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }
 
@@ -893,7 +834,7 @@ function LayoutPicker({
   highlightMode: 'active' | 'idle';
 }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {layouts.length === 0 && (
         <div className="text-sm text-white/40 col-span-full">No layouts available.</div>
       )}
@@ -920,9 +861,9 @@ function LayoutPicker({
                 </div>
               </div>
               <div className="flex flex-wrap justify-end gap-1">
-                {layout.is_default && <Badge variant="secondary" className="text-[10px] px-1 py-0">Default</Badge>}
+                {layout.is_default && <Badge variant="secondary" className="text-xs px-1 py-0">Default</Badge>}
                 {hasList && (
-                  <Badge variant="outline" className="text-[10px] px-1 py-0 flex items-center gap-1">
+                  <Badge variant="outline" className="text-xs px-1 py-0 flex items-center gap-1">
                     <ListOrdered size={10} />
                     List
                   </Badge>
