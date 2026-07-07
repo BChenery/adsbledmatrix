@@ -91,6 +91,24 @@ def test_time_window_detection(engine):
         assert engine._is_in_time_window("22:00", "23:00") is False
 
 
+def test_time_window_uses_configured_timezone(engine):
+    """When a timezone is supplied, the window is evaluated in that timezone."""
+    from unittest.mock import patch
+    from datetime import time, datetime, date
+    from zoneinfo import ZoneInfo
+
+    with patch("app.services.display_engine.datetime") as mock_dt:
+        mock_dt.strptime = datetime.strptime
+        # 05:14 in the user's timezone should be inside a 19:00-06:00 sleep window.
+        mock_dt.now.return_value = datetime.combine(date.today(), time(5, 14))
+        assert engine._is_in_time_window("19:00", "06:00", "America/Los_Angeles") is True
+        mock_dt.now.assert_called_with(ZoneInfo("America/Los_Angeles"))
+
+        # 15:00 should be outside the same window.
+        mock_dt.now.return_value = datetime.combine(date.today(), time(15, 0))
+        assert engine._is_in_time_window("19:00", "06:00", "America/Los_Angeles") is False
+
+
 def test_sleep_window_blanks_display(engine):
     """Sleep window clears the matrix and stops rendering."""
     from unittest.mock import MagicMock, patch

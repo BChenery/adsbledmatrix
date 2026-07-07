@@ -5,6 +5,7 @@ import threading
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any, Tuple
+from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
 from app.config import settings
 from app.services.geocalc import convert_distance, convert_altitude, convert_speed, format_heading
@@ -632,20 +633,28 @@ class DisplayEngine:
             )
         return None
 
-    def _is_in_time_window(self, start: Optional[str], end: Optional[str]) -> bool:
-        """Return True if the current local time falls within the HH:MM window."""
+    def _is_in_time_window(
+        self, start: Optional[str], end: Optional[str], timezone_name: Optional[str] = None
+    ) -> bool:
+        """Return True if the current time in the user's timezone falls within the HH:MM window."""
         if not start or not end:
             return False
         try:
-            now = datetime.now().time()
             start_time = datetime.strptime(start, "%H:%M").time()
             end_time = datetime.strptime(end, "%H:%M").time()
         except ValueError:
             return False
+
+        try:
+            now = datetime.now(ZoneInfo(timezone_name)) if timezone_name else datetime.now()
+        except Exception:
+            now = datetime.now()
+
+        now_time = now.time()
         if start_time < end_time:
-            return start_time <= now < end_time
+            return start_time <= now_time < end_time
         # Interval wraps past midnight (e.g. 22:00 -> 06:00).
-        return now >= start_time or now < end_time
+        return now_time >= start_time or now_time < end_time
 
     def _apply_matrix_brightness(self, brightness: int):
         """Apply a brightness value directly to the matrix hardware."""
@@ -654,11 +663,31 @@ class DisplayEngine:
 
     def _handle_night_mode(self, config: Optional[Any]) -> bool:
         """Apply sleep or dim windows. Returns True when rendering should be skipped."""
+        timezone_name = config.timezone if config else None
+        try:
+            local_now = datetime.now(ZoneInfo(timezone_name)) if timezone_name else datetime.now()
+        except Exception:
+            local_now = datetime.now()
+
+        logger.debug(
+            "Night-mode check: local_time=%s timezone=%s sleep=%s-%s dim=%s-%s",
+            local_now.strftime("%H:%M"),
+            timezone_name or "system",
+            config.sleep_mode_start if config else None,
+            config.sleep_mode_end if config else None,
+            config.night_mode_start if config else None,
+            config.night_mode_end if config else None,
+        )
+
         in_sleep_window = bool(
-            config and config.sleep_mode and self._is_in_time_window(config.sleep_mode_start, config.sleep_mode_end)
+            config
+            and config.sleep_mode
+            and self._is_in_time_window(config.sleep_mode_start, config.sleep_mode_end, timezone_name)
         )
         in_dim_window = bool(
-            config and config.night_mode and self._is_in_time_window(config.night_mode_start, config.night_mode_end)
+            config
+            and config.night_mode
+            and self._is_in_time_window(config.night_mode_start, config.night_mode_end, timezone_name)
         )
 
         if in_sleep_window:
@@ -743,6 +772,15 @@ class DisplayEngine:
         except Exception:
             pass
 
+        from app.api.config import get_user_config_sync
+
+        config = get_user_config_sync()
+        timezone_name = config.timezone if config else None
+        try:
+            local_now = datetime.now(ZoneInfo(timezone_name)) if timezone_name else datetime.now()
+        except Exception:
+            local_now = datetime.now()
+
         return {
             "hardware_mode": self.is_hardware_mode(),
             "matrix_type": type(self._matrix).__name__,
@@ -767,6 +805,8 @@ class DisplayEngine:
             "gpio_access": gpio_access,
             "user": user,
             "groups": groups,
+            "timezone": timezone_name or "system",
+            "local_time": local_now.strftime("%H:%M:%S"),
         }
 
 

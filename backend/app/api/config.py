@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from app.database import get_db
 from app.models import UserConfig, Layout
 from app.services.readsb_service_manager import apply_receiver_source
+from app.services.timezone import timezone_for_location
 
 router = APIRouter(prefix="/api/config", tags=["config"])
 
@@ -32,6 +33,7 @@ class ConfigResponse(BaseModel):
     sleep_mode: bool
     sleep_mode_start: Optional[str]
     sleep_mode_end: Optional[str]
+    timezone: Optional[str]
     led_matrix_brightness: int
     receiver_source: str
     network_readsb_host: Optional[str]
@@ -60,6 +62,7 @@ class ConfigUpdate(BaseModel):
     sleep_mode: Optional[bool] = None
     sleep_mode_start: Optional[str] = None
     sleep_mode_end: Optional[str] = None
+    timezone: Optional[str] = None
     led_matrix_brightness: Optional[int] = None
     receiver_source: Optional[str] = None
     network_readsb_host: Optional[str] = None
@@ -156,6 +159,14 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
 
     await session.commit()
     await session.refresh(config)
+
+    # Auto-detect timezone from lat/long if it changed or timezone is missing
+    if "latitude" in update_data or "longitude" in update_data or not config.timezone:
+        detected = timezone_for_location(config.latitude, config.longitude)
+        if detected and detected != config.timezone:
+            config.timezone = detected
+            await session.commit()
+            await session.refresh(config)
 
     # Refresh cache
     await refresh_config_cache(session)

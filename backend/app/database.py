@@ -82,6 +82,10 @@ async def migrate_db():
                 sync_conn.execute(
                     text("ALTER TABLE user_config ADD COLUMN sleep_mode_end VARCHAR(5)")
                 )
+            if "timezone" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN timezone VARCHAR(50)")
+                )
 
             # Radar element settings added after initial schema
             result = sync_conn.execute(

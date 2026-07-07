@@ -1,9 +1,15 @@
+import logging
 import platform
+import subprocess
+from typing import Optional
 from pydantic import BaseModel
 from fastapi import APIRouter
 from app.api.config import get_user_config_sync
 from app.config import settings
 from app.services.updater import updater
+from app.services.update_progress import read_update_progress
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/system", tags=["system"])
 
@@ -27,6 +33,15 @@ class UpdateStatus(BaseModel):
     update_available: bool
     release_notes: str = ""
     published_at: str = ""
+
+
+class UpdateProgressResponse(BaseModel):
+    status: str
+    progress: int
+    message: str
+    started_at: Optional[str] = None
+    completed_at: Optional[str] = None
+    error: Optional[str] = None
 
 
 @router.get("/health")
@@ -63,32 +78,57 @@ async def check_update():
 
 @router.post("/update")
 async def trigger_update():
-    """Manual update is handled by the root systemd update service.
+    """Trigger the systemd update service to check and install updates in the background."""
+    try:
+        result = subprocess.run(
+            ["systemctl", "is-active", "--quiet", "adsbledmatrix-update.service"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode == 0:
+            return {
+                "status": "already_running",
+                "message": "An update is already running. Check the progress below.",
+            }
 
-    This endpoint exists for backwards compatibility but does not apply
-    updates from the app process (which lacks privileges after the LED
-    matrix drops to the adsb user).
-    """
-    return {"status": "manual updates are applied by systemd; check status with GET /api/system/update"}
+        subprocess.Popen(
+            ["systemctl", "start", "--no-block", "adsbledmatrix-update.service"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        return {
+            "status": "started",
+            "message": "Update check started. Progress will appear below.",
+        }
+    except Exception as e:
+        logger.error(f"Failed to trigger update service: {e}")
+        return {
+            "status": "error",
+            "message": f"Could not start update: {e}",
+        }
+
+
+@router.get("/update-progress", response_model=UpdateProgressResponse)
+async def get_update_progress():
+    progress = read_update_progress()
+    return UpdateProgressResponse(**progress.model_dump())
 
 
 @router.post("/restart")
 async def restart_system():
-    import subprocess
     subprocess.Popen(["systemctl", "restart", "adsbledmatrix"])
     return {"message": "Restarting..."}
 
 
 @router.post("/reboot")
 async def reboot_system():
-    import subprocess
     subprocess.Popen(["bash", "-c", "sleep 2 && sudo reboot"])
     return {"message": "Rebooting the Pi..."}
 
 
 @router.post("/shutdown")
 async def shutdown_system():
-    import subprocess
     subprocess.Popen(["bash", "-c", "sleep 2 && sudo shutdown now"])
     return {"message": "Shutting down the Pi..."}
 

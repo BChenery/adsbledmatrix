@@ -29,7 +29,14 @@ async def lifespan(app: FastAPI):
 
     async with AsyncSessionLocal() as session:
         from app.api.config import get_or_create_config, refresh_config_cache
+        from app.services.timezone import timezone_for_location
         config = await get_or_create_config(session)
+        if not config.timezone:
+            detected = timezone_for_location(config.latitude, config.longitude)
+            if detected:
+                config.timezone = detected
+                await session.commit()
+                await session.refresh(config)
         await refresh_config_cache(session)
         receiver.set_user_location(config.latitude, config.longitude)
         await apply_receiver_source(config)

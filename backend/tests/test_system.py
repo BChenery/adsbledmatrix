@@ -1,6 +1,7 @@
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient, ASGITransport
+from unittest.mock import patch, MagicMock
 from app.api.system import router as system_router, trigger_update
 
 
@@ -12,11 +13,37 @@ def app():
 
 
 @pytest.mark.asyncio
-async def test_post_update_returns_status():
-    result = await trigger_update()
-    assert result == {
-        "status": "manual updates are applied by systemd; check status with GET /api/system/update"
-    }
+async def test_post_update_starts_service_when_not_running():
+    with patch("app.api.system.subprocess.run") as mock_run, \
+         patch("app.api.system.subprocess.Popen") as mock_popen:
+        mock_run.return_value = MagicMock(returncode=1)  # not running
+        result = await trigger_update()
+
+    assert result["status"] == "started"
+    assert "Progress will appear" in result["message"]
+    mock_popen.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_post_update_reports_already_running():
+    with patch("app.api.system.subprocess.run") as mock_run, \
+         patch("app.api.system.subprocess.Popen") as mock_popen:
+        mock_run.return_value = MagicMock(returncode=0)  # already running
+        result = await trigger_update()
+
+    assert result["status"] == "already_running"
+    mock_popen.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_get_update_progress_returns_idle_by_default(app):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.get("/api/system/update-progress")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "idle"
+    assert data["progress"] == 0
 
 
 @pytest.mark.asyncio

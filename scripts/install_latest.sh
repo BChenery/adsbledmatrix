@@ -6,6 +6,8 @@ REPO="BChenery/adsbledmatrix"
 API_URL="https://api.github.com/repos/${REPO}/releases/latest"
 SERVICE_USER="adsb"
 LOG_FILE="/var/log/adsbledmatrix-update.log"
+PROGRESS_FILE="${INSTALL_DIR}/data/.update_progress.json"
+export PROGRESS_FILE
 
 ADSB_PORT=8080
 if [ -f "${INSTALL_DIR}/.env" ]; then
@@ -18,6 +20,31 @@ log() {
     echo "[$(date -Iseconds)] $*" | tee -a "$LOG_FILE"
 }
 
+write_progress() {
+    local status="$1"
+    local progress="$2"
+    local message="$3"
+    local error="${4:-}"
+    local started_at="${5:-}"
+    local completed_at="${6:-}"
+    python3 - "$status" "$progress" "$message" "$error" "$started_at" "$completed_at" <<'PY'
+import json, os, sys
+path = os.environ.get("PROGRESS_FILE", "/opt/adsbledmatrix/data/.update_progress.json")
+os.makedirs(os.path.dirname(path), exist_ok=True)
+status, progress, message, error, started_at, completed_at = sys.argv[1:]
+data = {
+    "status": status,
+    "progress": int(progress),
+    "message": message,
+    "error": error if error else None,
+    "started_at": started_at if started_at else None,
+    "completed_at": completed_at if completed_at else None,
+}
+with open(path, "w") as f:
+    json.dump(data, f)
+PY
+}
+
 if [ "$(id -u)" -ne 0 ]; then
     log "This script must be run as root"
     exit 1
@@ -25,6 +52,9 @@ fi
 
 mkdir -p "$(dirname "$LOG_FILE")"
 touch "$LOG_FILE"
+
+STARTED_AT="${STARTED_AT:-$(date -Iseconds)}"
+write_progress "installing" 35 "Stopping services and preparing update..." "" "$STARTED_AT"
 
 cleanup() {
     shopt -s nullglob
@@ -210,6 +240,7 @@ prune_backups() {
 
 main() {
     fetch_release
+    write_progress "installing" 45 "Release downloaded. Updating files..." "" "$STARTED_AT"
 
     if [ "$MODE" = "update" ]; then
         log "Stopping adsbledmatrix.service for update"
@@ -220,11 +251,13 @@ main() {
         ensure_service_user
         install_os_deps
         install_or_update_code
+        write_progress "installing" 55 "Installing Python dependencies..." "" "$STARTED_AT"
         ensure_venv_and_requirements
         ensure_rgbmatrix
         install_systemd_units
     else
         install_or_update_code
+        write_progress "installing" 55 "Installing Python dependencies..." "" "$STARTED_AT"
         ensure_venv_and_requirements
         ensure_rgbmatrix
         install_systemd_units
@@ -233,16 +266,20 @@ main() {
     fix_ownership
 
     log "Starting services"
+    write_progress "installing" 70 "Restarting services..." "" "$STARTED_AT"
     systemctl start adsbledmatrix.service || true
     systemctl start readsb.service 2>/dev/null || true
 
+    write_progress "installing" 85 "Waiting for app to come back online..." "" "$STARTED_AT"
     if wait_for_health; then
         log "Install/update completed successfully"
+        write_progress "completed" 100 "Update completed successfully." "" "$STARTED_AT" "$(date -Iseconds)"
         if [ "$MODE" = "update" ]; then
             prune_backups
         fi
     else
         log "Install/update failed health check"
+        write_progress "failed" 0 "Update failed health check." "health check failed" "$STARTED_AT" "$(date -Iseconds)"
         if [ "$MODE" = "update" ]; then
             rollback
         fi

@@ -17,6 +17,7 @@ export interface UserConfig {
   sleep_mode: boolean;
   sleep_mode_start?: string;
   sleep_mode_end?: string;
+  timezone?: string;
   led_matrix_brightness: number;
   receiver_source: 'local' | 'network';
   network_readsb_host?: string;

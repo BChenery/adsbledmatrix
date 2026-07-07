@@ -32,6 +32,7 @@ import { useDisplayDiagnostics } from '@/hooks/useDisplayDiagnostics';
 import { useLayouts } from '@/hooks/useLayout';
 import { useAircraft } from '@/hooks/useAircraft';
 import { useReceiverStatus } from '@/hooks/useReceiverStatus';
+import { useUpdateProgress } from '@/hooks/useUpdateProgress';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
 
 export default function Settings() {
@@ -49,11 +50,24 @@ export default function Settings() {
   };
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateActive, setUpdateActive] = useState(false);
+  const updateProgress = useUpdateProgress(updateActive);
 
   useEffect(() => {
     api.get<UserConfig>('/api/config').then(setConfig);
     api.get<UpdateStatus>('/api/system/update').then(setUpdateStatus).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (
+      updateProgress?.status === 'completed' ||
+      updateProgress?.status === 'failed' ||
+      updateProgress?.status === 'up_to_date'
+    ) {
+      const timer = setTimeout(() => setUpdateActive(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [updateProgress?.status]);
 
   const update = (field: keyof UserConfig, value: unknown) => {
     if (!config) return;
@@ -91,11 +105,13 @@ export default function Settings() {
   };
 
   const handleApplyUpdate = async () => {
+    setUpdateActive(true);
     try {
-      const res = await api.post<{ status: string }>('/api/system/update');
-      toast.success(res.status || 'Update check triggered');
+      const res = await api.post<{ status: string; message: string }>('/api/system/update');
+      toast.success(res.message || 'Update check triggered');
     } catch {
       toast.error('Failed to trigger update');
+      setUpdateActive(false);
     }
   };
 
@@ -625,6 +641,11 @@ export default function Settings() {
                   />
                 </div>
               </div>
+              {config.timezone && (
+                <p className="text-xs text-white/40">
+                  Detected timezone: <span className="text-white/60">{config.timezone}</span>
+                </p>
+              )}
             </div>
           )}
 
@@ -662,6 +683,11 @@ export default function Settings() {
                   />
                 </div>
               </div>
+              {config.timezone && (
+                <p className="text-xs text-white/40">
+                  Detected timezone: <span className="text-white/60">{config.timezone}</span>
+                </p>
+              )}
             </div>
           )}
         </CardContent>
@@ -701,19 +727,43 @@ export default function Settings() {
               {updateStatus.error && (
                 <div className="text-xs text-red-400">{updateStatus.error}</div>
               )}
-              <div className="flex gap-2 pt-1">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleCheckUpdate}
-                  disabled={checkingUpdate}
-                >
-                  {checkingUpdate ? 'Checking...' : 'Check now'}
-                </Button>
-                {updateStatus.update_available && (
-                  <Button size="sm" onClick={handleApplyUpdate}>
-                    Trigger update
+              <div className="flex flex-col gap-3 pt-1">
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleCheckUpdate}
+                    disabled={checkingUpdate || updateActive}
+                  >
+                    {checkingUpdate ? 'Checking...' : 'Check now'}
                   </Button>
+                  {updateStatus.update_available && (
+                    <Button
+                      size="sm"
+                      onClick={handleApplyUpdate}
+                      disabled={updateActive}
+                    >
+                      {updateActive ? 'Updating...' : 'Trigger update'}
+                    </Button>
+                  )}
+                </div>
+
+                {updateActive && updateProgress && (
+                  <div className="space-y-2 rounded-lg border border-white/10 bg-white/5 p-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-white/70">{updateProgress.message}</span>
+                      <span className="text-white/50">{updateProgress.progress}%</span>
+                    </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className="h-full rounded-full bg-primary transition-all duration-500"
+                        style={{ width: `${updateProgress.progress}%` }}
+                      />
+                    </div>
+                    {updateProgress.error && (
+                      <p className="text-xs text-red-400">{updateProgress.error}</p>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

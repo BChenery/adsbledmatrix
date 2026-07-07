@@ -51,6 +51,7 @@ class UserConfig(Base):
     sleep_mode = Column(Boolean, nullable=False, default=False)
     sleep_mode_start = Column(String(5))
     sleep_mode_end = Column(String(5))
+    timezone = Column(String(50))
     led_matrix_brightness = Column(Integer, nullable=False, default=70)
 
     # Receiver source

@@ -450,3 +450,14 @@ async def test_get_config_response_schema(app_with_db):
     assert "receiver_source" in data
     assert "network_readsb_host" in data
     assert "network_readsb_port" in data
+    assert "timezone" in data
+
+
+@pytest.mark.asyncio
+async def test_update_config_detects_timezone_from_lat_long(app_with_db):
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put("/api/config", json={"latitude": -33.8568, "longitude": 151.2153})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["timezone"] == "Australia/Sydney"

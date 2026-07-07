@@ -6,12 +6,39 @@ REPO="BChenery/adsbledmatrix"
 API_URL="https://api.github.com/repos/${REPO}/releases/latest"
 LOG_FILE="/var/log/adsbledmatrix-update.log"
 LOCK_FILE="/var/run/adsbledmatrix-update.lock"
+PROGRESS_FILE="${INSTALL_DIR}/data/.update_progress.json"
+export PROGRESS_FILE
 if [ ! -d "/var/run" ]; then
     LOCK_FILE="/tmp/adsbledmatrix-update.lock"
 fi
 
 log() {
     echo "[$(date -Iseconds)] $*" | tee -a "$LOG_FILE"
+}
+
+write_progress() {
+    local status="$1"
+    local progress="$2"
+    local message="$3"
+    local error="${4:-}"
+    local started_at="${5:-}"
+    local completed_at="${6:-}"
+    python3 - "$status" "$progress" "$message" "$error" "$started_at" "$completed_at" <<'PY'
+import json, os, sys
+path = os.environ.get("PROGRESS_FILE", "/opt/adsbledmatrix/data/.update_progress.json")
+os.makedirs(os.path.dirname(path), exist_ok=True)
+status, progress, message, error, started_at, completed_at = sys.argv[1:]
+data = {
+    "status": status,
+    "progress": int(progress),
+    "message": message,
+    "error": error if error else None,
+    "started_at": started_at if started_at else None,
+    "completed_at": completed_at if completed_at else None,
+}
+with open(path, "w") as f:
+    json.dump(data, f)
+PY
 }
 
 if [ "$(id -u)" -ne 0 ]; then
@@ -21,6 +48,9 @@ fi
 
 mkdir -p "$(dirname "$LOG_FILE")"
 touch "$LOG_FILE"
+
+STARTED_AT=$(date -Iseconds)
+write_progress "checking" 5 "Checking for updates..." "" "$STARTED_AT"
 
 # Concurrency lock
 acquire_lock() {
@@ -52,6 +82,7 @@ fi
 log "Checking for updates. Current version: ${CURRENT_VERSION:-unknown}"
 
 if ! LATEST_JSON=$(curl -fsSL --max-time 60 "$API_URL"); then
+    write_progress "failed" 0 "Failed to fetch latest release information from GitHub." "curl failed" "$STARTED_AT" "$(date -Iseconds)"
     log "Failed to fetch latest release information from GitHub"
     exit 1
 fi
@@ -60,9 +91,11 @@ LATEST_VERSION=$(echo "$LATEST_JSON" | python3 -c "import sys,json; print(json.l
 LATEST_VERSION=${LATEST_VERSION#v}
 
 log "Latest release version: $LATEST_VERSION"
+write_progress "checking" 15 "Latest release: $LATEST_VERSION" "" "$STARTED_AT"
 
 if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
     log "Already up to date"
+    write_progress "up_to_date" 100 "Already up to date." "" "$STARTED_AT" "$(date -Iseconds)"
     exit 0
 fi
 
@@ -75,6 +108,7 @@ print(assets.get('rollout.json', ''))
 
 if [ -n "$ROLLOUT_URL" ]; then
     if ! PERCENTAGE_JSON=$(curl -fsSL --max-time 60 "$ROLLOUT_URL"); then
+        write_progress "failed" 0 "Failed to fetch rollout configuration." "rollout fetch failed" "$STARTED_AT" "$(date -Iseconds)"
         log "Failed to fetch rollout configuration; skipping update"
         exit 1
     fi
@@ -96,6 +130,7 @@ if [ -n "$ROLLOUT_URL" ]; then
     BUCKET_DEC=$((16#$BUCKET_HEX % 100))
     if [ "$BUCKET_DEC" -ge "$PERCENTAGE" ]; then
         log "Device not in rollout bucket ($BUCKET_DEC >= $PERCENTAGE); skipping update"
+        write_progress "up_to_date" 100 "Device not in this rollout bucket. Update skipped." "" "$STARTED_AT" "$(date -Iseconds)"
         exit 0
     fi
 fi
@@ -111,19 +146,24 @@ fi
 
 if [ "$AUTO_UPDATE" != "true" ]; then
     log "auto_update is disabled; skipping update"
+    write_progress "up_to_date" 100 "Auto-update is disabled. Update skipped." "" "$STARTED_AT" "$(date -Iseconds)"
     exit 0
 fi
 
 log "Applying update to $LATEST_VERSION"
+write_progress "downloading" 30 "Downloading update $LATEST_VERSION..." "" "$STARTED_AT"
 
 INSTALL_SCRIPT=$(mktemp)
 trap 'rm -f "$INSTALL_SCRIPT"' EXIT
 if ! curl -fsSL --max-time 60 "https://raw.githubusercontent.com/${REPO}/main/scripts/install_latest.sh" -o "$INSTALL_SCRIPT"; then
+    write_progress "failed" 0 "Failed to download install script." "install script download failed" "$STARTED_AT" "$(date -Iseconds)"
     log "Failed to download install script"
     exit 1
 fi
 if ! bash -n "$INSTALL_SCRIPT"; then
+    write_progress "failed" 0 "Downloaded install script failed syntax check." "syntax check failed" "$STARTED_AT" "$(date -Iseconds)"
     log "Downloaded install script failed syntax check"
     exit 1
 fi
+export STARTED_AT
 exec bash "$INSTALL_SCRIPT"
