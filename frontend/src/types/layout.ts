@@ -34,6 +34,7 @@ export interface LayoutElement {
   user_dot_color?: string;
   show_rings?: boolean;
   show_ticks?: boolean;
+  use_plane_symbol?: boolean;
 }
 
 export interface Layout {
