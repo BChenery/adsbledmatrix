@@ -35,6 +35,7 @@ class ElementCreate(BaseModel):
     user_dot_color: Optional[str] = '#00ff00'
     show_rings: Optional[bool] = True
     show_ticks: Optional[bool] = True
+    use_plane_symbol: Optional[bool] = False
 
 
 class ElementResponse(ElementCreate):

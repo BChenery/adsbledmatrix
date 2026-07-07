@@ -3,6 +3,16 @@ import { Layout, LayoutElement } from '@/types/layout';
 import { Aircraft } from '@/types/aircraft';
 import { getAircraftDisplayValue } from '@/lib/layoutDisplay';
 
+function rotatePoint(px: number, py: number, cx: number, cy: number, angleDeg: number): [number, number] {
+  const angle = (angleDeg * Math.PI) / 180;
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  return [
+    cx + (px - cx) * cos - (py - cy) * sin,
+    cy + (px - cx) * sin + (py - cy) * cos,
+  ];
+}
+
 interface CanvasProps {
   layout: Layout;
   selectedElement: LayoutElement | null;
@@ -193,16 +203,39 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         ctx.arc(cx, cy, 2, 0, Math.PI * 2);
         ctx.fill();
 
-        // Aircraft dot
+        // Aircraft marker
         if (ac && ac.distance_km !== undefined && ac.bearing !== undefined) {
           const ratio = Math.min(ac.distance_km / rangeKm, 1.0);
           const angle = (ac.bearing - 90) * (Math.PI / 180);
           const dotX = cx + radius * ratio * Math.cos(angle);
           const dotY = cy + radius * ratio * Math.sin(angle);
+
           ctx.fillStyle = dotColor;
-          ctx.beginPath();
-          ctx.arc(dotX, dotY, 3, 0, Math.PI * 2);
-          ctx.fill();
+
+          if (el.use_plane_symbol && ac.heading !== undefined && ac.heading !== null) {
+            const heading = Number(ac.heading);
+            const plane: [number, number][] = [
+              [0, -4],
+              [-3, 2],
+              [-1, 1],
+              [0, 3],
+              [1, 1],
+              [3, 2],
+            ];
+            ctx.beginPath();
+            const [startX, startY] = rotatePoint(dotX + plane[0][0], dotY + plane[0][1], dotX, dotY, heading);
+            ctx.moveTo(startX, startY);
+            for (let i = 1; i < plane.length; i++) {
+              const [rx, ry] = rotatePoint(dotX + plane[i][0], dotY + plane[i][1], dotX, dotY, heading);
+              ctx.lineTo(rx, ry);
+            }
+            ctx.closePath();
+            ctx.fill();
+          } else {
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
       }
 

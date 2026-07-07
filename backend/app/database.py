@@ -98,6 +98,7 @@ async def migrate_db():
                 ("user_dot_color", "VARCHAR(7)"),
                 ("show_rings", "BOOLEAN DEFAULT 1"),
                 ("show_ticks", "BOOLEAN DEFAULT 1"),
+                ("use_plane_symbol", "BOOLEAN DEFAULT 0"),
             ]
             for col_name, col_type in radar_columns:
                 if col_name not in columns:

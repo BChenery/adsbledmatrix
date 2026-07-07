@@ -196,3 +196,142 @@ def test_distance_bar_does_not_draw_label_below_bar(engine):
     for py in range(126, 128):
         for px in range(256):
             assert pixels[px, py] == (0, 0, 0), f"non-black pixel below bar at ({px},{py})"
+
+
+def test_draw_radar_plane_symbol_rotates_with_heading(engine):
+    """A plane symbol at due north with heading 90° (east) should point right."""
+    from unittest.mock import MagicMock
+    from app.services.display_engine import RenderContext
+    from PIL import Image, ImageDraw
+
+    element = MagicMock()
+    element.element_type = 'radar'
+    element.x = 0
+    element.y = 0
+    element.width = 100
+    element.height = 100
+    element.range_km = 20
+    element.ring_color = '#333333'
+    element.dot_color = '#ff0000'
+    element.user_dot_color = '#00ff00'
+    element.show_rings = True
+    element.show_ticks = True
+    element.bg_color = None
+    element.use_plane_symbol = True
+
+    aircraft = MagicMock()
+    aircraft.distance_km = 10.0
+    aircraft.bearing = 0.0  # North
+    aircraft.heading = 90.0  # East
+
+    ctx = RenderContext(aircraft=aircraft)
+
+    img = Image.new('RGB', (100, 100), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    engine._draw_radar(draw, img, element, ctx)
+
+    # The aircraft is at (50, 26). With heading 90° the nose should be to the right,
+    # well outside the original 7×7 dot (which only reaches x=53).
+    red_pixels_east = [
+        (px, py)
+        for px in range(54, 58)
+        for py in range(24, 29)
+        if img.getpixel((px, py)) == (255, 0, 0)
+    ]
+    assert red_pixels_east, "Expected red plane pixels east of the aircraft position"
+
+    # Confirm no red pixel where the unrotated nose would be; the plane has rotated east.
+    assert img.getpixel((50, 22)) == (0, 0, 0), "Expected no red pixel at the unrotated nose position"
+
+
+def test_draw_radar_plane_symbol_disabled_uses_dot(engine):
+    """When use_plane_symbol is False the renderer should fall back to the dot."""
+    from unittest.mock import MagicMock
+    from app.services.display_engine import RenderContext
+    from PIL import Image, ImageDraw
+
+    element = MagicMock()
+    element.element_type = 'radar'
+    element.x = 0
+    element.y = 0
+    element.width = 100
+    element.height = 100
+    element.range_km = 20
+    element.ring_color = '#333333'
+    element.dot_color = '#ff0000'
+    element.user_dot_color = '#00ff00'
+    element.show_rings = True
+    element.show_ticks = True
+    element.bg_color = None
+    element.use_plane_symbol = False
+
+    aircraft = MagicMock()
+    aircraft.distance_km = 10.0
+    aircraft.bearing = 0.0
+    aircraft.heading = 90.0
+
+    ctx = RenderContext(aircraft=aircraft)
+
+    img = Image.new('RGB', (100, 100), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    engine._draw_radar(draw, img, element, ctx)
+
+    # The original dot is rendered near (50, 26).
+    assert img.getpixel((50, 26)) == (255, 0, 0), "Expected red dot at aircraft position"
+
+    # No plane nose should appear east of the dot.
+    red_pixels_east = [
+        (px, py)
+        for px in range(54, 58)
+        for py in range(24, 29)
+        if img.getpixel((px, py)) == (255, 0, 0)
+    ]
+    assert not red_pixels_east, "Did not expect plane pixels east of the aircraft position"
+
+
+def test_draw_radar_plane_symbol_falls_back_when_no_heading(engine):
+    """When the aircraft has no heading the renderer should fall back to the dot."""
+    from unittest.mock import MagicMock
+    from app.services.display_engine import RenderContext
+    from PIL import Image, ImageDraw
+
+    element = MagicMock()
+    element.element_type = 'radar'
+    element.x = 0
+    element.y = 0
+    element.width = 100
+    element.height = 100
+    element.range_km = 20
+    element.ring_color = '#333333'
+    element.dot_color = '#ff0000'
+    element.user_dot_color = '#00ff00'
+    element.show_rings = True
+    element.show_ticks = True
+    element.bg_color = None
+    element.use_plane_symbol = True
+
+    aircraft = MagicMock()
+    aircraft.distance_km = 10.0
+    aircraft.bearing = 0.0
+    aircraft.heading = None
+
+    ctx = RenderContext(aircraft=aircraft)
+
+    img = Image.new('RGB', (100, 100), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    engine._draw_radar(draw, img, element, ctx)
+
+    # The original dot is rendered near (50, 26).
+    assert img.getpixel((50, 26)) == (255, 0, 0), "Expected red dot at aircraft position"
+
+    # No plane nose should appear east of the dot.
+    red_pixels_east = [
+        (px, py)
+        for px in range(54, 58)
+        for py in range(24, 29)
+        if img.getpixel((px, py)) == (255, 0, 0)
+    ]
+    assert not red_pixels_east, "Did not expect plane pixels east of the aircraft position"

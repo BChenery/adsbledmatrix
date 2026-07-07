@@ -465,6 +465,14 @@ class DisplayEngine:
             if row_y > y + h:
                 break
 
+    def _rotate_point(self, px: float, py: float, cx: float, cy: float, angle_deg: float) -> Tuple[float, float]:
+        angle = math.radians(angle_deg)
+        cos_a = math.cos(angle)
+        sin_a = math.sin(angle)
+        rx = cx + (px - cx) * cos_a - (py - cy) * sin_a
+        ry = cy + (px - cx) * sin_a + (py - cy) * cos_a
+        return rx, ry
+
     def _draw_radar(self, draw: ImageDraw.Draw, img: Image.Image, element: Any, ctx: RenderContext):
         x, y = element.x, element.y
         w = element.width or 100
@@ -509,14 +517,31 @@ class DisplayEngine:
         # Centre user dot
         draw.ellipse([cx - 2, cy - 2, cx + 2, cy + 2], fill=user_color)
 
-        # Aircraft dot
+        # Aircraft marker
         ac = ctx.aircraft
         if ac and ac.distance_km is not None and ac.bearing is not None:
             ratio = min(ac.distance_km / range_km, 1.0)
             angle = math.radians(ac.bearing - 90)
             dot_x = cx + radius * ratio * math.cos(angle)
             dot_y = cy + radius * ratio * math.sin(angle)
-            draw.ellipse([dot_x - 3, dot_y - 3, dot_x + 3, dot_y + 3], fill=dot_color)
+
+            use_plane = getattr(element, "use_plane_symbol", False)
+            heading = getattr(ac, 'heading', None)
+
+            if use_plane and heading is not None:
+                # Simple plane silhouette pointing up (0° heading = North)
+                plane = [
+                    (0, -4),
+                    (-3, 2),
+                    (-1, 1),
+                    (0, 3),
+                    (1, 1),
+                    (3, 2),
+                ]
+                rotated = [self._rotate_point(dot_x + px, dot_y + py, dot_x, dot_y, heading) for px, py in plane]
+                draw.polygon(rotated, fill=dot_color)
+            else:
+                draw.ellipse([dot_x - 3, dot_y - 3, dot_x + 3, dot_y + 3], fill=dot_color)
 
     def _resolve_data_field(self, field: Optional[str], fmt: Optional[str], ctx: RenderContext) -> str:
         ac = ctx.aircraft

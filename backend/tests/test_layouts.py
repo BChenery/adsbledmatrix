@@ -107,6 +107,7 @@ async def test_radar_element_settings_persist(app, db_session, monkeypatch):
                         "user_dot_color": "#ff00ff",
                         "show_rings": False,
                         "show_ticks": False,
+                        "use_plane_symbol": True,
                     }
                 ]
             },
@@ -123,6 +124,7 @@ async def test_radar_element_settings_persist(app, db_session, monkeypatch):
     assert el["user_dot_color"] == "#ff00ff"
     assert el["show_rings"] is False
     assert el["show_ticks"] is False
+    assert el["use_plane_symbol"] is True
 
 
 def test_default_layouts_validate():
