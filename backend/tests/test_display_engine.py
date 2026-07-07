@@ -396,3 +396,33 @@ def test_vertical_rate_uses_custom_font_size(engine):
     assert large_pixels > small_pixels, (
         f"Expected larger font_size to render more pixels, got {large_pixels} <= {small_pixels}"
     )
+
+
+def test_draw_image_thresholds_alpha_fringe(engine, tmp_path):
+    """Semi-transparent coloured edge pixels should be removed, not drawn as dots."""
+    from unittest.mock import MagicMock
+    from PIL import Image
+    from app.services.display_engine import RenderContext
+
+    # Create a 32x32 image: yellow shape on transparent background with
+    # semi-transparent red fringe pixels around the edge.
+    logo = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+    for y in range(8, 24):
+        for x in range(8, 24):
+            logo.putpixel((x, y), (255, 255, 0, 255))
+    for y in range(7, 25):
+        for x in range(7, 25):
+            if logo.getpixel((x, y))[3] == 0:
+                logo.putpixel((x, y), (255, 0, 0, 10))
+    logo_path = tmp_path / "fringe_logo.png"
+    logo.save(logo_path)
+
+    element = MagicMock()
+    element.image_path = str(logo_path)
+
+    ctx = RenderContext()
+    img = Image.new("RGB", (32, 32), (0, 0, 0))
+    engine._draw_image(img, 0, 0, 32, 32, element, ctx)
+
+    red_pixels = [px for px in img.getdata() if px == (255, 0, 0)]
+    assert not red_pixels, "Expected semi-transparent red fringe to be removed"

@@ -338,6 +338,15 @@ class DisplayEngine:
                 self._image_cache[path] = Image.open(path).convert("RGBA")
             logo = self._image_cache[path].copy()
             logo = logo.resize((w, h), Image.LANCZOS)
+
+            # Threshold the alpha channel to remove anti-aliased colour fringes that
+            # become visible red/blue dots on low-resolution LED matrices. Semi-
+            # transparent edge pixels are made fully transparent; everything else is
+            # kept fully opaque so the logo renders with crisp edges.
+            r, g, b, a = logo.split()
+            a = a.point(lambda p: 255 if p > 64 else 0)
+            logo = Image.merge("RGBA", (r, g, b, a))
+
             img.paste(logo, (x, y), logo)
         except Exception:
             pass

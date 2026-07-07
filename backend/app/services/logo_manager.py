@@ -243,6 +243,11 @@ class LogoManager:
             img = img.convert("RGBA")
             # Resize using high-quality downsampling
             img = img.resize(LOGO_SIZE, Image.LANCZOS)
+            # Threshold the alpha channel to remove anti-aliased colour fringes
+            # that show as stray red/blue dots on low-resolution LED matrices.
+            r, g, b, a = img.split()
+            a = a.point(lambda p: 255 if p > 64 else 0)
+            img = Image.merge("RGBA", (r, g, b, a))
             # Save to bytes
             out = BytesIO()
             img.save(out, format="PNG", optimize=True)
