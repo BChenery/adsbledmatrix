@@ -232,12 +232,12 @@ async def test_draw_radar_plane_symbol_rotates_with_heading(engine):
 
     engine._draw_radar(draw, img, element, ctx)
 
-    # The aircraft is at (50, 25). With heading 90° the nose should be to the right.
-    # Check for red pixels east of the aircraft position.
+    # The aircraft is at (50, 26). With heading 90° the nose should be to the right,
+    # well outside the original 7×7 dot (which only reaches x=53).
     red_pixels_east = [
         (px, py)
-        for px in range(52, 58)
-        for py in range(22, 29)
+        for px in range(54, 58)
+        for py in range(24, 29)
         if img.getpixel((px, py)) == (255, 0, 0)
     ]
     assert red_pixels_east, "Expected red plane pixels east of the aircraft position"
