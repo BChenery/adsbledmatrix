@@ -25,8 +25,9 @@ Add a conditional Font Size input when `element.element_type === 'vertical_rate'
 ```tsx
 {element.element_type === 'vertical_rate' && (
   <div className="space-y-1">
-    <Label>Font Size</Label>
+    <Label htmlFor="vertical-rate-font-size">Font Size</Label>
     <Input
+      id="vertical-rate-font-size"
       type="number"
       value={element.font_size || ''}
       onChange={(e) => update('font_size', parseInt(e.target.value) || undefined)}

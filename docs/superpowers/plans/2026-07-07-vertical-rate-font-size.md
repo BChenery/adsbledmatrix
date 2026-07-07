@@ -391,4 +391,4 @@ If any test fixes were required, commit them; otherwise this task is verificatio
   - Backend test → Task 5.
   - Existing validator limits size → no task needed.
 - **Placeholder scan:** No TODOs, TBDs, or vague steps. Each step includes exact file paths and code.
-- **Type consistency:** `LayoutElement` type already has `font_size?: number`; the panel update uses `parseInt(...)` consistent with other fields. Backend reads `element.font_size` directly, consistent with other specialized `_draw_*` helpers.
+- **Type consistency:** `LayoutElement` type already has `font_size?: number`; the panel update uses `parseInt(...)` consistent with other fields. Backend reads `element.font_size` via `getattr`, consistent with `_render_element` and the design spec.
