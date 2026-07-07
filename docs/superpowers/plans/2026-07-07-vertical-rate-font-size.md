@@ -278,16 +278,19 @@ git commit -m "feat: use vertical_rate element font_size in display engine"
 
 - [ ] **Step 1: Append the test to the existing test file**
 
-Add the following test to `backend/tests/test_display_engine.py`:
+Add the following helper at the top of `backend/tests/test_display_engine.py` (after the imports):
 
 ```python
-def count_non_black_pixels(img):
+def _count_non_black_pixels(img):
     """Count pixels that are not exactly black."""
-    return sum(1 for px in img.getdata() if px != (0, 0, 0))
+    return sum(1 for px in img.get_flattened_data() if px != (0, 0, 0))
+```
 
+Then append this test to `backend/tests/test_display_engine.py`:
 
+```python
 def test_vertical_rate_uses_custom_font_size(engine):
-    """A larger explicit font_size should render more text pixels than the default."""
+    """A larger explicit font_size should render more text pixels than a smaller one."""
     from unittest.mock import MagicMock
     from app.services.display_engine import RenderContext
     from PIL import Image, ImageDraw
@@ -299,7 +302,7 @@ def test_vertical_rate_uses_custom_font_size(engine):
 
     element_small = MagicMock()
     element_small.element_type = 'vertical_rate'
-    element_small.font_size = None
+    element_small.font_size = 12
     element_small.font_family = None
 
     element_large = MagicMock()
@@ -315,13 +318,16 @@ def test_vertical_rate_uses_custom_font_size(engine):
     draw_large = ImageDraw.Draw(img_large)
     engine._draw_vertical_rate(draw_large, 0, 0, 64, 32, element_large, ctx, (255, 255, 255))
 
-    small_pixels = count_non_black_pixels(img_small)
-    large_pixels = count_non_black_pixels(img_large)
+    small_pixels = _count_non_black_pixels(img_small)
+    large_pixels = _count_non_black_pixels(img_large)
 
+    assert small_pixels > 0, "Expected the small font to render some text"
     assert large_pixels > small_pixels, (
         f"Expected larger font_size to render more pixels, got {large_pixels} <= {small_pixels}"
     )
 ```
+
+Note: comparing against the default `h - 4` fallback (28 for a 32px box) would fail because any valid custom font size is `<= h - 4`. The test therefore compares two explicit sizes (12 vs 24).
 
 - [ ] **Step 2: Run the new test and confirm it passes**
 
@@ -360,18 +366,18 @@ PYTHONPATH=..:. /home/bchen/GitHub/adsledmatrix/adsbledmatrix/backend/.venv/bin/
 
 Expected: all backend tests pass.
 
-- [ ] **Step 3: Lint the frontend**
+- [ ] **Step 3: Lint the frontend (pre-existing config issue)**
 
 ```bash
 cd frontend
 npm run lint
 ```
 
-Expected: no lint errors.
+Note: the frontend currently has no ESLint configuration file, so `npm run lint` fails with "ESLint couldn't find a configuration file." This is a pre-existing issue unrelated to this feature. If a config is added in the future, this step should pass with no lint errors. The new code follows the same patterns as the existing property-panel inputs.
 
 - [ ] **Step 4: Final commit if any fixes were needed**
 
-If any lint/test fixes were required, commit them; otherwise this task is verification only.
+If any test fixes were required, commit them; otherwise this task is verification only. Ensure the worktree is clean (no build artifacts from `npm run build` are left in `backend/app/static/`).
 
 ---
 
@@ -385,4 +391,4 @@ If any lint/test fixes were required, commit them; otherwise this task is verifi
   - Backend test → Task 5.
   - Existing validator limits size → no task needed.
 - **Placeholder scan:** No TODOs, TBDs, or vague steps. Each step includes exact file paths and code.
-- **Type consistency:** `LayoutElement` type already has `font_size?: number`; the panel update uses `parseInt(...)` consistent with other fields. Backend reads `element.font_size` with `getattr`, consistent with `_render_element`.
+- **Type consistency:** `LayoutElement` type already has `font_size?: number`; the panel update uses `parseInt(...)` consistent with other fields. Backend reads `element.font_size` directly, consistent with other specialized `_draw_*` helpers.
