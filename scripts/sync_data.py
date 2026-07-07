@@ -33,7 +33,6 @@ DATA_FILES = [
     "data/routes.csv",
     "data/localadsb/flights.db",
     "data/localadsb/aircraft_type_names.json",
-    "data/aircraft_db.sqlite3",
 ]
 
 RAW_BASE = "https://raw.githubusercontent.com/{repo}/main/{path}"
@@ -170,8 +169,15 @@ async def main():
     localadsb_script = Path(__file__).resolve().parent / "import_localadsb.py"
     flights_db_local = settings.data_dir / "localadsb" / "flights.db"
     flights_db_rel = "data/localadsb/flights.db"
+    db_path = settings.db_path
+    localadsb_outdated = (
+        not db_path.exists()
+        or db_path.stat().st_mtime < flights_db_local.stat().st_mtime
+    )
     localadsb_updated = False
-    if localadsb_script.exists() and flights_db_local.exists() and (flights_db_rel in updated or args.force):
+    if localadsb_script.exists() and flights_db_local.exists() and (
+        flights_db_rel in updated or localadsb_outdated or args.force
+    ):
         print()
         print("[5/5] Importing localadsb databases...")
         result = subprocess.run(
