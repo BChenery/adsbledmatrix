@@ -360,43 +360,35 @@ export default function Settings() {
         </div>
       </SettingsSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Sun size={14} />
-            LED Matrix Brightness
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-white/60">Brightness</span>
-            <span className="font-medium tabular-nums">{config.led_matrix_brightness}%</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Moon size={14} className="text-white/30" />
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={1}
-              value={config.led_matrix_brightness}
-              onChange={(e) => handleBrightnessChange(parseInt(e.target.value, 10))}
-              className="slider flex-1"
-              style={{ '--brightness': `${config.led_matrix_brightness}%` } as React.CSSProperties}
-              aria-label="LED matrix brightness"
-            />
-            <Sun size={20} className="text-white/70" />
-          </div>
-          <div className="flex items-center justify-between text-xs">
-            <p className="text-white/40">
-              Drag to adjust the live LED matrix brightness. Changes are applied immediately.
-            </p>
-            {brightnessSaved && (
-              <span className="text-led-accent transition-opacity duration-500">Saved</span>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <SettingsSection title="LED Matrix Brightness" icon={Sun} description="Adjust the live matrix brightness. Changes apply immediately.">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-white/60">Brightness</span>
+          <span className="font-medium tabular-nums">{config.led_matrix_brightness}%</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Moon size={14} className="text-white/30" />
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={config.led_matrix_brightness}
+            onChange={(e) => handleBrightnessChange(parseInt(e.target.value, 10))}
+            className="slider flex-1"
+            style={{ '--brightness': `${config.led_matrix_brightness}%` } as React.CSSProperties}
+            aria-label="LED matrix brightness"
+          />
+          <Sun size={20} className="text-white/70" />
+        </div>
+        <div className="flex items-center justify-between text-xs">
+          <p className="text-white/40">
+            Drag to adjust the live LED matrix brightness. Changes are applied immediately.
+          </p>
+          {brightnessSaved && (
+            <span className="text-led-accent transition-opacity duration-500">Saved</span>
+          )}
+        </div>
+      </SettingsSection>
 
       <Card>
         <CardHeader>
@@ -478,113 +470,105 @@ export default function Settings() {
         </div>
       </SettingsSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Monitor size={14} />
-            Display Behaviour
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
+      <SettingsSection title="Display" icon={LayoutTemplate} description="Choose what appears on the matrix when aircraft are detected or when idle.">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3">
+            <Label className="flex items-center gap-2">
+              <Plane size={14} className="text-white/50" />
+              When aircraft are detected
+            </Label>
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1">
+              <Radio size={10} />
+              {aircraft.length} in range
+            </Badge>
+          </div>
+          <Select
+            value={config.display_mode}
+            onValueChange={(v) => update('display_mode', v)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="closest">Closest aircraft only</SelectItem>
+              <SelectItem value="cycle3">Cycle up to 3 nearest aircraft</SelectItem>
+              <SelectItem value="list">Show list of nearby aircraft</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-white/40">
+            {config.display_mode === 'closest' && (aircraft.length <= 1 ? 'Only one aircraft in range, so the display stays on it.' : 'Keeps the display focused on the single closest aircraft.')}
+            {config.display_mode === 'cycle3' && (aircraft.length <= 1 ? 'Cycle mode is on, but only one aircraft is in range. It will switch when more are detected.' : `Rotates through the ${Math.min(3, aircraft.length)} nearest aircraft every ${config.cycle_interval_sec} seconds.`)}
+            {config.display_mode === 'list' && 'Uses a layout that can show multiple aircraft at once. Pick a list-capable layout below.'}
+          </p>
+        </div>
+
+        {config.display_mode === 'cycle3' && (
           <div className="space-y-2">
-            <div className="flex items-center justify-between gap-3">
+            <Label>Switch aircraft every</Label>
+            <div className="flex items-center gap-3">
+              <Input
+                type="number"
+                min={1}
+                max={60}
+                value={config.cycle_interval_sec}
+                onChange={(e) => update('cycle_interval_sec', parseInt(e.target.value))}
+                className="w-24"
+              />
+              <span className="text-sm text-white/60">seconds</span>
+            </div>
+          </div>
+        )}
+
+        <Separator />
+
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
               <Label className="flex items-center gap-2">
-                <Plane size={14} className="text-white/50" />
-                When aircraft are detected
+                <LayoutTemplate size={14} className="text-white/50" />
+                Aircraft layout
               </Label>
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1">
-                <Radio size={10} />
-                {aircraft.length} in range
-              </Badge>
+              <p className="text-xs text-white/40 mt-0.5">
+                Shown when at least one aircraft is in range.
+              </p>
             </div>
-            <Select
-              value={config.display_mode}
-              onValueChange={(v) => update('display_mode', v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="closest">Closest aircraft only</SelectItem>
-                <SelectItem value="cycle3">Cycle up to 3 nearest aircraft</SelectItem>
-                <SelectItem value="list">Show list of nearby aircraft</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-xs text-white/40">
-              {config.display_mode === 'closest' && (aircraft.length <= 1 ? 'Only one aircraft in range, so the display stays on it.' : 'Keeps the display focused on the single closest aircraft.')}
-              {config.display_mode === 'cycle3' && (aircraft.length <= 1 ? 'Cycle mode is on, but only one aircraft is in range. It will switch when more are detected.' : `Rotates through the ${Math.min(3, aircraft.length)} nearest aircraft every ${config.cycle_interval_sec} seconds.`)}
-              {config.display_mode === 'list' && 'Uses a layout that can show multiple aircraft at once. Pick a list-capable layout below.'}
-            </p>
+            {activeLayout && (
+              <Badge variant="default" className="shrink-0">Active</Badge>
+            )}
           </div>
+          <LayoutPicker
+            layouts={layouts}
+            selectedId={config.active_layout_id}
+            onSelect={(id) => update('active_layout_id', id)}
+            highlightMode="active"
+          />
+        </div>
 
-          {config.display_mode === 'cycle3' && (
-            <div className="space-y-2">
-              <Label>Switch aircraft every</Label>
-              <div className="flex items-center gap-3">
-                <Input
-                  type="number"
-                  min={1}
-                  max={60}
-                  value={config.cycle_interval_sec}
-                  onChange={(e) => update('cycle_interval_sec', parseInt(e.target.value))}
-                  className="w-24"
-                />
-                <span className="text-sm text-white/60">seconds</span>
-              </div>
+        <Separator />
+
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <Label className="flex items-center gap-2">
+                <Crosshair size={14} className="text-white/50" />
+                Idle / scanning layout
+              </Label>
+              <p className="text-xs text-white/40 mt-0.5">
+                Shown when no aircraft are detected.
+              </p>
             </div>
-          )}
-
-          <Separator />
-
-          <div className="space-y-3">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <Label className="flex items-center gap-2">
-                  <LayoutTemplate size={14} className="text-white/50" />
-                  Aircraft layout
-                </Label>
-                <p className="text-xs text-white/40 mt-0.5">
-                  Shown when at least one aircraft is in range.
-                </p>
-              </div>
-              {activeLayout && (
-                <Badge variant="default" className="shrink-0">Active</Badge>
-              )}
-            </div>
-            <LayoutPicker
-              layouts={layouts}
-              selectedId={config.active_layout_id}
-              onSelect={(id) => update('active_layout_id', id)}
-              highlightMode="active"
-            />
+            {idleLayout && (
+              <Badge variant="secondary" className="shrink-0">Idle</Badge>
+            )}
           </div>
-
-          <Separator />
-
-          <div className="space-y-3">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <Label className="flex items-center gap-2">
-                  <Crosshair size={14} className="text-white/50" />
-                  Idle / scanning layout
-                </Label>
-                <p className="text-xs text-white/40 mt-0.5">
-                  Shown when no aircraft are detected.
-                </p>
-              </div>
-              {idleLayout && (
-                <Badge variant="secondary" className="shrink-0">Idle</Badge>
-              )}
-            </div>
-            <LayoutPicker
-              layouts={layouts}
-              selectedId={config.idle_layout_id}
-              onSelect={(id) => update('idle_layout_id', id)}
-              highlightMode="idle"
-            />
-          </div>
-        </CardContent>
-      </Card>
+          <LayoutPicker
+            layouts={layouts}
+            selectedId={config.idle_layout_id}
+            onSelect={(id) => update('idle_layout_id', id)}
+            highlightMode="idle"
+          />
+        </div>
+      </SettingsSection>
 
       <Card>
         <CardHeader>
@@ -876,7 +860,7 @@ function LayoutPicker({
   highlightMode: 'active' | 'idle';
 }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {layouts.length === 0 && (
         <div className="text-sm text-white/40 col-span-full">No layouts available.</div>
       )}
