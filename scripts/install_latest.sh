@@ -27,21 +27,24 @@ write_progress() {
     local error="${4:-}"
     local started_at="${5:-}"
     local completed_at="${6:-}"
-    python3 - "$status" "$progress" "$message" "$error" "$started_at" "$completed_at" <<'PY'
+    python3 - "$status" "$progress" "$message" "$error" "$started_at" "$completed_at" <<'PY' || true
 import json, os, sys
 path = os.environ.get("PROGRESS_FILE", "/opt/adsbledmatrix/data/.update_progress.json")
-os.makedirs(os.path.dirname(path), exist_ok=True)
-status, progress, message, error, started_at, completed_at = sys.argv[1:]
-data = {
-    "status": status,
-    "progress": int(progress),
-    "message": message,
-    "error": error if error else None,
-    "started_at": started_at if started_at else None,
-    "completed_at": completed_at if completed_at else None,
-}
-with open(path, "w") as f:
-    json.dump(data, f)
+try:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    status, progress, message, error, started_at, completed_at = sys.argv[1:]
+    data = {
+        "status": status,
+        "progress": int(progress),
+        "message": message,
+        "error": error if error else None,
+        "started_at": started_at if started_at else None,
+        "completed_at": completed_at if completed_at else None,
+    }
+    with open(path, "w") as f:
+        json.dump(data, f)
+except Exception as e:
+    print(f"Warning: could not write progress file: {e}", file=sys.stderr)
 PY
 }
 

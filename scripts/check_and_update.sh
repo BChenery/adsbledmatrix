@@ -23,21 +23,24 @@ write_progress() {
     local error="${4:-}"
     local started_at="${5:-}"
     local completed_at="${6:-}"
-    python3 - "$status" "$progress" "$message" "$error" "$started_at" "$completed_at" <<'PY'
+    python3 - "$status" "$progress" "$message" "$error" "$started_at" "$completed_at" <<'PY' || true
 import json, os, sys
 path = os.environ.get("PROGRESS_FILE", "/opt/adsbledmatrix/data/.update_progress.json")
-os.makedirs(os.path.dirname(path), exist_ok=True)
-status, progress, message, error, started_at, completed_at = sys.argv[1:]
-data = {
-    "status": status,
-    "progress": int(progress),
-    "message": message,
-    "error": error if error else None,
-    "started_at": started_at if started_at else None,
-    "completed_at": completed_at if completed_at else None,
-}
-with open(path, "w") as f:
-    json.dump(data, f)
+try:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    status, progress, message, error, started_at, completed_at = sys.argv[1:]
+    data = {
+        "status": status,
+        "progress": int(progress),
+        "message": message,
+        "error": error if error else None,
+        "started_at": started_at if started_at else None,
+        "completed_at": completed_at if completed_at else None,
+    }
+    with open(path, "w") as f:
+        json.dump(data, f)
+except Exception as e:
+    print(f"Warning: could not write progress file: {e}", file=sys.stderr)
 PY
 }
 
@@ -108,9 +111,9 @@ print(assets.get('rollout.json', ''))
 
 if [ -n "$ROLLOUT_URL" ]; then
     if ! PERCENTAGE_JSON=$(curl -fsSL --max-time 60 "$ROLLOUT_URL"); then
-        write_progress "failed" 0 "Failed to fetch rollout configuration." "rollout fetch failed" "$STARTED_AT" "$(date -Iseconds)"
-        log "Failed to fetch rollout configuration; skipping update"
-        exit 1
+        log "Failed to fetch rollout configuration; skipping this update"
+        write_progress "up_to_date" 100 "Update skipped: could not fetch rollout configuration." "" "$STARTED_AT" "$(date -Iseconds)"
+        exit 0
     fi
     PERCENTAGE=$(echo "$PERCENTAGE_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('percentage', 100))")
 
