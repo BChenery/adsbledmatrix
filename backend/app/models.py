@@ -111,6 +111,7 @@ class LayoutElement(Base):
     user_dot_color = Column(String(7))
     show_rings = Column(Boolean, default=True)
     show_ticks = Column(Boolean, default=True)
+    use_plane_symbol = Column(Boolean, default=False)
 
     layout = relationship("Layout", back_populates="elements")
 
