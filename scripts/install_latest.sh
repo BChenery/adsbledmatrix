@@ -11,7 +11,7 @@ export PROGRESS_FILE
 
 ADSB_PORT=8080
 if [ -f "${INSTALL_DIR}/.env" ]; then
-    port=$(grep -E '^[[:space:]]*ADSB_PORT[[:space:]]*=' "${INSTALL_DIR}/.env" | tail -n1 | sed -E 's/^[[:space:]]*ADSB_PORT[[:space:]]*=[[:space:]]*//;s/[[:space:]]*$//')
+    port=$(grep -E '^[[:space:]]*ADSB_PORT[[:space:]]*=' "${INSTALL_DIR}/.env" | tail -n1 | sed -E 's/^[[:space:]]*ADSB_PORT[[:space:]]*=[[:space:]]*//;s/[[:space:]]*$//' || true)
     [ -n "${port}" ] && ADSB_PORT="${port}"
 fi
 HEALTH_URL="http://127.0.0.1:${ADSB_PORT}/api/health"

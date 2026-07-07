@@ -141,7 +141,7 @@ fi
 # Check auto_update setting from .env first, then default to true
 AUTO_UPDATE=true
 if [ -f "${INSTALL_DIR}/.env" ]; then
-    VALUE=$(grep -E '^\s*ADSB_AUTO_UPDATE\s*=' "${INSTALL_DIR}/.env" | sed 's/.*=//' | tr -d "[:space:]'\"" | tr '[:upper:]' '[:lower:]')
+    VALUE=$(grep -E '^\s*ADSB_AUTO_UPDATE\s*=' "${INSTALL_DIR}/.env" | sed 's/.*=//' | tr -d "[:space:]'\"" | tr '[:upper:]' '[:lower:]' || true)
     if [ "$VALUE" = "false" ] || [ "$VALUE" = "0" ]; then
         AUTO_UPDATE=false
     fi
