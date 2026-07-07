@@ -34,6 +34,7 @@ import { useAircraft } from '@/hooks/useAircraft';
 import { useReceiverStatus } from '@/hooks/useReceiverStatus';
 import { useUpdateProgress } from '@/hooks/useUpdateProgress';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
+import SettingsSection from './SettingsSection';
 
 export default function Settings() {
   const [config, setConfig] = useState<UserConfig | null>(null);
@@ -166,17 +167,16 @@ export default function Settings() {
   if (!config) return <div className="p-6 text-white/50">Loading...</div>;
 
   return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-lg font-semibold">Settings</h1>
+    <main className="max-w-3xl mx-auto px-4 py-6 pb-24 space-y-4 md:space-y-6">
+      <header className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Settings</h1>
+        {brightnessSaved && (
+          <span className="text-xs text-led-accent">Brightness saved</span>
+        )}
+      </header>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-            <Cpu size={14} />
-            LED Matrix Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
+      <SettingsSection title="LED Matrix Status" icon={Cpu}>
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm">Connection</span>
             {displayStatus ? (
@@ -263,8 +263,8 @@ export default function Settings() {
               </Button>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </SettingsSection>
 
       <Card>
         <CardHeader>
@@ -851,7 +851,7 @@ export default function Settings() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </main>
   );
 }
 
