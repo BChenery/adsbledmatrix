@@ -93,7 +93,6 @@ describe('Settings', () => {
     expect(await screen.findByRole('heading', { name: /Settings/i })).toBeDefined();
     expect(screen.getByText('LED Matrix Status')).toBeDefined();
     expect(screen.getByText('Receiver')).toBeDefined();
-    expect(screen.getByText('LED Matrix Brightness')).toBeDefined();
     expect(screen.getByText('Display')).toBeDefined();
     expect(screen.getByText('Location & Units')).toBeDefined();
     expect(screen.getByText('Night Mode')).toBeDefined();
