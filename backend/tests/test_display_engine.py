@@ -196,3 +196,51 @@ def test_distance_bar_does_not_draw_label_below_bar(engine):
     for py in range(126, 128):
         for px in range(256):
             assert pixels[px, py] == (0, 0, 0), f"non-black pixel below bar at ({px},{py})"
+
+
+@pytest.mark.asyncio
+async def test_draw_radar_plane_symbol_rotates_with_heading(engine):
+    """A plane symbol at due north with heading 90° (east) should point right."""
+    from unittest.mock import MagicMock
+    from app.services.display_engine import RenderContext
+    from PIL import Image, ImageDraw
+
+    element = MagicMock()
+    element.element_type = 'radar'
+    element.x = 0
+    element.y = 0
+    element.width = 100
+    element.height = 100
+    element.range_km = 20
+    element.ring_color = '#333333'
+    element.dot_color = '#ff0000'
+    element.user_dot_color = '#00ff00'
+    element.show_rings = True
+    element.show_ticks = True
+    element.bg_color = None
+    element.use_plane_symbol = True
+
+    aircraft = MagicMock()
+    aircraft.distance_km = 10.0
+    aircraft.bearing = 0.0  # North
+    aircraft.heading = 90.0  # East
+
+    ctx = RenderContext(aircraft=aircraft)
+
+    img = Image.new('RGB', (100, 100), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+
+    engine._draw_radar(draw, img, element, ctx)
+
+    # The aircraft is at (50, 25). With heading 90° the nose should be to the right.
+    # Check for red pixels east of the aircraft position.
+    red_pixels_east = [
+        (px, py)
+        for px in range(52, 58)
+        for py in range(22, 29)
+        if img.getpixel((px, py)) == (255, 0, 0)
+    ]
+    assert red_pixels_east, "Expected red plane pixels east of the aircraft position"
+
+    # And confirm the nose pixel itself is not directly above the centre (that would be heading 0).
+    assert img.getpixel((50, 20)) == (0, 0, 0), "Expected no red pixel directly north of the aircraft"
