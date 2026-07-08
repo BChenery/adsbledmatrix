@@ -38,6 +38,18 @@ app.include_router(system.router)
 app.include_router(display.router)
 
 
+@app.get("/api/health")
+async def api_health():
+    """Compatibility health endpoint used by install/update scripts."""
+    return {"status": "ok", "version": settings.version}
+
+
+@app.get("/health")
+async def root_health():
+    """Short health alias for external probes."""
+    return {"status": "ok", "version": settings.version}
+
+
 def _is_ap_mode():
     """Detect whether the device is currently acting as a WiFi access point."""
     try:

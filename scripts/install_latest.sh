@@ -14,7 +14,7 @@ if [ -f "${INSTALL_DIR}/.env" ]; then
     port=$(grep -E '^[[:space:]]*ADSB_PORT[[:space:]]*=' "${INSTALL_DIR}/.env" | tail -n1 | sed -E 's/^[[:space:]]*ADSB_PORT[[:space:]]*=[[:space:]]*//;s/[[:space:]]*$//' || true)
     [ -n "${port}" ] && ADSB_PORT="${port}"
 fi
-HEALTH_URL="http://127.0.0.1:${ADSB_PORT}/api/health"
+HEALTH_URL="http://127.0.0.1:${ADSB_PORT}/api/system/health"
 
 log() {
     echo "[$(date -Iseconds)] $*" | tee -a "$LOG_FILE"
@@ -155,12 +155,15 @@ install_or_update_code() {
     if [ "$MODE" = "fresh" ]; then
         log "Copying release to ${INSTALL_DIR}"
         mkdir -p "$INSTALL_DIR"
-        find "${INSTALL_DIR}" -mindepth 1 -delete
+        # Never wipe a preserved venv/data/.env during "fresh" recovery installs.
+        find "${INSTALL_DIR}" -mindepth 1 -maxdepth 1 \
+            ! -name 'venv' ! -name 'data' ! -name '.env' -exec rm -rf {} +
         cp -a /tmp/adsbledmatrix/. "$INSTALL_DIR/"
     else
         BACKUP_DIR="${INSTALL_DIR}-backup-$(date +%Y%m%d%H%M%S)"
         log "Backing up current install to $BACKUP_DIR"
-        rsync -a --exclude='venv' "${INSTALL_DIR}/" "${BACKUP_DIR}/"
+        # Keep venv in the live install, but also snapshot it so rollback can restore a bootable tree.
+        rsync -a "${INSTALL_DIR}/" "${BACKUP_DIR}/"
 
         log "Updating files in $INSTALL_DIR (preserving venv, .env, and SQLite DBs)"
         rsync -a --delete \
@@ -216,8 +219,15 @@ rollback() {
     fi
     log "Rolling back from $BACKUP_DIR"
     systemctl stop adsbledmatrix.service || true
-    rm -rf "${INSTALL_DIR:?}/"*
+    # Preserve the live venv if the backup does not include one (older backups).
+    if [ ! -d "${BACKUP_DIR}/venv" ] && [ -d "${INSTALL_DIR}/venv" ]; then
+        mv "${INSTALL_DIR}/venv" /tmp/adsbledmatrix-venv-preserve
+    fi
+    find "${INSTALL_DIR}" -mindepth 1 -maxdepth 1 ! -name 'venv' -exec rm -rf {} +
     cp -a "${BACKUP_DIR}/." "$INSTALL_DIR/"
+    if [ ! -d "${INSTALL_DIR}/venv" ] && [ -d /tmp/adsbledmatrix-venv-preserve ]; then
+        mv /tmp/adsbledmatrix-venv-preserve "${INSTALL_DIR}/venv"
+    fi
     fix_ownership
     cp "${INSTALL_DIR}/systemd/"*.service /etc/systemd/system/ 2>/dev/null || true
     cp "${INSTALL_DIR}/systemd/"*.timer /etc/systemd/system/ 2>/dev/null || true
