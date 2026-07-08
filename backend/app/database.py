@@ -87,6 +87,36 @@ async def migrate_db():
                     text("ALTER TABLE user_config ADD COLUMN timezone VARCHAR(50)")
                 )
 
+            # Proximity focus, cycle count, layout playlist
+            if "cycle_count" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN cycle_count INTEGER NOT NULL DEFAULT 3")
+                )
+            if "proximity_focus_enabled" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN proximity_focus_enabled BOOLEAN NOT NULL DEFAULT 0")
+                )
+            if "proximity_focus_km" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN proximity_focus_km FLOAT NOT NULL DEFAULT 3.0")
+                )
+            if "proximity_focus_layout_id" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN proximity_focus_layout_id INTEGER")
+                )
+            if "layout_rotation_enabled" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN layout_rotation_enabled BOOLEAN NOT NULL DEFAULT 0")
+                )
+            if "layout_playlist_ids" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN layout_playlist_ids JSON NOT NULL DEFAULT '[]'")
+                )
+            if "layout_rotation_interval_sec" not in columns:
+                sync_conn.execute(
+                    text("ALTER TABLE user_config ADD COLUMN layout_rotation_interval_sec INTEGER NOT NULL DEFAULT 30")
+                )
+
             # Radar element settings added after initial schema
             result = sync_conn.execute(
                 text("SELECT name FROM sqlite_master WHERE type='table' AND name='layout_elements'")

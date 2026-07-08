@@ -39,6 +39,13 @@ class UserConfig(Base):
     speed_unit = Column(String(10), nullable=False, default="kts")
     cycle_interval_sec = Column(Integer, nullable=False, default=5)
     display_mode = Column(String(20), nullable=False, default="closest")
+    cycle_count = Column(Integer, nullable=False, default=3, server_default=text("3"))
+    proximity_focus_enabled = Column(Boolean, nullable=False, default=False, server_default=text("0"))
+    proximity_focus_km = Column(Float, nullable=False, default=3.0, server_default=text("3.0"))
+    proximity_focus_layout_id = Column(Integer, ForeignKey("layouts.id"), nullable=True)
+    layout_rotation_enabled = Column(Boolean, nullable=False, default=False, server_default=text("0"))
+    layout_playlist_ids = Column(JSON, nullable=False, default=list, server_default=text("'[]'"))
+    layout_rotation_interval_sec = Column(Integer, nullable=False, default=30, server_default=text("30"))
     active_layout_id = Column(Integer, ForeignKey("layouts.id"), nullable=True)
     idle_layout_id = Column(Integer, ForeignKey("layouts.id"), nullable=True)
     onboarding_complete = Column(Boolean, nullable=False, default=False)
@@ -61,6 +68,7 @@ class UserConfig(Base):
 
     active_layout = relationship("Layout", foreign_keys=[active_layout_id])
     idle_layout = relationship("Layout", foreign_keys=[idle_layout_id])
+    proximity_focus_layout = relationship("Layout", foreign_keys=[proximity_focus_layout_id])
 
 
 class Layout(Base):

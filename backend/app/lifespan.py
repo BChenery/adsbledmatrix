@@ -92,20 +92,9 @@ async def lifespan(app: FastAPI):
         await session.commit()
         logger.info(f"Merged {len(layouts_data)} default layouts")
 
-        # Load active layout
-        if config.active_layout_id:
-            result = await session.execute(select(Layout).where(Layout.id == config.active_layout_id).options(selectinload(Layout.elements)))
-            layout = result.scalar_one_or_none()
-        else:
-            layout = None
+        from app.services.layout_loader import apply_engine_layouts
 
-        if config.idle_layout_id:
-            result = await session.execute(select(Layout).where(Layout.id == config.idle_layout_id).options(selectinload(Layout.elements)))
-            idle = result.scalar_one_or_none()
-        else:
-            idle = None
-
-        engine.set_layout(layout, idle)
+        await apply_engine_layouts(config, session)
         engine.set_brightness(config.led_matrix_brightness)
 
     await receiver.start()

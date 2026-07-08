@@ -55,10 +55,10 @@ async def test_update_active_layout_triggers_engine_refresh(app, db_session, mon
     """Saving the active layout should tell the display engine to reload it."""
     calls = []
 
-    async def fake_refresh(active_layout_id, idle_layout_id):
-        calls.append((active_layout_id, idle_layout_id))
+    async def fake_apply(config, session=None):
+        calls.append((config.active_layout_id, config.idle_layout_id))
 
-    monkeypatch.setattr(layouts, "_refresh_engine_layouts", fake_refresh)
+    monkeypatch.setattr("app.services.layout_loader.apply_engine_layouts", fake_apply)
 
     result = await db_session.execute(select(Layout))
     layout = result.scalar_one()
@@ -81,10 +81,10 @@ async def test_update_active_layout_triggers_engine_refresh(app, db_session, mon
 @pytest.mark.asyncio
 async def test_radar_element_settings_persist(app, db_session, monkeypatch):
     """Radar-specific fields should survive a save/load round trip."""
-    async def fake_refresh(active_layout_id, idle_layout_id):
+    async def fake_apply(config, session=None):
         pass
 
-    monkeypatch.setattr(layouts, "_refresh_engine_layouts", fake_refresh)
+    monkeypatch.setattr("app.services.layout_loader.apply_engine_layouts", fake_apply)
 
     result = await db_session.execute(select(Layout))
     layout = result.scalar_one()

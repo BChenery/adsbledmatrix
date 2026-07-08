@@ -155,38 +155,21 @@ async def update_layout(layout_id: int, update: LayoutUpdate, session: AsyncSess
     # updated version to the display engine immediately.
     config_result = await session.execute(select(UserConfig).where(UserConfig.id == 1))
     config = config_result.scalar_one_or_none()
-    if config and (config.active_layout_id == layout_id or config.idle_layout_id == layout_id):
-        await _refresh_engine_layouts(config.active_layout_id, config.idle_layout_id)
+    playlist_ids = list(config.layout_playlist_ids or []) if config else []
+    if config and (
+        config.active_layout_id == layout_id
+        or config.idle_layout_id == layout_id
+        or config.proximity_focus_layout_id == layout_id
+        or layout_id in playlist_ids
+    ):
+        from app.services.layout_loader import apply_engine_layouts
+
+        await apply_engine_layouts(config, session)
 
     result = await session.execute(
         select(Layout).where(Layout.id == layout_id).options(selectinload(Layout.elements))
     )
     return result.scalar_one()
-
-
-async def _refresh_engine_layouts(active_layout_id: Optional[int], idle_layout_id: Optional[int]):
-    """Reload the active/idle layouts from the DB and push them to the display engine."""
-    from app.services.display_engine import engine
-    from app.database import AsyncSessionLocal
-
-    async with AsyncSessionLocal() as refresh_session:
-        active = None
-        idle = None
-        if active_layout_id:
-            result = await refresh_session.execute(
-                select(Layout)
-                .where(Layout.id == active_layout_id)
-                .options(selectinload(Layout.elements))
-            )
-            active = result.scalar_one_or_none()
-        if idle_layout_id:
-            result = await refresh_session.execute(
-                select(Layout)
-                .where(Layout.id == idle_layout_id)
-                .options(selectinload(Layout.elements))
-            )
-            idle = result.scalar_one_or_none()
-        engine.set_layout(active, idle)
 
 
 @router.delete("/{layout_id}", status_code=204)

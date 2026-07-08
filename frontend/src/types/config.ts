@@ -6,6 +6,13 @@ export interface UserConfig {
   speed_unit: string;
   cycle_interval_sec: number;
   display_mode: string;
+  cycle_count: number;
+  proximity_focus_enabled: boolean;
+  proximity_focus_km: number;
+  proximity_focus_layout_id?: number | null;
+  layout_rotation_enabled: boolean;
+  layout_playlist_ids: number[];
+  layout_rotation_interval_sec: number;
   active_layout_id?: number;
   idle_layout_id?: number;
   onboarding_complete: boolean;

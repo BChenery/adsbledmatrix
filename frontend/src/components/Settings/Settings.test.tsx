@@ -11,6 +11,13 @@ const mockConfig: UserConfig = {
   led_matrix_brightness: 50,
   display_mode: 'closest',
   cycle_interval_sec: 5,
+  cycle_count: 3,
+  proximity_focus_enabled: false,
+  proximity_focus_km: 3,
+  proximity_focus_layout_id: null,
+  layout_rotation_enabled: false,
+  layout_playlist_ids: [],
+  layout_rotation_interval_sec: 30,
   active_layout_id: 1,
   idle_layout_id: 2,
   latitude: -33.8688,
@@ -98,5 +105,45 @@ describe('Settings', () => {
     expect(screen.getByText('Night Mode')).toBeDefined();
     expect(screen.getByText('System')).toBeDefined();
     expect(screen.getByRole('button', { name: /Save Settings/i })).toBeDefined();
+  });
+
+  it('shows cycle count when cycle mode is selected', async () => {
+    vi.mocked(apiModule.api.get).mockImplementation((url: string) => {
+      if (url === '/api/config') {
+        return Promise.resolve({ ...mockConfig, display_mode: 'cycle' });
+      }
+      if (url === '/api/system/update') {
+        return Promise.resolve({
+          current_version: '1.0.0',
+          latest_version: '1.0.0',
+          update_available: false,
+        });
+      }
+      return Promise.reject(new Error('Unknown URL'));
+    });
+
+    render(<Settings />);
+    expect(await screen.findByText('Number of aircraft to cycle')).toBeDefined();
+    expect(screen.getByText('Switch aircraft every')).toBeDefined();
+  });
+
+  it('shows proximity distance when proximity focus is enabled', async () => {
+    vi.mocked(apiModule.api.get).mockImplementation((url: string) => {
+      if (url === '/api/config') {
+        return Promise.resolve({ ...mockConfig, proximity_focus_enabled: true });
+      }
+      if (url === '/api/system/update') {
+        return Promise.resolve({
+          current_version: '1.0.0',
+          latest_version: '1.0.0',
+          update_available: false,
+        });
+      }
+      return Promise.reject(new Error('Unknown URL'));
+    });
+
+    render(<Settings />);
+    expect(await screen.findByText('Focus distance')).toBeDefined();
+    expect(screen.getByText('Focus layout (optional)')).toBeDefined();
   });
 });

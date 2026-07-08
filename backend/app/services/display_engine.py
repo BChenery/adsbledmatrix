@@ -59,6 +59,12 @@ class DisplayEngine:
         self._last_render = datetime.utcnow()
         self._cycle_index = 0
         self._cycle_time = datetime.utcnow()
+        self._layout_index = 0
+        self._layout_time = datetime.utcnow()
+        self._proximity_focused = False
+        self._playlist_layouts: List[Any] = []
+        self._focus_layout: Optional[Any] = None
+        self._layout_rotation_enabled = False
         self._test_color: Optional[Tuple[int, int, int]] = None
         self._brightness = settings.led_matrix_brightness
         self._night_mode_active = False
@@ -86,9 +92,21 @@ class DisplayEngine:
             self._task = None
         logger.info("Display engine stopped")
 
-    def set_layout(self, layout: Optional[Any], idle_layout: Optional[Any] = None):
+    def set_layout(
+        self,
+        layout: Optional[Any],
+        idle_layout: Optional[Any] = None,
+        focus_layout: Optional[Any] = None,
+        playlist: Optional[List[Any]] = None,
+        rotation_enabled: bool = False,
+    ):
         self._current_layout = layout
         self._idle_layout = idle_layout
+        self._focus_layout = focus_layout
+        self._playlist_layouts = list(playlist or [])
+        self._layout_rotation_enabled = bool(rotation_enabled)
+        if self._layout_index and self._playlist_layouts:
+            self._layout_index %= max(1, len(self._playlist_layouts))
 
     async def _render_loop(self):
         while self._running:
@@ -99,10 +117,64 @@ class DisplayEngine:
                 logger.error(f"Render error: {e}")
                 await asyncio.sleep(1)
 
+    def _layout_list_prefetch_count(self, layout: Any) -> int:
+        """How many nearby routes to pre-fetch for aircraft_list elements."""
+        if not layout or not getattr(layout, "elements", None):
+            return 0
+        max_rows = 0
+        for element in layout.elements:
+            if getattr(element, "element_type", None) != "aircraft_list":
+                continue
+            extra = getattr(element, "extra", None) or {}
+            if isinstance(extra, dict):
+                rows = int(extra.get("max_rows", 5) or 5)
+            else:
+                rows = 5
+            max_rows = max(max_rows, rows)
+        return max_rows
+
+    def _resolve_aircraft_layout(self, user_config: Any, focused: bool) -> Optional[Any]:
+        from app.services.display_selection import select_layout_index
+
+        if focused and self._focus_layout is not None:
+            # Freeze layout rotation clock while using a dedicated focus layout.
+            self._layout_time = datetime.utcnow()
+            return self._focus_layout
+
+        rotation_enabled = bool(
+            self._layout_rotation_enabled
+            or (user_config and getattr(user_config, "layout_rotation_enabled", False))
+        )
+        playlist = self._playlist_layouts
+        if rotation_enabled and playlist and focused:
+            # Pause layout rotation while proximity-focused (even without focus layout).
+            self._layout_time = datetime.utcnow()
+            idx = self._layout_index % len(playlist)
+            return playlist[idx]
+
+        if rotation_enabled and playlist and not focused:
+            interval = 30
+            if user_config is not None:
+                interval = int(getattr(user_config, "layout_rotation_interval_sec", 30) or 30)
+            interval = max(5, min(interval, 600))
+            advance = (datetime.utcnow() - self._layout_time).total_seconds() >= interval
+            self._layout_index = select_layout_index(
+                len(playlist),
+                rotation_enabled=True,
+                current_index=self._layout_index,
+                advance=advance,
+            )
+            if advance:
+                self._layout_time = datetime.utcnow()
+            return playlist[self._layout_index]
+
+        return self._current_layout
+
     async def _render_frame(self):
         from app.services.adsb_receiver import receiver
         from app.services.aircraft_db import db
         from app.api.config import get_user_config_sync
+        from app.services.display_selection import FOCUS_POOL_CAP, select_aircraft
 
         # Test pattern takes precedence over normal rendering
         if self._test_color is not None:
@@ -116,11 +188,16 @@ class DisplayEngine:
         if self._handle_night_mode(user_config):
             return
 
-        # Determine what to display
-        closest = receiver.get_closest(n=3)
-        is_idle = len(closest) == 0
+        cycle_count = 3
+        if user_config is not None:
+            cycle_count = int(getattr(user_config, "cycle_count", 3) or 3)
+        cycle_count = max(1, min(cycle_count, 10))
+
+        focus_pool = receiver.get_closest(n=max(cycle_count, FOCUS_POOL_CAP))
+        is_idle = len(focus_pool) == 0
 
         if is_idle:
+            self._proximity_focused = False
             layout = self._idle_layout or self._current_layout
             ctx = RenderContext(
                 aircraft=None,
@@ -129,43 +206,70 @@ class DisplayEngine:
                 is_idle=True,
             )
         else:
-            layout = self._current_layout
+            cycle_interval = user_config.cycle_interval_sec if user_config else 5
+            mode = user_config.display_mode if user_config else "closest"
+            proximity_enabled = bool(
+                user_config and getattr(user_config, "proximity_focus_enabled", False)
+            )
+            proximity_km = float(
+                getattr(user_config, "proximity_focus_km", 3.0) if user_config else 3.0
+            )
+
+            was_focused = self._proximity_focused
+            if not was_focused:
+                if (datetime.utcnow() - self._cycle_time).total_seconds() >= cycle_interval:
+                    self._cycle_index = (self._cycle_index + 1) % max(1, min(cycle_count, len(focus_pool)))
+                    self._cycle_time = datetime.utcnow()
+            else:
+                # Freeze cycle clock while proximity-focused so release does not jump.
+                self._cycle_time = datetime.utcnow()
+
+            selection = select_aircraft(
+                focus_pool,
+                display_mode=mode,
+                cycle_count=cycle_count,
+                cycle_index=self._cycle_index,
+                proximity_enabled=proximity_enabled,
+                proximity_km=proximity_km,
+                currently_focused=was_focused,
+            )
+            self._proximity_focused = selection.focused
+            if selection.mode == "cycle":
+                self._cycle_index = selection.cycle_index
+
+            aircraft = selection.aircraft
+            if aircraft is None:
+                return
+
+            layout = self._resolve_aircraft_layout(user_config, selection.focused)
             if not layout:
                 return
 
-            # Handle cycling
-            cycle_interval = user_config.cycle_interval_sec if user_config else 5
-            if (datetime.utcnow() - self._cycle_time).seconds >= cycle_interval:
-                self._cycle_index = (self._cycle_index + 1) % max(1, len(closest))
-                self._cycle_time = datetime.utcnow()
-
-            mode = user_config.display_mode if user_config else "closest"
-            if mode == "closest":
-                idx = 0
-            elif mode == "cycle3":
-                idx = self._cycle_index % min(3, len(closest))
-            else:
-                idx = 0
-
-            aircraft = closest[idx] if idx < len(closest) else closest[0]
             enriched = await db.enrich(aircraft.hex_code)
             route = await route_service.lookup(aircraft.callsign) if aircraft.callsign else None
 
-            # Pre-fetch routes for all closest aircraft (used by aircraft_list)
+            # Pre-fetch routes only when the layout has an aircraft_list (or cycle needs them).
             all_routes: Dict[str, Any] = {}
-            for ac in closest:
-                if ac.callsign:
+            if route and aircraft.callsign:
+                all_routes[aircraft.callsign] = route
+            list_rows = self._layout_list_prefetch_count(layout)
+            prefetch_n = list_rows if list_rows > 0 else 0
+            if prefetch_n > 0:
+                for ac in focus_pool[:prefetch_n]:
+                    if not ac.callsign or ac.callsign in all_routes:
+                        continue
                     r = await route_service.lookup(ac.callsign)
                     if r:
                         all_routes[ac.callsign] = r
 
+            total_cycles = min(cycle_count, len(focus_pool))
             ctx = RenderContext(
                 aircraft=aircraft,
                 enriched=enriched,
                 user_config=user_config,
                 is_idle=False,
-                cycle_index=idx,
-                total_cycles=len(closest),
+                cycle_index=selection.cycle_index,
+                total_cycles=max(1, total_cycles),
                 route=route,
                 all_routes=all_routes,
             )

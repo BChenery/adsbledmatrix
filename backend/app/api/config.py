@@ -7,7 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, Query
 from app.database import get_db
-from app.models import UserConfig, Layout
+from app.models import UserConfig
 from app.services.readsb_service_manager import apply_receiver_source
 from app.services.timezone import timezone_for_location
 
@@ -22,6 +22,13 @@ class ConfigResponse(BaseModel):
     speed_unit: str
     cycle_interval_sec: int
     display_mode: str
+    cycle_count: int = 3
+    proximity_focus_enabled: bool = False
+    proximity_focus_km: float = 3.0
+    proximity_focus_layout_id: Optional[int] = None
+    layout_rotation_enabled: bool = False
+    layout_playlist_ids: list = Field(default_factory=list)
+    layout_rotation_interval_sec: int = 30
     active_layout_id: Optional[int]
     idle_layout_id: Optional[int]
     onboarding_complete: bool
@@ -50,6 +57,13 @@ class ConfigUpdate(BaseModel):
     speed_unit: Optional[str] = None
     cycle_interval_sec: Optional[int] = None
     display_mode: Optional[str] = None
+    cycle_count: Optional[int] = None
+    proximity_focus_enabled: Optional[bool] = None
+    proximity_focus_km: Optional[float] = None
+    proximity_focus_layout_id: Optional[int] = None
+    layout_rotation_enabled: Optional[bool] = None
+    layout_playlist_ids: Optional[list] = None
+    layout_rotation_interval_sec: Optional[int] = None
     active_layout_id: Optional[int] = None
     idle_layout_id: Optional[int] = None
     onboarding_complete: Optional[bool] = None
@@ -81,6 +95,56 @@ class ConfigUpdate(BaseModel):
         if v is not None and not (1 <= v <= 65535):
             raise ValueError("network_readsb_port must be between 1 and 65535")
         return v
+
+    @field_validator("display_mode")
+    @classmethod
+    def validate_display_mode(cls, v):
+        if v is not None and v not in ("closest", "cycle", "cycle3", "list"):
+            raise ValueError("display_mode must be 'closest', 'cycle', 'cycle3', or 'list'")
+        return v
+
+    @field_validator("cycle_count")
+    @classmethod
+    def validate_cycle_count(cls, v):
+        if v is not None and not (1 <= v <= 10):
+            raise ValueError("cycle_count must be between 1 and 10")
+        return v
+
+    @field_validator("proximity_focus_km")
+    @classmethod
+    def validate_proximity_focus_km(cls, v):
+        if v is not None and not (0.1 <= v <= 50):
+            raise ValueError("proximity_focus_km must be between 0.1 and 50")
+        return v
+
+    @field_validator("layout_rotation_interval_sec")
+    @classmethod
+    def validate_layout_rotation_interval(cls, v):
+        if v is not None and not (5 <= v <= 600):
+            raise ValueError("layout_rotation_interval_sec must be between 5 and 600")
+        return v
+
+    @field_validator("layout_playlist_ids")
+    @classmethod
+    def validate_layout_playlist_ids(cls, v):
+        from app.services.display_selection import MAX_PLAYLIST_SIZE
+
+        if v is None:
+            return v
+        if not isinstance(v, list):
+            raise ValueError("layout_playlist_ids must be a list")
+        if len(v) > MAX_PLAYLIST_SIZE:
+            raise ValueError(f"layout_playlist_ids must have at most {MAX_PLAYLIST_SIZE} items")
+        cleaned = []
+        seen = set()
+        for item in v:
+            if not isinstance(item, int) or isinstance(item, bool) or item <= 0:
+                raise ValueError("layout_playlist_ids must contain positive integers")
+            if item in seen:
+                continue
+            seen.add(item)
+            cleaned.append(item)
+        return cleaned
 
 
 class GeocodeResponse(BaseModel):
@@ -177,20 +241,17 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
         receiver.set_user_location(config.latitude, config.longitude)
 
     # Notify display engine of config change
-    if "active_layout_id" in update_data or "idle_layout_id" in update_data:
-        from app.services.display_engine import engine
-        from app.database import AsyncSessionLocal
-        from sqlalchemy.orm import selectinload
-        async with AsyncSessionLocal() as s:
-            layout = None
-            idle = None
-            if config.active_layout_id:
-                r = await s.execute(select(Layout).where(Layout.id == config.active_layout_id).options(selectinload(Layout.elements)))
-                layout = r.scalar_one_or_none()
-            if config.idle_layout_id:
-                r = await s.execute(select(Layout).where(Layout.id == config.idle_layout_id).options(selectinload(Layout.elements)))
-                idle = r.scalar_one_or_none()
-            engine.set_layout(layout, idle)
+    layout_fields = {
+        "active_layout_id",
+        "idle_layout_id",
+        "proximity_focus_layout_id",
+        "layout_playlist_ids",
+        "layout_rotation_enabled",
+    }
+    if layout_fields & set(update_data.keys()):
+        from app.services.layout_loader import apply_engine_layouts
+
+        await apply_engine_layouts(config, session)
 
     if "led_matrix_brightness" in update_data:
         from app.services.display_engine import engine

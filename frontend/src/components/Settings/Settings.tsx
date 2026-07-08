@@ -55,7 +55,17 @@ export default function Settings() {
   const updateProgress = useUpdateProgress(updateActive);
 
   useEffect(() => {
-    api.get<UserConfig>('/api/config').then(setConfig);
+    api.get<UserConfig>('/api/config').then((raw) => {
+      setConfig({
+        ...raw,
+        cycle_count: raw.cycle_count ?? 3,
+        proximity_focus_enabled: raw.proximity_focus_enabled ?? false,
+        proximity_focus_km: raw.proximity_focus_km ?? 3,
+        layout_rotation_enabled: raw.layout_rotation_enabled ?? false,
+        layout_playlist_ids: raw.layout_playlist_ids ?? [],
+        layout_rotation_interval_sec: raw.layout_rotation_interval_sec ?? 30,
+      });
+    });
     api.get<UpdateStatus>('/api/system/update').then(setUpdateStatus).catch(() => {});
   }, []);
 
@@ -141,8 +151,20 @@ export default function Settings() {
         return;
       }
     }
+    const payload: UserConfig = {
+      ...config,
+      display_mode: config.display_mode === 'cycle3' ? 'cycle' : config.display_mode,
+      cycle_count: clampInt(config.cycle_count ?? 3, 1, 10),
+      proximity_focus_km: Math.min(50, Math.max(0.1, config.proximity_focus_km ?? 3)),
+      layout_rotation_interval_sec: clampInt(config.layout_rotation_interval_sec ?? 30, 5, 600),
+      layout_playlist_ids: config.layout_playlist_ids ?? [],
+    };
+    if (payload.layout_rotation_enabled && payload.layout_playlist_ids.length > 0) {
+      payload.active_layout_id = payload.layout_playlist_ids[0];
+    }
     try {
-      await api.put('/api/config', config);
+      await api.put('/api/config', payload);
+      setConfig(payload);
       toast.success('Settings saved');
     } catch {
       toast.error('Failed to save settings');
@@ -163,6 +185,13 @@ export default function Settings() {
 
   const activeLayout = layouts.find((l) => l.id === config?.active_layout_id);
   const idleLayout = layouts.find((l) => l.id === config?.idle_layout_id);
+  const focusLayout = layouts.find((l) => l.id === config?.proximity_focus_layout_id);
+  const isCycleMode = config?.display_mode === 'cycle' || config?.display_mode === 'cycle3';
+  const cycleCount = clampInt(config?.cycle_count ?? 3, 1, 10);
+  const distanceUnit = config?.distance_unit || 'km';
+  const proximityDisplay = config
+    ? roundDistance(kmToDisplay(config.proximity_focus_km ?? 3, distanceUnit))
+    : 3;
 
   if (!config) return <div className="p-6 text-white/50">Loading...</div>;
 
@@ -427,7 +456,7 @@ export default function Settings() {
             </Badge>
           </div>
           <Select
-            value={config.display_mode}
+            value={isCycleMode ? 'cycle' : config.display_mode}
             onValueChange={(v) => update('display_mode', v)}
           >
             <SelectTrigger>
@@ -435,57 +464,199 @@ export default function Settings() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="closest">Closest aircraft only</SelectItem>
-              <SelectItem value="cycle3">Cycle up to 3 nearest aircraft</SelectItem>
+              <SelectItem value="cycle">Cycle nearest aircraft</SelectItem>
               <SelectItem value="list">Show list of nearby aircraft</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-white/40">
             {config.display_mode === 'closest' && (aircraft.length <= 1 ? 'Only one aircraft in range, so the display stays on it.' : 'Keeps the display focused on the single closest aircraft.')}
-            {config.display_mode === 'cycle3' && (aircraft.length <= 1 ? 'Cycle mode is on, but only one aircraft is in range. It will switch when more are detected.' : `Rotates through the ${Math.min(3, aircraft.length)} nearest aircraft every ${config.cycle_interval_sec} seconds.`)}
+            {isCycleMode && (aircraft.length <= 1 ? 'Cycle mode is on, but only one aircraft is in range. It will switch when more are detected.' : `Rotates through the ${Math.min(cycleCount, aircraft.length)} nearest aircraft every ${config.cycle_interval_sec} seconds.`)}
             {config.display_mode === 'list' && 'Uses a layout that can show multiple aircraft at once. Pick a list-capable layout below.'}
           </p>
         </div>
 
-        {config.display_mode === 'cycle3' && (
-          <div className="space-y-2">
-            <Label>Switch aircraft every</Label>
-            <div className="flex items-center gap-3">
+        {isCycleMode && (
+          <FormGrid>
+            <div className="space-y-2">
+              <Label>Number of aircraft to cycle</Label>
               <Input
                 type="number"
                 min={1}
-                max={60}
-                value={config.cycle_interval_sec}
-                onChange={(e) => update('cycle_interval_sec', parseInt(e.target.value))}
+                max={10}
+                value={cycleCount}
+                onChange={(e) => update('cycle_count', clampInt(parseInt(e.target.value || '3', 10), 1, 10))}
                 className="w-24"
               />
-              <span className="text-sm text-white/60">seconds</span>
             </div>
-          </div>
+            <div className="space-y-2">
+              <Label>Switch aircraft every</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  min={1}
+                  max={60}
+                  value={config.cycle_interval_sec}
+                  onChange={(e) => update('cycle_interval_sec', parseInt(e.target.value))}
+                  className="w-24"
+                />
+                <span className="text-sm text-white/60">seconds</span>
+              </div>
+            </div>
+          </FormGrid>
         )}
 
         <Separator />
 
         <div className="space-y-3">
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <Label className="flex items-center gap-2">
+                <Crosshair size={14} className="text-white/50" />
+                Highlight aircraft when they get close
+              </Label>
+              <p className="text-xs text-white/40 mt-0.5">
+                When an aircraft is within this distance, the display locks onto it so you can identify what you hear.
+              </p>
+            </div>
+            <Switch
+              checked={!!config.proximity_focus_enabled}
+              onCheckedChange={(v) => update('proximity_focus_enabled', v)}
+            />
+          </div>
+          {config.proximity_focus_enabled && (
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label>Focus distance</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    min={0.1}
+                    max={distanceUnit === 'mi' ? 31 : 50}
+                    step={0.1}
+                    value={proximityDisplay}
+                    onChange={(e) => {
+                      const raw = parseFloat(e.target.value);
+                      if (Number.isNaN(raw)) return;
+                      update('proximity_focus_km', displayToKm(raw, distanceUnit));
+                    }}
+                    className="w-28"
+                  />
+                  <span className="text-sm text-white/60">{distanceUnit}</span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <Label className="flex items-center gap-2">
+                      <LayoutTemplate size={14} className="text-white/50" />
+                      Focus layout (optional)
+                    </Label>
+                    <p className="text-xs text-white/40 mt-0.5">
+                      Used only while an aircraft is within the focus distance. Leave unset to keep the current layout.
+                    </p>
+                  </div>
+                  {focusLayout && (
+                    <Badge variant="outline" className="shrink-0">Focus</Badge>
+                  )}
+                </div>
+                <LayoutPicker
+                  layouts={layouts}
+                  selectedId={config.proximity_focus_layout_id ?? undefined}
+                  onSelect={(id) => update('proximity_focus_layout_id', id ?? null)}
+                  highlightMode="active"
+                  selectLabel="Use for focus"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <Separator />
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
             <div>
               <Label className="flex items-center gap-2">
                 <LayoutTemplate size={14} className="text-white/50" />
-                Aircraft layout
+                Rotate layouts for variety
               </Label>
               <p className="text-xs text-white/40 mt-0.5">
-                Shown when at least one aircraft is in range.
+                Cycle through multiple aircraft layouts so the display has more variety.
               </p>
             </div>
-            {activeLayout && (
-              <Badge variant="default" className="shrink-0">Active</Badge>
-            )}
+            <Switch
+              checked={!!config.layout_rotation_enabled}
+              onCheckedChange={(v) => {
+                setConfig({
+                  ...config,
+                  layout_rotation_enabled: v,
+                  layout_playlist_ids:
+                    v && (!config.layout_playlist_ids || config.layout_playlist_ids.length === 0) && config.active_layout_id
+                      ? [config.active_layout_id]
+                      : (config.layout_playlist_ids ?? []),
+                });
+              }}
+            />
           </div>
-          <LayoutPicker
-            layouts={layouts}
-            selectedId={config.active_layout_id}
-            onSelect={(id) => update('active_layout_id', id)}
-            highlightMode="active"
-          />
+
+          {config.layout_rotation_enabled ? (
+            <>
+              <div className="space-y-2">
+                <Label>Switch layout every</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="number"
+                    min={5}
+                    max={600}
+                    value={config.layout_rotation_interval_sec ?? 30}
+                    onChange={(e) => update('layout_rotation_interval_sec', clampInt(parseInt(e.target.value || '30', 10), 5, 600))}
+                    className="w-24"
+                  />
+                  <span className="text-sm text-white/60">seconds</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Layout playlist</Label>
+                <p className="text-xs text-white/40">
+                  Click layouts to add or remove them. Order is the order you selected them.
+                </p>
+                <LayoutPlaylistPicker
+                  layouts={layouts}
+                  selectedIds={config.layout_playlist_ids ?? []}
+                  onChange={(ids) => {
+                    setConfig({
+                      ...config,
+                      layout_playlist_ids: ids,
+                      active_layout_id: ids.length > 0 ? ids[0] : config.active_layout_id,
+                    });
+                  }}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <Label className="flex items-center gap-2">
+                    <LayoutTemplate size={14} className="text-white/50" />
+                    Aircraft layout
+                  </Label>
+                  <p className="text-xs text-white/40 mt-0.5">
+                    Shown when at least one aircraft is in range.
+                  </p>
+                </div>
+                {activeLayout && (
+                  <Badge variant="default" className="shrink-0">Active</Badge>
+                )}
+              </div>
+              <LayoutPicker
+                layouts={layouts}
+                selectedId={config.active_layout_id}
+                onSelect={(id) => update('active_layout_id', id)}
+                highlightMode="active"
+              />
+            </div>
+          )}
         </div>
 
         <Separator />
@@ -804,6 +975,25 @@ function isValidPort(port: number): boolean {
   return Number.isInteger(port) && port >= 1 && port <= 65535;
 }
 
+const KM_PER_MI = 1.60934;
+
+function kmToDisplay(km: number, unit: string): number {
+  return unit === 'mi' ? km / KM_PER_MI : km;
+}
+
+function displayToKm(value: number, unit: string): number {
+  return unit === 'mi' ? value * KM_PER_MI : value;
+}
+
+function roundDistance(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+function clampInt(value: number, min: number, max: number): number {
+  if (Number.isNaN(value)) return min;
+  return Math.min(max, Math.max(min, value));
+}
+
 function SelectField({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
   return (
     <div className="space-y-2">
@@ -827,12 +1017,15 @@ function LayoutPicker({
   selectedId,
   onSelect,
   highlightMode,
+  selectLabel,
 }: {
   layouts: Layout[];
   selectedId?: number;
   onSelect: (id?: number) => void;
   highlightMode: 'active' | 'idle';
+  selectLabel?: string;
 }) {
+  const useLabel = selectLabel || `Use for ${highlightMode === 'active' ? 'aircraft' : 'idle'}`;
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {layouts.length === 0 && (
@@ -880,7 +1073,7 @@ function LayoutPicker({
                 className="flex-1 text-xs"
                 onClick={() => onSelect(layout.id)}
               >
-                {isSelected ? 'Selected' : `Use for ${highlightMode === 'active' ? 'aircraft' : 'idle'}`}
+                {isSelected ? 'Selected' : useLabel}
               </Button>
               {isSelected && (
                 <Button
@@ -894,6 +1087,65 @@ function LayoutPicker({
               )}
             </div>
           </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function LayoutPlaylistPicker({
+  layouts,
+  selectedIds,
+  onChange,
+}: {
+  layouts: Layout[];
+  selectedIds: number[];
+  onChange: (ids: number[]) => void;
+}) {
+  const toggle = (id: number) => {
+    if (selectedIds.includes(id)) {
+      onChange(selectedIds.filter((x) => x !== id));
+    } else {
+      onChange([...selectedIds, id]);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {layouts.length === 0 && (
+        <div className="text-sm text-white/40 col-span-full">No layouts available.</div>
+      )}
+      {layouts.map((layout) => {
+        const order = selectedIds.indexOf(layout.id);
+        const isSelected = order >= 0;
+        return (
+          <button
+            key={layout.id}
+            type="button"
+            onClick={() => toggle(layout.id)}
+            className={`text-left rounded-lg border p-3 transition-colors ${
+              isSelected
+                ? 'border-primary bg-primary/10'
+                : 'border-white/10 bg-white/5 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <div className="text-sm font-medium">{layout.name}</div>
+                <div className="text-xs text-white/40 mt-0.5">
+                  {layout.width}×{layout.height}px
+                </div>
+              </div>
+              {isSelected && (
+                <Badge variant="default" className="shrink-0 text-xs px-1.5 py-0">
+                  #{order + 1}
+                </Badge>
+              )}
+            </div>
+            {layout.description && (
+              <p className="text-xs text-white/50 mt-2 line-clamp-2">{layout.description}</p>
+            )}
+          </button>
         );
       })}
     </div>
