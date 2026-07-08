@@ -1116,13 +1116,15 @@ function LayoutPlaylistPicker({
         <div className="text-sm text-white/40 col-span-full">No layouts available.</div>
       )}
       {layouts.map((layout) => {
-        const order = selectedIds.indexOf(layout.id);
+        if (layout.id == null) return null;
+        const layoutId = layout.id;
+        const order = selectedIds.indexOf(layoutId);
         const isSelected = order >= 0;
         return (
           <button
-            key={layout.id}
+            key={layoutId}
             type="button"
-            onClick={() => toggle(layout.id)}
+            onClick={() => toggle(layoutId)}
             className={`text-left rounded-lg border p-3 transition-colors ${
               isSelected
                 ? 'border-primary bg-primary/10'
