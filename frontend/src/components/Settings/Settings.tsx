@@ -33,6 +33,7 @@ import { useAircraft } from '@/hooks/useAircraft';
 import { useReceiverStatus } from '@/hooks/useReceiverStatus';
 import { useUpdateProgress } from '@/hooks/useUpdateProgress';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
+import LocationMapPreview from '@/components/LocationLookup/LocationMapPreview';
 import SettingsSection from './SettingsSection';
 import FormGrid from './FormGrid';
 
@@ -715,6 +716,8 @@ export default function Settings() {
             />
           </div>
         </FormGrid>
+
+        <LocationMapPreview latitude={config.latitude} longitude={config.longitude} />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <SelectField

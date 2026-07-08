@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/api/client';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
+import LocationMapPreview from '@/components/LocationLookup/LocationMapPreview';
 import { UserConfig } from '@/types/config';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -168,6 +169,10 @@ export default function OnboardingWizard({ onComplete: _onComplete }: Props) {
                     />
                   </div>
                 </div>
+                <LocationMapPreview
+                  latitude={lat ? parseFloat(lat) : 0}
+                  longitude={lon ? parseFloat(lon) : 0}
+                />
                 <div className="flex gap-2">
                   <Button variant="secondary" onClick={() => setStep(0)} className="flex-1">Back</Button>
                   <Button onClick={handleLocationSubmit} className="flex-1">Continue</Button>
