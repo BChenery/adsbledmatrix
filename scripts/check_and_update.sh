@@ -77,6 +77,15 @@ acquire_lock() {
 }
 acquire_lock
 
+# Manual trigger from Settings writes .force_update and bypasses auto_update / rollout gates.
+FORCE_FLAG="${INSTALL_DIR}/data/.force_update"
+FORCE_UPDATE=false
+if [ -f "$FORCE_FLAG" ]; then
+    FORCE_UPDATE=true
+    rm -f "$FORCE_FLAG"
+    log "Force update flag present; applying update regardless of auto_update/rollout settings"
+fi
+
 CURRENT_VERSION=""
 if [ -f "${INSTALL_DIR}/VERSION" ]; then
     CURRENT_VERSION=$(cat "${INSTALL_DIR}/VERSION")
@@ -109,7 +118,7 @@ assets = {a['name']: a['browser_download_url'] for a in json.load(sys.stdin).get
 print(assets.get('rollout.json', ''))
 ")
 
-if [ -n "$ROLLOUT_URL" ]; then
+if [ "$FORCE_UPDATE" != "true" ] && [ -n "$ROLLOUT_URL" ]; then
     if ! PERCENTAGE_JSON=$(curl -fsSL --max-time 60 "$ROLLOUT_URL"); then
         log "Failed to fetch rollout configuration; skipping this update"
         write_progress "up_to_date" 100 "Update skipped: could not fetch rollout configuration." "" "$STARTED_AT" "$(date -Iseconds)"
@@ -147,7 +156,7 @@ if [ -f "${INSTALL_DIR}/.env" ]; then
     fi
 fi
 
-if [ "$AUTO_UPDATE" != "true" ]; then
+if [ "$FORCE_UPDATE" != "true" ] && [ "$AUTO_UPDATE" != "true" ]; then
     log "auto_update is disabled; skipping update"
     write_progress "up_to_date" 100 "Auto-update is disabled. Update skipped." "" "$STARTED_AT" "$(date -Iseconds)"
     exit 0

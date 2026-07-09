@@ -7,7 +7,7 @@ from fastapi import APIRouter
 from app.api.config import get_user_config_sync
 from app.config import settings
 from app.services.updater import updater
-from app.services.update_progress import read_update_progress
+from app.services.update_progress import read_update_progress, write_update_progress
 
 logger = logging.getLogger(__name__)
 
@@ -92,6 +92,22 @@ async def trigger_update():
                 "message": "An update is already running. Check the progress below.",
             }
 
+        # Seed progress immediately so the UI never shows a stale 100% from a prior run.
+        from datetime import datetime, timezone
+
+        started_at = datetime.now(timezone.utc).isoformat()
+        write_update_progress(
+            status="checking",
+            progress=0,
+            message="Starting update...",
+            started_at=started_at,
+        )
+
+        # Manual trigger bypasses auto_update=false and rollout skip gates in the script.
+        force_flag = settings.data_dir / ".force_update"
+        force_flag.parent.mkdir(parents=True, exist_ok=True)
+        force_flag.write_text(started_at)
+
         subprocess.Popen(
             ["systemctl", "start", "--no-block", "adsbledmatrix-update.service"],
             stdout=subprocess.DEVNULL,
@@ -99,7 +115,8 @@ async def trigger_update():
         )
         return {
             "status": "started",
-            "message": "Update check started. Progress will appear below.",
+            "message": "Update started. Progress will appear below.",
+            "started_at": started_at,
         }
     except Exception as e:
         logger.error(f"Failed to trigger update service: {e}")

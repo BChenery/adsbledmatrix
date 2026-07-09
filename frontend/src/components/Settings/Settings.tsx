@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff } from 'lucide-react';
+import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff, Loader2, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
@@ -32,6 +32,7 @@ import { useLayouts } from '@/hooks/useLayout';
 import { useAircraft } from '@/hooks/useAircraft';
 import { useReceiverStatus } from '@/hooks/useReceiverStatus';
 import { useUpdateProgress } from '@/hooks/useUpdateProgress';
+import { UPDATE_STAGES, type UpdateProgressStatus } from '@/types/update';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
 import LocationMapPreview from '@/components/LocationLookup/LocationMapPreview';
 import SettingsSection from './SettingsSection';
@@ -53,7 +54,11 @@ export default function Settings() {
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus | null>(null);
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [updateActive, setUpdateActive] = useState(false);
-  const updateProgress = useUpdateProgress(updateActive);
+  const [updateSessionStartedAt, setUpdateSessionStartedAt] = useState<string | null>(null);
+  const { progress: updateProgress, unreachable: updateUnreachable } = useUpdateProgress(
+    updateActive,
+    updateSessionStartedAt,
+  );
 
   useEffect(() => {
     api.get<UserConfig>('/api/config').then((raw) => {
@@ -76,10 +81,25 @@ export default function Settings() {
       updateProgress?.status === 'failed' ||
       updateProgress?.status === 'up_to_date'
     ) {
-      const timer = setTimeout(() => setUpdateActive(false), 5000);
+      // Only auto-dismiss after a run that belongs to this session.
+      if (
+        updateSessionStartedAt &&
+        updateProgress.started_at &&
+        updateProgress.started_at < updateSessionStartedAt
+      ) {
+        return;
+      }
+      const delay = updateProgress.status === 'failed' ? 12000 : 8000;
+      const timer = setTimeout(() => {
+        setUpdateActive(false);
+        setUpdateSessionStartedAt(null);
+        if (updateProgress.status === 'completed' || updateProgress.status === 'up_to_date') {
+          api.get<UpdateStatus>('/api/system/update').then(setUpdateStatus).catch(() => {});
+        }
+      }, delay);
       return () => clearTimeout(timer);
     }
-  }, [updateProgress?.status]);
+  }, [updateProgress?.status, updateProgress?.started_at, updateSessionStartedAt]);
 
   const update = (field: keyof UserConfig, value: unknown) => {
     if (!config) return;
@@ -117,14 +137,40 @@ export default function Settings() {
   };
 
   const handleApplyUpdate = async () => {
+    const startedAt = new Date().toISOString();
+    setUpdateSessionStartedAt(startedAt);
     setUpdateActive(true);
     try {
-      const res = await api.post<{ status: string; message: string }>('/api/system/update');
-      toast.success(res.message || 'Update check triggered');
+      const res = await api.post<{ status: string; message: string; started_at?: string }>(
+        '/api/system/update',
+      );
+      if (res.status === 'error') {
+        toast.error(res.message || 'Failed to trigger update');
+        setUpdateActive(false);
+        setUpdateSessionStartedAt(null);
+        return;
+      }
+      if (res.status === 'already_running') {
+        // Attach to the in-flight run; do not filter by this click time.
+        setUpdateSessionStartedAt(null);
+      } else if (res.started_at) {
+        setUpdateSessionStartedAt(res.started_at);
+      }
+      toast.success(res.message || 'Update started');
     } catch {
       toast.error('Failed to trigger update');
       setUpdateActive(false);
+      setUpdateSessionStartedAt(null);
     }
+  };
+
+  const updateStageIndex = (status: UpdateProgressStatus | undefined): number => {
+    if (!status) return 0;
+    if (status === 'failed') return -1;
+    if (status === 'up_to_date' || status === 'completed') return UPDATE_STAGES.length - 1;
+    if (status === 'already_running') return 1;
+    const idx = UPDATE_STAGES.findIndex((s) => s.key === status);
+    return idx >= 0 ? idx : 0;
   };
 
   const handlePowerAction = async () => {
@@ -878,20 +924,128 @@ export default function Settings() {
                   )}
                 </div>
 
-                {updateActive && updateProgress && (
-                  <div className="space-y-2 rounded-lg border border-white/10 bg-white/5 p-3">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-white/70">{updateProgress.message}</span>
-                      <span className="text-white/50">{updateProgress.progress}%</span>
+                {updateActive && (
+                  <div
+                    className={`space-y-3 rounded-lg border p-3 ${
+                      updateProgress?.status === 'failed'
+                        ? 'border-red-500/30 bg-red-950/20'
+                        : updateProgress?.status === 'completed'
+                          ? 'border-green-500/30 bg-green-950/20'
+                          : updateProgress?.status === 'up_to_date'
+                            ? 'border-sky-500/30 bg-sky-950/20'
+                            : 'border-white/10 bg-white/5'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-start gap-2">
+                        {updateProgress?.status === 'completed' ? (
+                          <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-green-400" />
+                        ) : updateProgress?.status === 'failed' ? (
+                          <XCircle size={16} className="mt-0.5 shrink-0 text-red-400" />
+                        ) : updateProgress?.status === 'up_to_date' ? (
+                          <AlertCircle size={16} className="mt-0.5 shrink-0 text-sky-400" />
+                        ) : (
+                          <Loader2 size={16} className="mt-0.5 shrink-0 animate-spin text-primary" />
+                        )}
+                        <div className="min-w-0 space-y-0.5">
+                          <p className="text-sm font-medium text-white/90">
+                            {updateProgress?.status === 'completed'
+                              ? 'Update complete'
+                              : updateProgress?.status === 'failed'
+                                ? 'Update failed'
+                                : updateProgress?.status === 'up_to_date'
+                                  ? 'No update applied'
+                                  : updateProgress?.status === 'installing'
+                                    ? 'Installing update'
+                                    : updateProgress?.status === 'downloading'
+                                      ? 'Downloading update'
+                                      : 'Checking for updates'}
+                          </p>
+                          <p className="text-xs text-white/60">
+                            {updateProgress?.message ?? 'Starting update...'}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="shrink-0 tabular-nums text-xs font-medium text-white/50">
+                        {updateProgress?.progress ?? 0}%
+                      </span>
                     </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+
+                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/10">
                       <div
-                        className="h-full rounded-full bg-primary transition-all duration-500"
-                        style={{ width: `${updateProgress.progress}%` }}
+                        className={`h-full rounded-full transition-all duration-700 ease-out ${
+                          updateProgress?.status === 'failed'
+                            ? 'bg-red-500'
+                            : updateProgress?.status === 'completed'
+                              ? 'bg-green-500'
+                              : updateProgress?.status === 'up_to_date'
+                                ? 'bg-sky-500'
+                                : 'bg-primary'
+                        }`}
+                        style={{
+                          width: `${Math.max(2, updateProgress?.progress ?? 0)}%`,
+                        }}
                       />
                     </div>
-                    {updateProgress.error && (
+
+                    <div className="flex items-center justify-between gap-1">
+                      {UPDATE_STAGES.map((stage, i) => {
+                        const current = updateStageIndex(updateProgress?.status);
+                        const isFailed = updateProgress?.status === 'failed';
+                        const done = !isFailed && current >= i;
+                        const active = !isFailed && current === i;
+                        return (
+                          <div key={stage.key} className="flex flex-1 flex-col items-center gap-1">
+                            <div
+                              className={`h-1.5 w-full rounded-full ${
+                                done
+                                  ? active
+                                    ? 'bg-primary'
+                                    : 'bg-primary/60'
+                                  : 'bg-white/10'
+                              }`}
+                            />
+                            <span
+                              className={`text-[10px] ${
+                                active
+                                  ? 'font-medium text-white/80'
+                                  : done
+                                    ? 'text-white/50'
+                                    : 'text-white/30'
+                              }`}
+                            >
+                              {stage.label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {updateUnreachable &&
+                      updateProgress?.status !== 'completed' &&
+                      updateProgress?.status !== 'failed' && (
+                        <p className="text-xs text-amber-400/90">
+                          The LED matrix may go dark while services restart. This page will reconnect automatically.
+                        </p>
+                      )}
+
+                    {updateProgress?.error && (
                       <p className="text-xs text-red-400">{updateProgress.error}</p>
+                    )}
+
+                    {(updateProgress?.status === 'completed' ||
+                      updateProgress?.status === 'failed' ||
+                      updateProgress?.status === 'up_to_date') && (
+                      <button
+                        type="button"
+                        className="text-xs text-white/50 underline-offset-2 hover:text-white/80 hover:underline"
+                        onClick={() => {
+                          setUpdateActive(false);
+                          setUpdateSessionStartedAt(null);
+                        }}
+                      >
+                        Dismiss
+                      </button>
                     )}
                   </div>
                 )}

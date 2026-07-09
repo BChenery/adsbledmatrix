@@ -69,7 +69,7 @@ vi.mock('@/hooks/useReceiverStatus', () => ({
 }));
 
 vi.mock('@/hooks/useUpdateProgress', () => ({
-  useUpdateProgress: () => null,
+  useUpdateProgress: () => ({ progress: null, unreachable: false }),
 }));
 
 vi.mock('@/components/LocationLookup/LocationLookup', () => ({

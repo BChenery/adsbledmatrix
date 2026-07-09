@@ -13,26 +13,37 @@ def app():
 
 
 @pytest.mark.asyncio
-async def test_post_update_starts_service_when_not_running():
+async def test_post_update_starts_service_when_not_running(tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "data_dir", tmp_path)
     with patch("app.api.system.subprocess.run") as mock_run, \
-         patch("app.api.system.subprocess.Popen") as mock_popen:
+         patch("app.api.system.subprocess.Popen") as mock_popen, \
+         patch("app.api.system.write_update_progress") as mock_write:
         mock_run.return_value = MagicMock(returncode=1)  # not running
         result = await trigger_update()
 
     assert result["status"] == "started"
     assert "Progress will appear" in result["message"]
+    assert "started_at" in result
     mock_popen.assert_called_once()
+    mock_write.assert_called_once()
+    assert mock_write.call_args.kwargs["status"] == "checking"
+    assert mock_write.call_args.kwargs["progress"] == 0
+    assert (tmp_path / ".force_update").exists()
 
 
 @pytest.mark.asyncio
 async def test_post_update_reports_already_running():
     with patch("app.api.system.subprocess.run") as mock_run, \
-         patch("app.api.system.subprocess.Popen") as mock_popen:
+         patch("app.api.system.subprocess.Popen") as mock_popen, \
+         patch("app.api.system.write_update_progress") as mock_write:
         mock_run.return_value = MagicMock(returncode=0)  # already running
         result = await trigger_update()
 
     assert result["status"] == "already_running"
     mock_popen.assert_not_called()
+    mock_write.assert_not_called()
 
 
 @pytest.mark.asyncio
