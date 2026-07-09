@@ -696,7 +696,7 @@ class DisplayEngine:
             "operator_icao": enriched.get("operator_icao") or "---",
             "cycle_index": str(ctx.cycle_index + 1),
             "total_cycles": str(ctx.total_cycles),
-            "current_time": datetime.utcnow().strftime("%H:%M:%S"),
+            "current_time": self._local_now(config).strftime("%H:%M:%S"),
         })
 
         # Route data
@@ -746,6 +746,16 @@ class DisplayEngine:
             )
         return None
 
+    def _local_now(self, config: Optional[Any] = None, timezone_name: Optional[str] = None) -> datetime:
+        """Current time in the user's configured timezone, falling back to system local time."""
+        tz = timezone_name
+        if tz is None and config is not None:
+            tz = getattr(config, "timezone", None)
+        try:
+            return datetime.now(ZoneInfo(tz)) if tz else datetime.now()
+        except Exception:
+            return datetime.now()
+
     def _is_in_time_window(
         self, start: Optional[str], end: Optional[str], timezone_name: Optional[str] = None
     ) -> bool:
@@ -758,12 +768,7 @@ class DisplayEngine:
         except ValueError:
             return False
 
-        try:
-            now = datetime.now(ZoneInfo(timezone_name)) if timezone_name else datetime.now()
-        except Exception:
-            now = datetime.now()
-
-        now_time = now.time()
+        now_time = self._local_now(timezone_name=timezone_name).time()
         if start_time < end_time:
             return start_time <= now_time < end_time
         # Interval wraps past midnight (e.g. 22:00 -> 06:00).
@@ -777,10 +782,7 @@ class DisplayEngine:
     def _handle_night_mode(self, config: Optional[Any]) -> bool:
         """Apply sleep or dim windows. Returns True when rendering should be skipped."""
         timezone_name = config.timezone if config else None
-        try:
-            local_now = datetime.now(ZoneInfo(timezone_name)) if timezone_name else datetime.now()
-        except Exception:
-            local_now = datetime.now()
+        local_now = self._local_now(config)
 
         logger.debug(
             "Night-mode check: local_time=%s timezone=%s sleep=%s-%s dim=%s-%s",
@@ -889,10 +891,7 @@ class DisplayEngine:
 
         config = get_user_config_sync()
         timezone_name = config.timezone if config else None
-        try:
-            local_now = datetime.now(ZoneInfo(timezone_name)) if timezone_name else datetime.now()
-        except Exception:
-            local_now = datetime.now()
+        local_now = self._local_now(config)
 
         return {
             "hardware_mode": self.is_hardware_mode(),

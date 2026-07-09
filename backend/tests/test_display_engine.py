@@ -109,6 +109,26 @@ def test_time_window_uses_configured_timezone(engine):
         assert engine._is_in_time_window("19:00", "06:00", "America/Los_Angeles") is False
 
 
+def test_current_time_uses_configured_timezone(engine):
+    """Idle layout current_time should use the user's configured timezone, not UTC."""
+    from unittest.mock import MagicMock, patch
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from app.services.display_engine import RenderContext
+
+    config = MagicMock()
+    config.timezone = "Australia/Sydney"
+    ctx = RenderContext(is_idle=True, user_config=config)
+
+    fixed = datetime(2026, 7, 10, 6, 15, 32, tzinfo=ZoneInfo("Australia/Sydney"))
+    with patch("app.services.display_engine.datetime") as mock_dt:
+        mock_dt.now.return_value = fixed
+        result = engine._resolve_data_field("current_time", "{current_time}", ctx)
+
+    assert result == "06:15:32"
+    mock_dt.now.assert_called_with(ZoneInfo("Australia/Sydney"))
+
+
 def test_sleep_window_blanks_display(engine):
     """Sleep window clears the matrix and stops rendering."""
     from unittest.mock import MagicMock, patch
