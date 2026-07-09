@@ -176,6 +176,15 @@ install_or_update_code() {
     fi
 }
 
+install_sudoers() {
+    log "Installing sudoers rules for ${SERVICE_USER}"
+    cat > /etc/sudoers.d/adsbledmatrix <<EOF
+${SERVICE_USER} ALL=(ALL) NOPASSWD: ${INSTALL_DIR}/venv/bin/python3 ${INSTALL_DIR}/scripts/wifi_manager.py *
+${SERVICE_USER} ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/reboot, /sbin/shutdown, /usr/sbin/shutdown, /usr/sbin/nmcli, /usr/sbin/iptables, /usr/sbin/netfilter-persistent, /bin/systemctl restart adsbledmatrix, /bin/systemctl restart adsbledmatrix.service, /bin/systemctl start adsbledmatrix-update.service, /bin/systemctl start --no-block adsbledmatrix-update.service
+EOF
+    chmod 440 /etc/sudoers.d/adsbledmatrix
+}
+
 install_systemd_units() {
     log "Installing systemd units"
     cp "${INSTALL_DIR}/systemd/"*.service /etc/systemd/system/ 2>/dev/null || true
@@ -185,6 +194,7 @@ install_systemd_units() {
     systemctl enable adsbledmatrix-update.timer || true
     systemctl enable adsbledmatrix-update.service || true
     systemctl enable readsb.service 2>/dev/null || true
+    install_sudoers
 }
 
 fix_ownership() {

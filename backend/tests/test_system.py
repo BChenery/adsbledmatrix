@@ -18,15 +18,20 @@ async def test_post_update_starts_service_when_not_running(tmp_path, monkeypatch
 
     monkeypatch.setattr(settings, "data_dir", tmp_path)
     with patch("app.api.system.subprocess.run") as mock_run, \
-         patch("app.api.system.subprocess.Popen") as mock_popen, \
          patch("app.api.system.write_update_progress") as mock_write:
-        mock_run.return_value = MagicMock(returncode=1)  # not running
+        mock_run.side_effect = [
+            MagicMock(returncode=3, stdout="inactive\n", stderr=""),  # is-active
+            MagicMock(returncode=0, stdout="", stderr=""),  # sudo systemctl start
+        ]
         result = await trigger_update()
 
     assert result["status"] == "started"
     assert "Progress will appear" in result["message"]
     assert "started_at" in result
-    mock_popen.assert_called_once()
+    assert mock_run.call_count == 2
+    start_cmd = mock_run.call_args_list[1].args[0]
+    assert start_cmd[:3] == ["sudo", "-n", "systemctl"]
+    assert "adsbledmatrix-update.service" in start_cmd
     mock_write.assert_called_once()
     assert mock_write.call_args.kwargs["status"] == "checking"
     assert mock_write.call_args.kwargs["progress"] == 0
@@ -36,14 +41,33 @@ async def test_post_update_starts_service_when_not_running(tmp_path, monkeypatch
 @pytest.mark.asyncio
 async def test_post_update_reports_already_running():
     with patch("app.api.system.subprocess.run") as mock_run, \
-         patch("app.api.system.subprocess.Popen") as mock_popen, \
          patch("app.api.system.write_update_progress") as mock_write:
-        mock_run.return_value = MagicMock(returncode=0)  # already running
+        mock_run.return_value = MagicMock(returncode=0, stdout="activating\n", stderr="")
         result = await trigger_update()
 
     assert result["status"] == "already_running"
-    mock_popen.assert_not_called()
+    mock_run.assert_called_once()
     mock_write.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_post_update_reports_error_when_systemctl_fails(tmp_path, monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "data_dir", tmp_path)
+    with patch("app.api.system.subprocess.run") as mock_run, \
+         patch("app.api.system.write_update_progress") as mock_write:
+        mock_run.side_effect = [
+            MagicMock(returncode=3, stdout="inactive\n", stderr=""),
+            MagicMock(returncode=1, stdout="", stderr="Interactive authentication required."),
+        ]
+        result = await trigger_update()
+
+    assert result["status"] == "error"
+    assert "Interactive authentication required" in result["message"]
+    assert mock_write.call_count == 2
+    assert mock_write.call_args_list[-1].kwargs["status"] == "failed"
+    assert not (tmp_path / ".force_update").exists()
 
 
 @pytest.mark.asyncio

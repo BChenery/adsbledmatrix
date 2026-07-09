@@ -76,17 +76,33 @@ async def check_update():
     return UpdateStatus(**result)
 
 
+def _update_service_is_running() -> bool:
+    """True when the oneshot update unit is active or still starting."""
+    result = subprocess.run(
+        ["systemctl", "is-active", "adsbledmatrix-update.service"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    state = (result.stdout or "").strip()
+    return state in {"active", "activating"}
+
+
+def _start_update_service() -> subprocess.CompletedProcess:
+    """Start the update oneshot. Prefer passwordless sudo (service runs as adsb)."""
+    return subprocess.run(
+        ["sudo", "-n", "systemctl", "start", "--no-block", "adsbledmatrix-update.service"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
 @router.post("/update")
 async def trigger_update():
     """Trigger the systemd update service to check and install updates in the background."""
     try:
-        result = subprocess.run(
-            ["systemctl", "is-active", "--quiet", "adsbledmatrix-update.service"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode == 0:
+        if _update_service_is_running():
             return {
                 "status": "already_running",
                 "message": "An update is already running. Check the progress below.",
@@ -108,11 +124,28 @@ async def trigger_update():
         force_flag.parent.mkdir(parents=True, exist_ok=True)
         force_flag.write_text(started_at)
 
-        subprocess.Popen(
-            ["systemctl", "start", "--no-block", "adsbledmatrix-update.service"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+        start_result = _start_update_service()
+        if start_result.returncode != 0:
+            err = (start_result.stderr or start_result.stdout or "systemctl start failed").strip()
+            logger.error("Failed to start adsbledmatrix-update.service: %s", err)
+            write_update_progress(
+                status="failed",
+                progress=0,
+                message="Could not start update service.",
+                started_at=started_at,
+                error=err,
+            )
+            try:
+                force_flag.unlink(missing_ok=True)
+            except TypeError:
+                if force_flag.exists():
+                    force_flag.unlink()
+            return {
+                "status": "error",
+                "message": f"Could not start update: {err}",
+                "started_at": started_at,
+            }
+
         return {
             "status": "started",
             "message": "Update started. Progress will appear below.",

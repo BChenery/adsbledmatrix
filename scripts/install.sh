@@ -212,9 +212,9 @@ systemctl enable adsbledmatrix-update.timer
 systemctl enable adsbledmatrix-sync.timer
 systemctl enable avahi-daemon.service
 
-# Allow the adsb service user to manage WiFi and reboot without a password
+# Allow the adsb service user to manage WiFi, reboot, and trigger OTA without a password
 echo "adsb ALL=(ALL) NOPASSWD: /opt/adsbledmatrix/venv/bin/python3 /opt/adsbledmatrix/scripts/wifi_manager.py *" > /etc/sudoers.d/adsbledmatrix
-echo "adsb ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/reboot, /sbin/shutdown, /usr/sbin/shutdown, /usr/sbin/nmcli, /usr/sbin/iptables, /usr/sbin/netfilter-persistent, /bin/systemctl restart adsbledmatrix" >> /etc/sudoers.d/adsbledmatrix
+echo "adsb ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/reboot, /sbin/shutdown, /usr/sbin/shutdown, /usr/sbin/nmcli, /usr/sbin/iptables, /usr/sbin/netfilter-persistent, /bin/systemctl restart adsbledmatrix, /bin/systemctl restart adsbledmatrix.service, /bin/systemctl start adsbledmatrix-update.service, /bin/systemctl start --no-block adsbledmatrix-update.service" >> /etc/sudoers.d/adsbledmatrix
 chmod 440 /etc/sudoers.d/adsbledmatrix
 
 # Set permissions
