@@ -109,29 +109,30 @@ export default function LayoutDesigner() {
     setSelectedElement(null);
   };
 
+  const errorMessage = (err: unknown, fallback: string) =>
+    err instanceof Error ? err.message : fallback;
+
   const handleSave = async () => {
     if (!activeLayout) return;
     try {
       if (activeLayout.id) {
-        await update(activeLayout.id, {
+        const updated = await update(activeLayout.id, {
           name: activeLayout.name,
+          description: activeLayout.description,
           width: activeLayout.width,
           height: activeLayout.height,
           elements: activeLayout.elements,
         });
+        setActiveLayout(updated);
+        setSelectedElement(null);
         toast.success('Layout saved');
       } else {
         const created = await create(activeLayout);
         setActiveLayout(created);
         toast.success('Layout created');
       }
-    } catch (err: any) {
-      const message = err?.response?.detail
-        ? JSON.stringify(err.response.detail)
-        : err instanceof Error
-        ? err.message
-        : 'Save failed';
-      toast.error(`Save failed: ${message}`);
+    } catch (err: unknown) {
+      toast.error(`Save failed: ${errorMessage(err, 'Save failed')}`);
     }
   };
 
@@ -147,13 +148,8 @@ export default function LayoutDesigner() {
       setShowNewModal(false);
       setNewLayoutName('');
       toast.success('Layout created');
-    } catch (err: any) {
-      const message = err?.response?.detail
-        ? JSON.stringify(err.response.detail)
-        : err instanceof Error
-        ? err.message
-        : 'Create failed';
-      toast.error(`Create failed: ${message}`);
+    } catch (err: unknown) {
+      toast.error(`Create failed: ${errorMessage(err, 'Create failed')}`);
     } finally {
       setIsCreating(false);
     }
@@ -164,15 +160,13 @@ export default function LayoutDesigner() {
     const normalized = normalizeLayoutName(name, activeLayout.name);
     try {
       const updated = await update(activeLayout.id, { name: normalized });
-      setActiveLayout(updated);
+      // Keep unsaved local edits; only apply the renamed name from the server.
+      setActiveLayout((prev) =>
+        prev ? { ...prev, name: updated.name, updated_at: updated.updated_at } : updated,
+      );
       toast.success('Layout renamed');
-    } catch (err: any) {
-      const message = err?.response?.detail
-        ? JSON.stringify(err.response.detail)
-        : err instanceof Error
-        ? err.message
-        : 'Rename failed';
-      toast.error(`Rename failed: ${message}`);
+    } catch (err: unknown) {
+      toast.error(`Rename failed: ${errorMessage(err, 'Rename failed')}`);
       throw err;
     }
   };

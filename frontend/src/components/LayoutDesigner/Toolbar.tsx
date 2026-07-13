@@ -74,8 +74,15 @@ export default function Toolbar({
               setDraftName(layoutName);
             }
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.currentTarget.blur();
+            }
+          }}
           disabled={!canRename}
           placeholder="Layout name"
+          title={canRename ? 'Edit name, then press Enter or click away to rename' : undefined}
+          aria-label="Layout name"
           className="h-9 min-w-[140px] bg-led-black border-white/10 text-sm"
         />
         <DropdownMenu>

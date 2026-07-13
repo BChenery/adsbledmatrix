@@ -215,6 +215,19 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
     for field, value in update_data.items():
         setattr(config, field, value)
 
+    # UI shows default times for enabled modes; ensure they are persisted so the
+    # display engine does not treat empty start/end as "never in window".
+    if config.night_mode:
+        if not config.night_mode_start:
+            config.night_mode_start = "22:00"
+        if not config.night_mode_end:
+            config.night_mode_end = "06:00"
+    if config.sleep_mode:
+        if not config.sleep_mode_start:
+            config.sleep_mode_start = "23:00"
+        if not config.sleep_mode_end:
+            config.sleep_mode_end = "06:00"
+
     if config.receiver_source == "network" and (not config.network_readsb_host or not config.network_readsb_host.strip()):
         raise HTTPException(
             status_code=422,

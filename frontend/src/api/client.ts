@@ -11,7 +11,14 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     (error as Error & { status?: number }).status = res.status;
     throw error;
   }
-  return res.json();
+  if (res.status === 204 || res.headers.get('content-length') === '0') {
+    return undefined as T;
+  }
+  const text = await res.text();
+  if (!text) {
+    return undefined as T;
+  }
+  return JSON.parse(text) as T;
 }
 
 export const api = {
@@ -20,5 +27,5 @@ export const api = {
     request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
   post: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'POST', body: body ? JSON.stringify(body) : undefined }),
-  delete: (path: string) => request<unknown>(path, { method: 'DELETE' }),
+  delete: <T = unknown>(path: string) => request<T>(path, { method: 'DELETE' }),
 };

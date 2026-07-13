@@ -22,8 +22,7 @@ async def lifespan(app: FastAPI):
 
     # Load user config and set receiver location
     from app.database import AsyncSessionLocal
-    from sqlalchemy import select, delete
-    from sqlalchemy.orm import selectinload
+    from sqlalchemy import select
     from app.models import Layout, LayoutElement, UserConfig
     import json
 
@@ -55,20 +54,9 @@ async def lifespan(app: FastAPI):
             name = layout_data.get("name")
 
             if name in existing_layouts:
+                # Never overwrite user-edited layouts on restart. Only seed
+                # layouts that are missing by name.
                 layout = existing_layouts[name]
-                # Update metadata
-                for key, value in layout_data.items():
-                    if key != "id":
-                        setattr(layout, key, value)
-                # Replace existing elements with the current defaults so that
-                # layout dimension changes are reflected on existing installs.
-                await session.execute(
-                    delete(LayoutElement).where(LayoutElement.layout_id == layout.id)
-                )
-                await session.flush()
-                for elem_data in elements:
-                    elem = LayoutElement(layout_id=layout.id, **elem_data)
-                    session.add(elem)
             else:
                 logger.info(f"Seeding new default layout: {name}")
                 layout = Layout(**layout_data)

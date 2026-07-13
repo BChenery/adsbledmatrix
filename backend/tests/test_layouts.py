@@ -127,6 +127,40 @@ async def test_radar_element_settings_persist(app, db_session, monkeypatch):
     assert el["use_plane_symbol"] is True
 
 
+@pytest.mark.asyncio
+async def test_rename_and_description_persist(app, db_session, monkeypatch):
+    """Name and description updates must round-trip through PUT /api/layouts/{id}."""
+    async def fake_apply(config, session=None):
+        pass
+
+    monkeypatch.setattr("app.services.layout_loader.apply_engine_layouts", fake_apply)
+
+    result = await db_session.execute(select(Layout))
+    layout = result.scalar_one()
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.put(
+            f"/api/layouts/{layout.id}",
+            json={
+                "name": "Renamed Layout",
+                "description": "Custom night display",
+            },
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == "Renamed Layout"
+    assert data["description"] == "Custom night display"
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        reloaded = await client.get(f"/api/layouts/{layout.id}")
+
+    assert reloaded.status_code == 200
+    body = reloaded.json()
+    assert body["name"] == "Renamed Layout"
+    assert body["description"] == "Custom night display"
+
+
 def test_default_layouts_validate():
     """All layouts shipped in data/default_layouts.json must pass the design-system validator."""
     errors = validate()

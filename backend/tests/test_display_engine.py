@@ -90,6 +90,14 @@ def test_time_window_detection(engine):
         mock_dt.now.return_value = datetime.combine(date.today(), time(2, 0))
         assert engine._is_in_time_window("22:00", "23:00") is False
 
+        # Browsers sometimes emit HH:MM:SS from type="time".
+        mock_dt.now.return_value = datetime.combine(date.today(), time(23, 30))
+        assert engine._is_in_time_window("22:00:00", "06:00:00") is True
+
+        # Missing bounds never match (avoids silent full-day sleep/dim).
+        assert engine._is_in_time_window(None, "06:00") is False
+        assert engine._is_in_time_window("22:00", None) is False
+
 
 def test_time_window_uses_configured_timezone(engine):
     """When a timezone is supplied, the window is evaluated in that timezone."""
@@ -165,6 +173,7 @@ def test_sleep_window_overrides_dim_window(engine):
     config.sleep_mode_end = "06:00"
 
     engine._night_mode_active = False
+    engine._sleep_active = False
     engine._matrix = MagicMock()
 
     with patch("app.services.display_engine.datetime") as mock_dt:
@@ -172,6 +181,35 @@ def test_sleep_window_overrides_dim_window(engine):
         mock_dt.now.return_value = datetime.combine(date.today(), time(0, 30))
         assert engine._handle_night_mode(config) is True
         engine._matrix.clear.assert_called_once()
+
+
+def test_leaving_sleep_into_dim_reapplies_brightness(engine):
+    """After sleep ends while still in the dim window, brightness must dim again."""
+    from unittest.mock import MagicMock, patch
+    from datetime import datetime, date, time
+
+    config = MagicMock()
+    config.timezone = None
+    config.night_mode = True
+    config.night_mode_start = "22:00"
+    config.night_mode_end = "07:00"
+    config.sleep_mode = True
+    config.sleep_mode_start = "23:00"
+    config.sleep_mode_end = "06:00"
+
+    engine._brightness = 70
+    engine._night_mode_active = True
+    engine._sleep_active = True
+    engine._matrix = MagicMock()
+
+    with patch("app.services.display_engine.datetime") as mock_dt:
+        mock_dt.strptime = datetime.strptime
+        # 06:30: past sleep end, still inside dim window.
+        mock_dt.now.return_value = datetime.combine(date.today(), time(6, 30))
+        assert engine._handle_night_mode(config) is False
+        assert engine._sleep_active is False
+        assert engine._night_mode_active is True
+        engine._matrix.set_brightness.assert_called_with(14)
 
 
 def test_draw_text_clips_to_box_width(engine):

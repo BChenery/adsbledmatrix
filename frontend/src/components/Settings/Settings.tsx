@@ -103,6 +103,26 @@ export default function Settings() {
 
   const update = (field: keyof UserConfig, value: unknown) => {
     if (!config) return;
+    // Enabling night/sleep without ever touching the time inputs left start/end null
+    // while the UI showed defaults — so the engine never entered those windows.
+    if (field === 'night_mode' && value === true) {
+      setConfig({
+        ...config,
+        night_mode: true,
+        night_mode_start: config.night_mode_start || '22:00',
+        night_mode_end: config.night_mode_end || '06:00',
+      });
+      return;
+    }
+    if (field === 'sleep_mode' && value === true) {
+      setConfig({
+        ...config,
+        sleep_mode: true,
+        sleep_mode_start: config.sleep_mode_start || '23:00',
+        sleep_mode_end: config.sleep_mode_end || '06:00',
+      });
+      return;
+    }
     setConfig({ ...config, [field]: value });
   };
 
@@ -205,13 +225,33 @@ export default function Settings() {
       proximity_focus_km: Math.min(50, Math.max(0.1, config.proximity_focus_km ?? 3)),
       layout_rotation_interval_sec: clampInt(config.layout_rotation_interval_sec ?? 30, 5, 600),
       layout_playlist_ids: config.layout_playlist_ids ?? [],
+      // Persist the same defaults the time inputs display when modes are enabled.
+      night_mode_start: config.night_mode
+        ? (config.night_mode_start || '22:00')
+        : config.night_mode_start,
+      night_mode_end: config.night_mode
+        ? (config.night_mode_end || '06:00')
+        : config.night_mode_end,
+      sleep_mode_start: config.sleep_mode
+        ? (config.sleep_mode_start || '23:00')
+        : config.sleep_mode_start,
+      sleep_mode_end: config.sleep_mode
+        ? (config.sleep_mode_end || '06:00')
+        : config.sleep_mode_end,
     };
     if (payload.layout_rotation_enabled && payload.layout_playlist_ids.length > 0) {
       payload.active_layout_id = payload.layout_playlist_ids[0];
     }
     try {
-      await api.put('/api/config', payload);
-      setConfig(payload);
+      const saved = await api.put<UserConfig>('/api/config', payload);
+      setConfig({
+        ...payload,
+        ...saved,
+        night_mode_start: saved.night_mode_start ?? payload.night_mode_start,
+        night_mode_end: saved.night_mode_end ?? payload.night_mode_end,
+        sleep_mode_start: saved.sleep_mode_start ?? payload.sleep_mode_start,
+        sleep_mode_end: saved.sleep_mode_end ?? payload.sleep_mode_end,
+      });
       toast.success('Settings saved');
     } catch {
       toast.error('Failed to save settings');

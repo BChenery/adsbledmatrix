@@ -3,7 +3,7 @@ import logging
 import math
 import threading
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from typing import Optional, List, Dict, Any, Tuple
 from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
@@ -68,6 +68,7 @@ class DisplayEngine:
         self._test_color: Optional[Tuple[int, int, int]] = None
         self._brightness = settings.led_matrix_brightness
         self._night_mode_active = False
+        self._sleep_active = False
 
         from hardware import create_matrix
         self._matrix = create_matrix(self.width, self.height)
@@ -756,16 +757,26 @@ class DisplayEngine:
         except Exception:
             return datetime.now()
 
+    @staticmethod
+    def _parse_hhmm(value: Optional[str]) -> Optional[time]:
+        """Parse HH:MM or HH:MM:SS into a time, or None if invalid/missing."""
+        if not value:
+            return None
+        text = value.strip()
+        for fmt in ("%H:%M", "%H:%M:%S"):
+            try:
+                return datetime.strptime(text, fmt).time()
+            except ValueError:
+                continue
+        return None
+
     def _is_in_time_window(
         self, start: Optional[str], end: Optional[str], timezone_name: Optional[str] = None
     ) -> bool:
         """Return True if the current time in the user's timezone falls within the HH:MM window."""
-        if not start or not end:
-            return False
-        try:
-            start_time = datetime.strptime(start, "%H:%M").time()
-            end_time = datetime.strptime(end, "%H:%M").time()
-        except ValueError:
+        start_time = self._parse_hhmm(start)
+        end_time = self._parse_hhmm(end)
+        if start_time is None or end_time is None:
             return False
 
         now_time = self._local_now(timezone_name=timezone_name).time()
@@ -807,18 +818,23 @@ class DisplayEngine:
 
         if in_sleep_window:
             # Sleep: blank the matrix and skip rendering entirely.
-            if not self._night_mode_active:
+            if not self._sleep_active:
                 logger.info("Sleep window active — turning display off")
+                self._sleep_active = True
                 self._night_mode_active = True
             if self._matrix:
                 self._matrix.clear()
             self._framebuffer = None
             return True
 
+        was_sleeping = self._sleep_active
+        self._sleep_active = False
+
         if in_dim_window:
             # Dim: drop to 20% of the configured brightness (min 5%).
             night_brightness = max(5, int(self._brightness * 0.2))
-            if not self._night_mode_active:
+            # Re-apply after leaving sleep (shared flag would otherwise skip dim).
+            if not self._night_mode_active or was_sleeping:
                 logger.info(f"Night mode dim active — brightness {self._brightness} -> {night_brightness}")
                 self._night_mode_active = True
                 self._apply_matrix_brightness(night_brightness)

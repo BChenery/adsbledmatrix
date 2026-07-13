@@ -461,3 +461,24 @@ async def test_update_config_detects_timezone_from_lat_long(app_with_db):
     assert response.status_code == 200
     data = response.json()
     assert data["timezone"] == "Australia/Sydney"
+
+
+async def test_update_config_fills_default_night_sleep_times(app_with_db):
+    """Enabling night/sleep without times must persist UI defaults so windows activate."""
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put(
+            "/api/config",
+            json={
+                "night_mode": True,
+                "sleep_mode": True,
+            },
+        )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["night_mode"] is True
+    assert data["night_mode_start"] == "22:00"
+    assert data["night_mode_end"] == "06:00"
+    assert data["sleep_mode"] is True
+    assert data["sleep_mode_start"] == "23:00"
+    assert data["sleep_mode_end"] == "06:00"
