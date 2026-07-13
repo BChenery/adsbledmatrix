@@ -13,7 +13,7 @@
     background: linear-gradient(
       to right,
       hsl(var(--primary)) var(--brightness, 0%),
-      hsla(0, 0%, 100%, 0.1) var(--brightness, 0%)
+      hsla(0, 0%, 100%, 0.08) var(--brightness, 0%)
     );
   }
 
@@ -22,13 +22,13 @@
     background: linear-gradient(
       to right,
       hsl(var(--primary)) var(--brightness, 0%),
-      hsla(0, 0%, 100%, 0.1) var(--brightness, 0%)
+      hsla(0, 0%, 100%, 0.08) var(--brightness, 0%)
     );
   }
 
   .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    @apply -mt-1.5 h-5 w-5 rounded-full border-2 border-led-panel bg-primary shadow-md transition-transform;
+    @apply -mt-1.5 h-5 w-5 rounded-full border-2 border-led-black bg-primary shadow-md transition-transform;
   }
 
   .slider::-webkit-slider-thumb:hover {
@@ -36,36 +36,98 @@
   }
 
   .slider::-moz-range-thumb {
-    @apply h-5 w-5 rounded-full border-2 border-led-panel bg-primary shadow-md;
+    @apply h-5 w-5 rounded-full border-2 border-led-black bg-primary shadow-md;
+  }
+
+  .eyebrow {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint;
+  }
+
+  .page-shell {
+    @apply mx-auto w-full max-w-3xl px-4 py-5 sm:px-6 sm:py-7;
+  }
+
+  .surface-card {
+    @apply rounded-xl border border-led-line bg-led-dark shadow-panel;
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 55%);
+  }
+
+  .status-dot {
+    @apply inline-block h-1.5 w-1.5 rounded-full bg-led-accent animate-pulse-dot;
+  }
+
+  .safe-bottom {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 
 @layer base {
   :root {
+    --void: #0a0a0a;
+    --panel: #111111;
+    --elevated: #161616;
+    --line: #222222;
+    --line-soft: #1a1a1a;
+    --led-cyan: #35e0ff;
+    --led-amber: #ffb02e;
+    --text: #f5f5f5;
+    --dim: #a1a1a1;
+    --faint: #6b6b6b;
+    --muted-border: #3a3a3a;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
     --background: 0 0% 4%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 13%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 13%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 192 100% 50%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 100% / 0.1;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 192 100% 50%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 100% 63%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 188 100% 60%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 100% / 0.06;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 63%;
+    --accent: 188 100% 60%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 8 80% 54%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 100% / 0.1;
-    --input: 0 0% 100% / 0.2;
-    --ring: 192 100% 50%;
+    --border: 0 0% 13%;
+    --input: 0 0% 16%;
+    --ring: 188 100% 60%;
     --radius: 0.75rem;
   }
 
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply bg-led-black;
+  }
+
   body {
-    @apply bg-led-black text-white antialiased;
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply bg-led-black text-[#f5f5f5] antialiased font-sans;
+    font-feature-settings: "ss01" on, "cv11" on;
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background: rgba(53, 224, 255, 0.28);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--led-cyan);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

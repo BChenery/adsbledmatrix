@@ -60,161 +60,167 @@ export default function Toolbar({
   }, [layoutName]);
 
   return (
-    <div className="h-14 bg-led-panel border-b border-white/10 flex items-center px-4 gap-4">
-      <div className="flex items-center gap-1">
-        <Input
-          type="text"
-          value={draftName}
-          onChange={(e) => setDraftName(e.target.value)}
-          onBlur={async () => {
-            if (!canRename || draftName === layoutName) return;
-            try {
-              await onRename(draftName);
-            } catch {
-              setDraftName(layoutName);
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.currentTarget.blur();
-            }
-          }}
-          disabled={!canRename}
-          placeholder="Layout name"
-          title={canRename ? 'Edit name, then press Enter or click away to rename' : undefined}
-          aria-label="Layout name"
-          className="h-9 min-w-[140px] bg-led-black border-white/10 text-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="secondary" size="icon" className="h-9 w-9">
-              <ChevronDown size={14} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            {layouts.map((l) => (
-              <DropdownMenuItem key={l.id} onClick={() => onSelectLayout(l)}>
-                <div>
-                  <div className="font-medium">{l.name}</div>
-                  <div className="text-xs text-white/40">{l.width}×{l.height}</div>
-                </div>
-              </DropdownMenuItem>
-            ))}
-            {layouts.length === 0 && (
-              <div className="px-2 py-3 text-sm text-white/30">No layouts yet</div>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div className="flex flex-col gap-2 border-b border-led-line bg-led-dark/95 px-3 py-2.5 backdrop-blur-xl sm:px-4">
+      <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-1">
+          <Input
+            type="text"
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            onBlur={async () => {
+              if (!canRename || draftName === layoutName) return;
+              try {
+                await onRename(draftName);
+              } catch {
+                setDraftName(layoutName);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.currentTarget.blur();
+              }
+            }}
+            disabled={!canRename}
+            placeholder="Layout name"
+            title={canRename ? 'Edit name, then press Enter or click away to rename' : undefined}
+            aria-label="Layout name"
+            className="h-9 min-w-0 flex-1 bg-led-black text-sm sm:max-w-[220px]"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="icon" className="h-9 w-9 shrink-0">
+                <ChevronDown size={14} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56">
+              {layouts.map((l) => (
+                <DropdownMenuItem key={l.id} onClick={() => onSelectLayout(l)}>
+                  <div>
+                    <div className="font-medium">{l.name}</div>
+                    <div className="font-mono text-xs text-led-faint">{l.width}×{l.height}</div>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+              {layouts.length === 0 && (
+                <div className="px-2 py-3 text-sm text-led-faint">No layouts yet</div>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <Button variant="secondary" size="icon" onClick={onNew} className="h-9 w-9 shrink-0">
+          <Plus size={16} />
+        </Button>
+
+        {activeLayout && (
+          <Button onClick={onSave} size="sm" className="gap-2 shrink-0">
+            <Save size={14} />
+            <span className="hidden xs:inline sm:inline">Save</span>
+          </Button>
+        )}
       </div>
 
-      <Button variant="secondary" size="icon" onClick={onNew}>
-        <Plus size={16} />
-      </Button>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {activeLayout?.id && (
+          <>
+            {activeLayout.id === config?.active_layout_id && (
+              <Badge variant="default" className="gap-1">
+                <Monitor size={11} />
+                Active
+              </Badge>
+            )}
+            {activeLayout.id === config?.idle_layout_id && (
+              <Badge variant="secondary" className="gap-1 text-led-accent">
+                <Moon size={11} />
+                Idle
+              </Badge>
+            )}
+          </>
+        )}
 
-      {activeLayout?.id && (
-        <div className="flex items-center gap-2">
-          {activeLayout.id === config?.active_layout_id && (
-            <Badge variant="default" className="bg-green-500/20 text-green-400 hover:bg-green-500/30 gap-1">
-              <Monitor size={12} />
-              Active
-            </Badge>
-          )}
-          {activeLayout.id === config?.idle_layout_id && (
-            <Badge variant="default" className="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 gap-1">
-              <Moon size={12} />
-              Idle
-            </Badge>
-          )}
-        </div>
-      )}
-
-      <div className="flex items-center gap-1">
         <Button
           variant={activeLayout?.id === config?.active_layout_id ? 'default' : 'secondary'}
           size="sm"
           onClick={onSetAsActive}
           disabled={!activeLayout?.id}
-          className="gap-2"
+          className="gap-1.5"
         >
-          <Monitor size={14} />
-          {activeLayout?.id === config?.active_layout_id ? 'Active Layout' : 'Set Active'}
+          <Monitor size={13} />
+          <span className="hidden sm:inline">
+            {activeLayout?.id === config?.active_layout_id ? 'Active' : 'Set active'}
+          </span>
+          <span className="sm:hidden">Active</span>
         </Button>
         <Button
           variant={activeLayout?.id === config?.idle_layout_id ? 'default' : 'secondary'}
           size="sm"
           onClick={onSetAsIdle}
           disabled={!activeLayout?.id}
-          className="gap-2"
+          className="gap-1.5"
         >
-          <Moon size={14} />
-          {activeLayout?.id === config?.idle_layout_id ? 'Idle Layout' : 'Set Idle'}
+          <Moon size={13} />
+          <span className="hidden sm:inline">
+            {activeLayout?.id === config?.idle_layout_id ? 'Idle' : 'Set idle'}
+          </span>
+          <span className="sm:hidden">Idle</span>
+        </Button>
+
+        <div className="ml-auto flex items-center gap-1 rounded-full border border-led-line bg-led-black/50 px-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => onZoomChange(Math.max(1, zoom - 1))}
+            disabled={zoom <= 1}
+          >
+            <ZoomOut size={15} />
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="min-w-[48px] font-mono text-xs">
+                {zoom}×
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center">
+              {ZOOM_OPTIONS.map((z) => (
+                <DropdownMenuItem key={z} onClick={() => onZoomChange(z)}>
+                  {z}×
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => onZoomChange(Math.min(6, zoom + 1))}
+            disabled={zoom >= 6}
+          >
+            <ZoomIn size={15} />
+          </Button>
+        </div>
+
+        <Button
+          variant={panelPreview ? 'default' : 'secondary'}
+          size="sm"
+          onClick={onTogglePanelPreview}
+          className="gap-1.5"
+          title="Show canvas as the physical panels see it"
+        >
+          <Eye size={14} />
+          <span className="hidden md:inline">{panelPreview ? 'Panel' : 'Logical'}</span>
+        </Button>
+
+        <Button
+          variant={useMockData ? 'default' : 'secondary'}
+          size="sm"
+          onClick={onToggleMockData}
+          className={`gap-1.5 ${useMockData ? 'bg-led-amber text-led-black hover:bg-led-amber/90' : ''}`}
+        >
+          {useMockData ? <FlaskConical size={14} /> : <Radio size={14} />}
+          <span className="hidden sm:inline">{useMockData ? 'Mock' : 'Live'}</span>
         </Button>
       </div>
-
-      <div className="flex-1" />
-
-      <div className="flex items-center gap-1 bg-black/30 rounded-md px-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => onZoomChange(Math.max(1, zoom - 1))}
-          disabled={zoom <= 1}
-        >
-          <ZoomOut size={16} />
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="min-w-[64px] text-xs">
-              {zoom}×
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center">
-            {ZOOM_OPTIONS.map((z) => (
-              <DropdownMenuItem key={z} onClick={() => onZoomChange(z)}>
-                {z}×
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => onZoomChange(Math.min(6, zoom + 1))}
-          disabled={zoom >= 6}
-        >
-          <ZoomIn size={16} />
-        </Button>
-      </div>
-
-      <Button
-        variant={panelPreview ? 'default' : 'secondary'}
-        size="sm"
-        onClick={onTogglePanelPreview}
-        className={`gap-2 ${panelPreview ? 'text-cyan-400' : 'text-white/70'}`}
-        title="Show canvas as the physical panels see it"
-      >
-        <Eye size={16} />
-        {panelPreview ? 'Panel Preview' : 'Logical'}
-      </Button>
-
-      <Button
-        variant={useMockData ? 'default' : 'secondary'}
-        size="sm"
-        onClick={onToggleMockData}
-        className={`gap-2 ${useMockData ? 'bg-amber-500 hover:bg-amber-600 text-black' : 'text-green-400'}`}
-      >
-        {useMockData ? <FlaskConical size={16} /> : <Radio size={16} />}
-        {useMockData ? 'Mock' : 'Live'}
-      </Button>
-
-      {activeLayout && (
-        <Button onClick={onSave} className="gap-2">
-          <Save size={16} />
-          Save
-        </Button>
-      )}
     </div>
   );
 }

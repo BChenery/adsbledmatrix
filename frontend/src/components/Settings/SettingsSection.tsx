@@ -20,13 +20,17 @@ export default function SettingsSection({
 }: SettingsSectionProps) {
   return (
     <Card className={cn(className)}>
-      <CardHeader>
-        <CardTitle className="text-sm text-white/70 flex items-center gap-2">
-          {Icon && <Icon size={14} />}
-          {title}
+      <CardHeader className="space-y-2">
+        <CardTitle className="flex items-center gap-2 text-[13px] font-medium text-led-dim">
+          {Icon && (
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-led-line bg-led-panel text-led-accent">
+              <Icon size={14} />
+            </span>
+          )}
+          <span className="font-display tracking-tight text-[#f5f5f5]">{title}</span>
         </CardTitle>
         {description && (
-          <p className="text-xs text-white/50 leading-relaxed">{description}</p>
+          <p className="text-xs leading-relaxed text-led-faint sm:text-[13px]">{description}</p>
         )}
       </CardHeader>
       <CardContent className="space-y-4">{children}</CardContent>

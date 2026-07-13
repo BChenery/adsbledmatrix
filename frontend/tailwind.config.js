@@ -10,12 +10,16 @@ export default {
       colors: {
         led: {
           black: '#0a0a0a',
-          dark: '#1a1a1a',
-          panel: '#222222',
-          accent: '#00d4ff',
-          green: '#00ff88',
-          red: '#ff4444',
-          amber: '#ffaa00',
+          dark: '#111111',
+          panel: '#161616',
+          elevated: '#1a1a1a',
+          line: '#222222',
+          accent: '#35e0ff',
+          green: '#2ade4b',
+          red: '#e8312a',
+          amber: '#ffb02e',
+          dim: '#a1a1a1',
+          faint: '#6b6b6b',
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,7 +61,13 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+        sans: ['"DM Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Outfit', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+      boxShadow: {
+        panel: '0 1px 0 rgba(255,255,255,0.03) inset, 0 8px 24px rgba(0,0,0,0.35)',
+        glow: '0 0 24px rgba(53,224,255,0.12)',
       },
       keyframes: {
         "accordion-down": {
@@ -68,10 +78,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "pulse-dot": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.35" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-dot": "pulse-dot 1.6s ease-in-out infinite",
       },
     },
   },

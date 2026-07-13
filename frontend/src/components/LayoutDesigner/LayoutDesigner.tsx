@@ -23,7 +23,7 @@ import Canvas from './Canvas';
 import ElementPalette, { QUICK_ADD_PRESETS, ADVANCED_ELEMENTS } from './ElementPalette';
 import PropertyPanel from './PropertyPanel';
 import Toolbar from './Toolbar';
-import { Save, Plus } from 'lucide-react';
+import { Save, Plus, Layers, SlidersHorizontal, X } from 'lucide-react';
 
 const DEFAULT_LAYOUT: Layout = {
   name: 'New Layout',
@@ -51,6 +51,7 @@ export default function LayoutDesigner() {
   const [panelPreview, setPanelPreview] = useState(false);
   const [zoom, setZoom] = useState(3);
   const [config, setConfig] = useState<UserConfig | null>(null);
+  const [mobilePanel, setMobilePanel] = useState<'palette' | 'props' | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -183,11 +184,15 @@ export default function LayoutDesigner() {
   };
 
   if (loading) {
-    return <div className="p-6 text-white/50">Loading layouts...</div>;
+    return (
+      <div className="flex h-[70dvh] items-center justify-center">
+        <p className="font-mono text-xs uppercase tracking-[0.12em] text-led-faint">Loading layouts…</p>
+      </div>
+    );
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="flex h-[calc(100dvh-4.75rem)] flex-col md:h-[calc(100dvh-3.5rem)]">
       <Toolbar
         layouts={layouts}
         activeLayout={activeLayout}
@@ -211,7 +216,7 @@ export default function LayoutDesigner() {
       <Dialog open={showNewModal} onOpenChange={setShowNewModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>New Layout</DialogTitle>
+            <DialogTitle>New layout</DialogTitle>
             <DialogDescription>
               Give your layout a name and create it for the {DEFAULT_LAYOUT.width}×{DEFAULT_LAYOUT.height} LED matrix.
             </DialogDescription>
@@ -244,36 +249,126 @@ export default function LayoutDesigner() {
       </Dialog>
 
       {activeLayout ? (
-        <div className="flex-1 flex overflow-hidden">
-          <ElementPalette onAddElement={handleAddElement} />
+        <div className="relative flex min-h-0 flex-1 overflow-hidden">
+          <ElementPalette
+            onAddElement={(key) => {
+              handleAddElement(key);
+              setMobilePanel(null);
+            }}
+          />
 
-          <div className="flex-1 overflow-auto bg-led-black flex items-center justify-center p-8">
-            <div ref={canvasRef}>
-              <Canvas
-                layout={activeLayout}
-                selectedElement={selectedElement}
-                onSelectElement={setSelectedElement}
-                onUpdateElement={handleUpdateElement}
-                aircraft={useMockData ? MOCK_AIRCRAFT_FLEET : aircraft}
-                zoom={zoom}
-                flipVertical={panelPreview && (diagnostics?.flip_vertical ?? false)}
-              />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <div className="flex flex-1 items-center justify-center overflow-auto bg-[radial-gradient(circle_at_center,rgba(53,224,255,0.04),transparent_55%),#0a0a0a] p-4 sm:p-8">
+              <div ref={canvasRef} className="rounded-lg border border-led-line/80 shadow-panel">
+                <Canvas
+                  layout={activeLayout}
+                  selectedElement={selectedElement}
+                  onSelectElement={(el) => {
+                    setSelectedElement(el);
+                    if (el) setMobilePanel('props');
+                  }}
+                  onUpdateElement={handleUpdateElement}
+                  aircraft={useMockData ? MOCK_AIRCRAFT_FLEET : aircraft}
+                  zoom={zoom}
+                  flipVertical={panelPreview && (diagnostics?.flip_vertical ?? false)}
+                />
+              </div>
+            </div>
+
+            <div
+              className="flex gap-2 border-t border-led-line bg-led-dark/95 px-3 py-2 lg:hidden"
+              style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))' }}
+            >
+              <Button
+                variant={mobilePanel === 'palette' ? 'default' : 'secondary'}
+                size="sm"
+                className="flex-1 gap-2"
+                onClick={() => setMobilePanel((v) => (v === 'palette' ? null : 'palette'))}
+              >
+                <Layers size={14} />
+                Add
+              </Button>
+              <Button
+                variant={mobilePanel === 'props' ? 'default' : 'secondary'}
+                size="sm"
+                className="flex-1 gap-2"
+                onClick={() => setMobilePanel((v) => (v === 'props' ? null : 'props'))}
+              >
+                <SlidersHorizontal size={14} />
+                Props
+              </Button>
             </div>
           </div>
 
-          <PropertyPanel
-            layout={activeLayout}
-            onLayoutChange={setActiveLayout}
-            onNameBlur={() => activeLayout?.id && handleRename(activeLayout.name)}
-            element={selectedElement}
-            onChange={handleUpdateElement}
-            onDelete={handleDeleteElement}
-          />
+          <div className="hidden lg:flex">
+            <PropertyPanel
+              layout={activeLayout}
+              onLayoutChange={setActiveLayout}
+              onNameBlur={() => activeLayout?.id && handleRename(activeLayout.name)}
+              element={selectedElement}
+              onChange={handleUpdateElement}
+              onDelete={handleDeleteElement}
+            />
+          </div>
+
+          {mobilePanel && (
+            <div className="absolute inset-0 z-30 flex flex-col justify-end bg-black/55 lg:hidden" onClick={() => setMobilePanel(null)}>
+              <div
+                className="flex max-h-[70dvh] flex-col overflow-hidden rounded-t-2xl border border-led-line bg-led-dark shadow-panel"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between border-b border-led-line px-4 py-3">
+                  <span className="font-display text-sm font-medium tracking-tight">
+                    {mobilePanel === 'palette' ? 'Add elements' : 'Properties'}
+                  </span>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setMobilePanel(null)}>
+                    <X size={16} />
+                  </Button>
+                </div>
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                  {mobilePanel === 'palette' ? (
+                    <ElementPalette
+                      compact
+                      className="border-0"
+                      onAddElement={(key) => {
+                        handleAddElement(key);
+                        setMobilePanel(null);
+                      }}
+                    />
+                  ) : (
+                    <PropertyPanel
+                      layout={activeLayout}
+                      onLayoutChange={setActiveLayout}
+                      onNameBlur={() => activeLayout?.id && handleRename(activeLayout.name)}
+                      element={selectedElement}
+                      onChange={handleUpdateElement}
+                      onDelete={() => {
+                        handleDeleteElement();
+                        setMobilePanel(null);
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
-        <div className="flex-1 flex flex-col items-center justify-center text-white/30">
-          <Save size={48} className="mb-4 opacity-20" />
-          <p className="text-lg">Select or create a layout to begin designing</p>
+        <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-led-line bg-led-dark text-led-faint">
+            <Save size={28} />
+          </div>
+          <p className="eyebrow mb-2">Designer</p>
+          <p className="font-display text-xl font-medium tracking-tight text-[#f5f5f5]">
+            Select or create a layout
+          </p>
+          <p className="mt-2 max-w-sm text-sm text-led-dim">
+            Build pixel-perfect LED screens for live aircraft and idle states.
+          </p>
+          <Button className="mt-6 gap-2" onClick={() => setShowNewModal(true)}>
+            <Plus size={16} />
+            New layout
+          </Button>
         </div>
       )}
     </div>

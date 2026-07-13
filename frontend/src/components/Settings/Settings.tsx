@@ -280,14 +280,23 @@ export default function Settings() {
     ? roundDistance(kmToDisplay(config.proximity_focus_km ?? 3, distanceUnit))
     : 3;
 
-  if (!config) return <div className="p-6 text-white/50">Loading...</div>;
+  if (!config) {
+    return (
+      <main className="page-shell">
+        <p className="font-mono text-xs uppercase tracking-[0.12em] text-led-faint">Loading settings…</p>
+      </main>
+    );
+  }
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-6 pb-24 space-y-4 md:space-y-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Settings</h1>
+    <main className="page-shell space-y-4 md:space-y-5">
+      <header className="flex items-end justify-between gap-3">
+        <div>
+          <p className="eyebrow mb-2">Device</p>
+          <h1 className="font-display text-2xl font-medium tracking-tight sm:text-[28px]">Settings</h1>
+        </div>
         {brightnessSaved && (
-          <span className="text-xs text-led-accent">Brightness saved</span>
+          <span className="font-mono text-[11px] text-led-accent">Brightness saved</span>
         )}
       </header>
 
@@ -1121,18 +1130,24 @@ export default function Settings() {
         </Button>
       </SettingsSection>
 
-      <div className="flex flex-col sm:flex-row gap-3 pt-4">
-        <Button
-          onClick={handleSave}
-          className="w-full sm:flex-1 gap-2"
-          disabled={
-            config.receiver_source === 'network' &&
-            (!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port))
-          }
-        >
-          <Save size={16} />
-          Save Settings
-        </Button>
+      <div className="h-16" aria-hidden />
+      <div
+        className="fixed inset-x-0 z-40 border-t border-led-line/80 bg-led-black/90 px-4 py-3 backdrop-blur-xl md:static md:inset-auto md:z-auto md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none"
+        style={{ bottom: 'calc(4.25rem + env(safe-area-inset-bottom, 0px))' }}
+      >
+        <div className="mx-auto flex max-w-3xl flex-col gap-3 sm:flex-row md:pt-2">
+          <Button
+            onClick={handleSave}
+            className="w-full gap-2 sm:flex-1"
+            disabled={
+              config.receiver_source === 'network' &&
+              (!isValidHost(config.network_readsb_host) || !isValidPort(config.network_readsb_port))
+            }
+          >
+            <Save size={16} />
+            Save settings
+          </Button>
+        </div>
       </div>
 
       <Dialog open={!!powerAction} onOpenChange={() => setPowerAction(null)}>

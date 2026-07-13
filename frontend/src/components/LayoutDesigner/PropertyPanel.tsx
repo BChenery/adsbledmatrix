@@ -27,9 +27,9 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
     };
 
     return (
-      <div className="w-64 bg-led-panel border-l border-white/10 flex flex-col">
-        <div className="p-3 border-b border-white/10">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Layout Properties</h3>
+      <div className="flex h-full w-full flex-col border-led-line bg-led-dark lg:w-72 lg:border-l">
+        <div className="border-b border-led-line p-3">
+          <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">Layout properties</h3>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="space-y-1">
@@ -83,10 +83,10 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
   };
 
   return (
-    <div className="w-64 bg-led-panel border-l border-white/10 flex flex-col">
-      <div className="p-3 border-b border-white/10 flex items-center justify-between">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Properties</h3>
-        <Button variant="ghost" size="icon" onClick={onDelete} className="text-led-red hover:text-red-400 hover:bg-led-red/10 h-8 w-8">
+    <div className="flex h-full w-full flex-col border-led-line bg-led-dark lg:w-72 lg:border-l">
+      <div className="flex items-center justify-between border-b border-led-line p-3">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">Properties</h3>
+        <Button variant="ghost" size="icon" onClick={onDelete} className="h-8 w-8 text-led-red hover:bg-led-red/10 hover:text-led-red">
           <Trash2 size={16} />
         </Button>
       </div>

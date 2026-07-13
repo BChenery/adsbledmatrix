@@ -183,40 +183,48 @@ export const ADVANCED_ELEMENTS: PalettePreset[] = [
 
 interface ElementPaletteProps {
   onAddElement: (key: string) => void;
+  className?: string;
+  compact?: boolean;
 }
 
-export default function ElementPalette({ onAddElement }: ElementPaletteProps) {
+export default function ElementPalette({ onAddElement, className, compact = false }: ElementPaletteProps) {
   return (
-    <div className="w-48 bg-led-panel border-r border-white/10 flex flex-col">
-      <div className="p-3 border-b border-white/10">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Quick Add</h3>
+    <div
+      className={[
+        'flex flex-col border-led-line bg-led-dark',
+        compact ? 'h-full' : 'hidden w-52 shrink-0 border-r lg:flex',
+        className || '',
+      ].join(' ')}
+    >
+      <div className="border-b border-led-line p-3">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">Quick add</h3>
       </div>
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      <div className="flex-1 space-y-1 overflow-y-auto p-2">
         {QUICK_ADD_PRESETS.map((el) => (
           <Button
             key={el.key}
             variant="ghost"
             onClick={() => onAddElement(el.key)}
-            className="w-full justify-start gap-3 px-3 py-2 h-auto text-sm text-white/70 hover:text-white"
+            className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm text-led-dim hover:text-[#f5f5f5]"
           >
-            <span className="text-white/40">{el.icon}</span>
+            <span className="text-led-faint">{el.icon}</span>
             {el.label}
           </Button>
         ))}
       </div>
 
-      <div className="p-3 border-t border-b border-white/10">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">Advanced</h3>
+      <div className="border-y border-led-line p-3">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">Advanced</h3>
       </div>
-      <div className="p-2 space-y-1">
+      <div className="space-y-1 p-2">
         {ADVANCED_ELEMENTS.map((el) => (
           <Button
             key={el.key}
             variant="ghost"
             onClick={() => onAddElement(el.key)}
-            className="w-full justify-start gap-3 px-3 py-2 h-auto text-sm text-white/70 hover:text-white"
+            className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm text-led-dim hover:text-[#f5f5f5]"
           >
-            <span className="text-white/40">{el.icon}</span>
+            <span className="text-led-faint">{el.icon}</span>
             {el.label}
           </Button>
         ))}
