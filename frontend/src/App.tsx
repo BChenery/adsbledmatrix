@@ -14,8 +14,8 @@ import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 const links = [
   { href: '/', icon: Radio, label: 'Live' },
   { href: '/designer', icon: Layout, label: 'Designer' },
-  { href: '/whats-new', icon: Sparkles, label: "What's New" },
   { href: '/settings', icon: SettingsIcon, label: 'Settings' },
+  { href: '/whats-new', icon: Sparkles, label: "What's New" },
 ] as const;
 
 function BrandMark({ compact = false }: { compact?: boolean }) {
