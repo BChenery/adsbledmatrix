@@ -58,6 +58,7 @@ jobs:
           cp -r systemd release/adsbledmatrix/
           cp -r docs release/adsbledmatrix/
           cp README.md release/adsbledmatrix/
+          cp CHANGELOG.md release/adsbledmatrix/
           cp VERSION release/adsbledmatrix/
           cd release
           tar -czf adsbledmatrix-v${{ steps.bump.outputs.version }}.tar.gz adsbledmatrix

@@ -1,8 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import Settings from './Settings';
 import * as apiModule from '@/api/client';
 import type { UserConfig } from '@/types/config';
+
+function renderSettings() {
+  return render(
+    <MemoryRouter>
+      <Settings />
+    </MemoryRouter>,
+  );
+}
 
 const mockConfig: UserConfig = {
   receiver_source: 'local',
@@ -117,7 +126,7 @@ describe('Settings', () => {
   });
 
   it('renders settings sections and save button', async () => {
-    render(<Settings />);
+    renderSettings();
 
     expect(await screen.findByRole('heading', { name: /Settings/i })).toBeDefined();
     expect(screen.getByText('LED Matrix Status')).toBeDefined();
@@ -158,7 +167,7 @@ describe('Settings', () => {
       return Promise.reject(new Error('Unknown URL'));
     });
 
-    render(<Settings />);
+    renderSettings();
     expect(await screen.findByText('Number of aircraft to cycle')).toBeDefined();
     expect(screen.getByText('Switch aircraft every')).toBeDefined();
   });
@@ -192,13 +201,13 @@ describe('Settings', () => {
       return Promise.reject(new Error('Unknown URL'));
     });
 
-    render(<Settings />);
+    renderSettings();
     expect(await screen.findByText('Focus distance')).toBeDefined();
     expect(screen.getByText('Focus layout (optional)')).toBeDefined();
   });
 
   it('shows learning baseline banner while interesting feature is warming up', async () => {
-    render(<Settings />);
+    renderSettings();
     expect(await screen.findByText('Learning local regulars')).toBeDefined();
     expect(screen.getAllByText('Baseline building').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/rarity highlights stay off/i).length).toBeGreaterThan(0);

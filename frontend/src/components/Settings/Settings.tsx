@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff, Loader2, CheckCircle2, XCircle, AlertCircle, Sparkles, Hourglass } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
@@ -1230,6 +1231,15 @@ export default function Settings() {
               {updateStatus.error && (
                 <div className="text-xs text-red-400">{updateStatus.error}</div>
               )}
+              <div className="pt-0.5">
+                <Link
+                  to="/whats-new"
+                  className="inline-flex items-center gap-1.5 text-xs text-led-accent hover:underline"
+                >
+                  <Sparkles size={12} />
+                  Read what&apos;s new on this device
+                </Link>
+              </div>
               <div className="flex flex-col gap-3 pt-1">
                 <div className="flex gap-2">
                   <Button

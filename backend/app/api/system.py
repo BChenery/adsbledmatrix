@@ -8,6 +8,7 @@ from app.api.config import get_user_config_sync
 from app.config import settings
 from app.services.updater import updater
 from app.services.update_progress import read_update_progress, write_update_progress
+from app.services.changelog import changelog_payload
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,22 @@ class UpdateProgressResponse(BaseModel):
     error: Optional[str] = None
 
 
+class ChangelogSectionModel(BaseModel):
+    title: str
+    items: list[str]
+
+
+class ChangelogEntryModel(BaseModel):
+    version: str
+    date: Optional[str] = None
+    sections: list[ChangelogSectionModel]
+
+
+class ChangelogResponse(BaseModel):
+    current_version: str
+    entries: list[ChangelogEntryModel]
+
+
 @router.get("/health")
 async def health_check():
     from app.config import settings
@@ -74,6 +91,12 @@ async def get_status():
 async def check_update():
     result = await updater.check_for_update()
     return UpdateStatus(**result)
+
+
+@router.get("/changelog", response_model=ChangelogResponse)
+async def get_changelog():
+    """Return structured release notes from the local CHANGELOG.md (offline-friendly)."""
+    return ChangelogResponse(**changelog_payload())
 
 
 def _update_service_is_running() -> bool:

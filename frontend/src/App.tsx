@@ -6,13 +6,15 @@ import OnboardingWizard from '@/components/OnboardingWizard/OnboardingWizard';
 import LayoutDesigner from '@/components/LayoutDesigner/LayoutDesigner';
 import Settings from '@/components/Settings/Settings';
 import LiveAircraft from '@/components/LiveAircraft/LiveAircraft';
-import { Layout, Settings as SettingsIcon, Radio } from 'lucide-react';
+import WhatsNew from '@/components/WhatsNew/WhatsNew';
+import { Layout, Settings as SettingsIcon, Radio, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 
 const links = [
   { href: '/', icon: Radio, label: 'Live' },
   { href: '/designer', icon: Layout, label: 'Designer' },
+  { href: '/whats-new', icon: Sparkles, label: "What's New" },
   { href: '/settings', icon: SettingsIcon, label: 'Settings' },
 ] as const;
 
@@ -113,7 +115,9 @@ function MobileNav() {
             {({ isActive }) => (
               <>
                 <link.icon size={20} strokeWidth={isActive ? 2.25 : 1.75} />
-                <span className="font-mono text-[10px] uppercase tracking-[0.08em]">{link.label}</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.08em]">
+                  {link.href === '/whats-new' ? 'New' : link.label}
+                </span>
                 {link.href === '/settings' && displayStatus && (
                   <span
                     className={cn(
@@ -172,6 +176,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LiveAircraft />} />
         <Route path="/designer" element={<LayoutDesigner />} />
+        <Route path="/whats-new" element={<WhatsNew />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
