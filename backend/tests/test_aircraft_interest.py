@@ -6,12 +6,13 @@ from app.services.aircraft_interest import (
     is_warmup,
     score_aircraft,
     pick_most_interesting,
+    warmup_status,
 )
 
 
 def _ready_baseline(now: datetime) -> SiteBaseline:
     return SiteBaseline(
-        earliest_first_seen=now - timedelta(days=30),
+        earliest_first_seen=now - timedelta(days=50),
         unique_hexes=100,
     )
 
@@ -41,6 +42,26 @@ def test_first_seen_suppressed_during_warmup():
         distance_km=5.0,
         history=None,
         baseline=cold,
+        now=now,
+    )
+    assert not res.is_interesting
+
+
+def test_first_seen_suppressed_with_many_hexes_before_days():
+    """Busy sites must not treat every plane as NEW before the day baseline."""
+    now = datetime.utcnow()
+    busy_but_young = SiteBaseline(
+        earliest_first_seen=now - timedelta(days=3),
+        unique_hexes=500,
+    )
+    res = score_aircraft(
+        hex_code="NEW001",
+        squawk=None,
+        distance_km=5.0,
+        history=None,
+        baseline=busy_but_young,
+        warmup_days=45,
+        warmup_hexes=50,
         now=now,
     )
     assert not res.is_interesting
@@ -125,22 +146,37 @@ def test_long_absent_30_days():
     assert res.primary_reason == "RETURN"
 
 
-def test_warmup_ends_after_days_even_if_few_hexes():
+def test_warmup_requires_both_days_and_hexes():
     now = datetime.utcnow()
-    baseline = SiteBaseline(
-        earliest_first_seen=now - timedelta(days=8),
+    aged_few = SiteBaseline(
+        earliest_first_seen=now - timedelta(days=50),
         unique_hexes=3,
     )
-    assert not is_warmup(baseline, now=now, warmup_days=7, warmup_hexes=50)
-
-
-def test_warmup_ends_after_enough_hexes():
-    now = datetime.utcnow()
-    baseline = SiteBaseline(
-        earliest_first_seen=now - timedelta(hours=1),
+    young_many = SiteBaseline(
+        earliest_first_seen=now - timedelta(days=8),
+        unique_hexes=200,
+    )
+    ready = SiteBaseline(
+        earliest_first_seen=now - timedelta(days=45),
         unique_hexes=50,
     )
-    assert not is_warmup(baseline, now=now, warmup_days=7, warmup_hexes=50)
+    assert is_warmup(aged_few, now=now, warmup_days=45, warmup_hexes=50)
+    assert is_warmup(young_many, now=now, warmup_days=45, warmup_hexes=50)
+    assert not is_warmup(ready, now=now, warmup_days=45, warmup_hexes=50)
+
+
+def test_warmup_status_progress():
+    now = datetime.utcnow()
+    baseline = SiteBaseline(
+        earliest_first_seen=now - timedelta(days=15),
+        unique_hexes=20,
+    )
+    status = warmup_status(baseline, now=now, warmup_days=45, warmup_hexes=50)
+    assert status.learning
+    assert status.age_days == 15
+    assert status.days_remaining == 30
+    assert status.hexes_remaining == 30
+    assert status.as_dict()["learning"] is True
 
 
 def test_pick_most_interesting_prefers_emergency():

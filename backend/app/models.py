@@ -66,7 +66,7 @@ class UserConfig(Base):
     interesting_record_range_km = Column(Float, nullable=False, default=50.0, server_default=text("50.0"))
     interesting_rare_sightings = Column(Integer, nullable=False, default=3, server_default=text("3"))
     interesting_absent_days = Column(Integer, nullable=False, default=30, server_default=text("30"))
-    interesting_warmup_days = Column(Integer, nullable=False, default=7, server_default=text("7"))
+    interesting_warmup_days = Column(Integer, nullable=False, default=45, server_default=text("45"))
     interesting_layout_id = Column(Integer, ForeignKey("layouts.id"), nullable=True)
     interesting_hold_sec = Column(Integer, nullable=False, default=8, server_default=text("8"))
 

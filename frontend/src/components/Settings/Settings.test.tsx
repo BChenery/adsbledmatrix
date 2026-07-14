@@ -22,7 +22,7 @@ const mockConfig: UserConfig = {
   interesting_record_range_km: 50,
   interesting_rare_sightings: 3,
   interesting_absent_days: 30,
-  interesting_warmup_days: 7,
+  interesting_warmup_days: 45,
   interesting_layout_id: null,
   interesting_hold_sec: 8,
   active_layout_id: 1,
@@ -97,6 +97,21 @@ describe('Settings', () => {
           update_available: false,
         });
       }
+      if (url === '/api/aircraft/interesting-status') {
+        return Promise.resolve({
+          enabled: true,
+          learning: true,
+          rarity_alerts_active: false,
+          warmup_days: 45,
+          warmup_hexes: 50,
+          unique_hexes: 12,
+          age_days: 5,
+          days_remaining: 40,
+          hexes_remaining: 38,
+          tracked_hexes: 12,
+          earliest_first_seen: null,
+        });
+      }
       return Promise.reject(new Error('Unknown URL'));
     });
   });
@@ -126,6 +141,20 @@ describe('Settings', () => {
           update_available: false,
         });
       }
+      if (url === '/api/aircraft/interesting-status') {
+        return Promise.resolve({
+          enabled: true,
+          learning: false,
+          rarity_alerts_active: true,
+          warmup_days: 45,
+          warmup_hexes: 50,
+          unique_hexes: 100,
+          age_days: 50,
+          days_remaining: 0,
+          hexes_remaining: 0,
+          tracked_hexes: 100,
+        });
+      }
       return Promise.reject(new Error('Unknown URL'));
     });
 
@@ -146,11 +175,32 @@ describe('Settings', () => {
           update_available: false,
         });
       }
+      if (url === '/api/aircraft/interesting-status') {
+        return Promise.resolve({
+          enabled: true,
+          learning: false,
+          rarity_alerts_active: true,
+          warmup_days: 45,
+          warmup_hexes: 50,
+          unique_hexes: 100,
+          age_days: 50,
+          days_remaining: 0,
+          hexes_remaining: 0,
+          tracked_hexes: 100,
+        });
+      }
       return Promise.reject(new Error('Unknown URL'));
     });
 
     render(<Settings />);
     expect(await screen.findByText('Focus distance')).toBeDefined();
     expect(screen.getByText('Focus layout (optional)')).toBeDefined();
+  });
+
+  it('shows learning baseline banner while interesting feature is warming up', async () => {
+    render(<Settings />);
+    expect(await screen.findByText('Learning local regulars')).toBeDefined();
+    expect(screen.getAllByText('Baseline building').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/rarity highlights stay off/i).length).toBeGreaterThan(0);
   });
 });

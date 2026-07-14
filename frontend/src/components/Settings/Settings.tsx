@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff, Loader2, CheckCircle2, XCircle, AlertCircle, Sparkles } from 'lucide-react';
+import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff, Loader2, CheckCircle2, XCircle, AlertCircle, Sparkles, Hourglass } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
@@ -55,6 +55,20 @@ export default function Settings() {
   const [checkingUpdate, setCheckingUpdate] = useState(false);
   const [updateActive, setUpdateActive] = useState(false);
   const [updateSessionStartedAt, setUpdateSessionStartedAt] = useState<string | null>(null);
+  type InterestingBaselineStatus = {
+    enabled: boolean;
+    learning: boolean;
+    rarity_alerts_active: boolean;
+    warmup_days: number;
+    warmup_hexes: number;
+    unique_hexes: number;
+    age_days: number;
+    days_remaining: number;
+    hexes_remaining: number;
+    tracked_hexes: number;
+    earliest_first_seen?: string | null;
+  };
+  const [interestingStatus, setInterestingStatus] = useState<InterestingBaselineStatus | null>(null);
   const { progress: updateProgress, unreachable: updateUnreachable } = useUpdateProgress(
     updateActive,
     updateSessionStartedAt,
@@ -74,13 +88,37 @@ export default function Settings() {
         interesting_record_range_km: raw.interesting_record_range_km ?? 50,
         interesting_rare_sightings: raw.interesting_rare_sightings ?? 3,
         interesting_absent_days: raw.interesting_absent_days ?? 30,
-        interesting_warmup_days: raw.interesting_warmup_days ?? 7,
+        interesting_warmup_days: raw.interesting_warmup_days ?? 45,
         interesting_layout_id: raw.interesting_layout_id ?? null,
         interesting_hold_sec: raw.interesting_hold_sec ?? 8,
       });
     });
     api.get<UpdateStatus>('/api/system/update').then(setUpdateStatus).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!config || config.interesting_alerts_enabled === false) {
+      setInterestingStatus(null);
+      return;
+    }
+    let cancelled = false;
+    const load = () => {
+      api
+        .get<InterestingBaselineStatus>('/api/aircraft/interesting-status')
+        .then((s) => {
+          if (!cancelled) setInterestingStatus(s);
+        })
+        .catch(() => {
+          if (!cancelled) setInterestingStatus(null);
+        });
+    };
+    load();
+    const id = window.setInterval(load, 30_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [config?.interesting_alerts_enabled, config?.interesting_warmup_days]);
 
   useEffect(() => {
     if (
@@ -235,7 +273,7 @@ export default function Settings() {
       interesting_record_range_km: Math.min(200, Math.max(1, config.interesting_record_range_km ?? 50)),
       interesting_rare_sightings: clampInt(config.interesting_rare_sightings ?? 3, 1, 20),
       interesting_absent_days: clampInt(config.interesting_absent_days ?? 30, 1, 60),
-      interesting_warmup_days: clampInt(config.interesting_warmup_days ?? 7, 0, 60),
+      interesting_warmup_days: clampInt(config.interesting_warmup_days ?? 45, 0, 90),
       interesting_hold_sec: clampInt(config.interesting_hold_sec ?? 8, 1, 120),
       // Persist the same defaults the time inputs display when modes are enabled.
       night_mode_start: config.night_mode
@@ -693,8 +731,9 @@ export default function Settings() {
                 Highlight interesting aircraft
               </Label>
               <p className="text-xs text-white/40 mt-0.5">
-                Learns regulars at your location and prioritises emergencies, first-time visitors,
-                rare visitors, and aircraft returning after a long gap. Takes priority over proximity focus.
+                Learns regulars at your location, then highlights first-time visitors, rare visitors,
+                long-absent returns, and emergencies. Takes priority over proximity focus. While
+                learning, rarity highlights stay off so the matrix does not flash yellow for every plane.
               </p>
             </div>
             <Switch
@@ -704,6 +743,99 @@ export default function Settings() {
           </div>
           {config.interesting_alerts_enabled !== false && (
             <div className="space-y-3">
+              {interestingStatus?.learning ? (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-3 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <Hourglass size={16} className="mt-0.5 shrink-0 text-amber-300/90" />
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-medium text-amber-100/95">Learning local regulars</p>
+                        <Badge variant="outline" className="border-amber-400/40 text-amber-100/90">
+                          Baseline building
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-amber-100/70 leading-relaxed">
+                        Feature stays on and keeps logging traffic. Yellow border flashes for NEW / RARE /
+                        RETURN are paused until both a day baseline and enough unique aircraft are recorded.
+                        Emergency squawks (7500 / 7600 / 7700) still highlight immediately.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px] text-amber-100/70">
+                        <span>History age</span>
+                        <span>
+                          {Math.floor(interestingStatus.age_days)} / {interestingStatus.warmup_days} days
+                        </span>
+                      </div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-black/30">
+                        <div
+                          className="h-full rounded-full bg-amber-400/80 transition-all"
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              interestingStatus.warmup_days > 0
+                                ? (interestingStatus.age_days / interestingStatus.warmup_days) * 100
+                                : 100,
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px] text-amber-100/70">
+                        <span>Unique aircraft</span>
+                        <span>
+                          {interestingStatus.unique_hexes} / {interestingStatus.warmup_hexes}
+                        </span>
+                      </div>
+                      <div className="h-1.5 overflow-hidden rounded-full bg-black/30">
+                        <div
+                          className="h-full rounded-full bg-amber-400/80 transition-all"
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              interestingStatus.warmup_hexes > 0
+                                ? (interestingStatus.unique_hexes / interestingStatus.warmup_hexes) * 100
+                                : 100,
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {(interestingStatus.days_remaining > 0 || interestingStatus.hexes_remaining > 0) && (
+                    <p className="text-[11px] text-amber-100/55">
+                      About {Math.ceil(interestingStatus.days_remaining)} day
+                      {Math.ceil(interestingStatus.days_remaining) === 1 ? '' : 's'}
+                      {interestingStatus.hexes_remaining > 0
+                        ? ` and ${interestingStatus.hexes_remaining} more unique aircraft`
+                        : ''}{' '}
+                      until rarity highlights activate.
+                    </p>
+                  )}
+                </div>
+              ) : interestingStatus && !interestingStatus.learning ? (
+                <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 py-2.5">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-300/90" />
+                    <div className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-medium text-emerald-100/95">Baseline ready</p>
+                        <Badge variant="outline" className="border-emerald-400/40 text-emerald-100/90">
+                          Rarity active
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-emerald-100/65">
+                        Tracking {interestingStatus.unique_hexes} unique aircraft over{' '}
+                        {Math.floor(interestingStatus.age_days)} days. First-time, rare, and returning
+                        aircraft can flash amber; emergencies flash red.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
               <FormGrid>
                 <div className="space-y-2">
                   <Label>Record range</Label>
@@ -724,6 +856,23 @@ export default function Settings() {
                     <span className="text-sm text-white/60">{distanceUnit}</span>
                   </div>
                   <p className="text-xs text-white/40">Only log aircraft within this distance (60-day history, one row per plane).</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Learn for</Label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={90}
+                      value={clampInt(config.interesting_warmup_days ?? 45, 0, 90)}
+                      onChange={(e) => update('interesting_warmup_days', clampInt(parseInt(e.target.value || '45', 10), 0, 90))}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-white/60">days</span>
+                  </div>
+                  <p className="text-xs text-white/40">
+                    Days of local history before NEW/RARE/RETURN yellow flashes activate (also needs ~50 unique aircraft). Default 45.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label>Rare if fewer than</Label>
@@ -776,7 +925,8 @@ export default function Settings() {
                       Interesting layout (optional)
                     </Label>
                     <p className="text-xs text-white/40 mt-0.5">
-                      Used while highlighting an interesting aircraft. Leave unset to keep the current layout (border flash still applies).
+                      Used while highlighting an interesting aircraft after the baseline is ready (or for emergencies).
+                      Leave unset to keep the current layout; border flash still applies when alerts fire.
                     </p>
                   </div>
                   {interestingLayout && (

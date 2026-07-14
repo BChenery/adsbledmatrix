@@ -123,7 +123,7 @@ async def migrate_db():
                 ("interesting_record_range_km", "FLOAT NOT NULL DEFAULT 50.0"),
                 ("interesting_rare_sightings", "INTEGER NOT NULL DEFAULT 3"),
                 ("interesting_absent_days", "INTEGER NOT NULL DEFAULT 30"),
-                ("interesting_warmup_days", "INTEGER NOT NULL DEFAULT 7"),
+                ("interesting_warmup_days", "INTEGER NOT NULL DEFAULT 45"),
                 ("interesting_layout_id", "INTEGER"),
                 ("interesting_hold_sec", "INTEGER NOT NULL DEFAULT 8"),
             ]
@@ -132,6 +132,18 @@ async def migrate_db():
                     sync_conn.execute(
                         text(f"ALTER TABLE user_config ADD COLUMN {col_name} {col_type}")
                     )
+
+            # Old default (7) ended warmup far too soon → every plane looked "new".
+            # Bump only rows still on the previous default so custom values stay.
+            try:
+                sync_conn.execute(
+                    text(
+                        "UPDATE user_config SET interesting_warmup_days = 45 "
+                        "WHERE interesting_warmup_days = 7"
+                    )
+                )
+            except Exception:
+                pass
 
             # Seen aircraft history columns (table may already exist without new fields)
             result = sync_conn.execute(

@@ -313,6 +313,29 @@ class SightingHistoryService:
             "record_range_km": self._record_range_km,
         }
 
+    def interesting_status(
+        self,
+        *,
+        warmup_days: int = 45,
+        warmup_hexes: int = 50,
+        enabled: bool = True,
+    ) -> dict:
+        """Learning progress + tracking stats for Settings UI."""
+        from app.services.aircraft_interest import warmup_status
+
+        status = warmup_status(
+            self._baseline,
+            warmup_days=warmup_days,
+            warmup_hexes=warmup_hexes,
+        )
+        payload = status.as_dict()
+        payload["enabled"] = bool(enabled)
+        payload["tracked_hexes"] = len(self._cache)
+        payload["record_range_km"] = self._record_range_km
+        # Rarity/NEW/RETURN only apply after learning; emergencies always can.
+        payload["rarity_alerts_active"] = bool(enabled) and not status.learning
+        return payload
+
 
 # Process-wide singleton used by lifespan + display engine.
 sighting_history = SightingHistoryService()

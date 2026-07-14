@@ -33,7 +33,7 @@ class ConfigResponse(BaseModel):
     interesting_record_range_km: float = 50.0
     interesting_rare_sightings: int = 3
     interesting_absent_days: int = 30
-    interesting_warmup_days: int = 7
+    interesting_warmup_days: int = 45
     interesting_layout_id: Optional[int] = None
     interesting_hold_sec: int = 8
     active_layout_id: Optional[int]
@@ -184,8 +184,8 @@ class ConfigUpdate(BaseModel):
     @field_validator("interesting_warmup_days")
     @classmethod
     def validate_interesting_warmup_days(cls, v):
-        if v is not None and not (0 <= v <= 60):
-            raise ValueError("interesting_warmup_days must be between 0 and 60")
+        if v is not None and not (0 <= v <= 90):
+            raise ValueError("interesting_warmup_days must be between 0 and 90")
         return v
 
     @field_validator("interesting_hold_sec")

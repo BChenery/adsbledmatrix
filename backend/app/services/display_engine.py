@@ -249,7 +249,7 @@ class DisplayEngine:
                 getattr(user_config, "interesting_absent_days", 30) if user_config else 30
             )
             warmup_days = int(
-                getattr(user_config, "interesting_warmup_days", 7) if user_config else 7
+                getattr(user_config, "interesting_warmup_days", 45) if user_config else 45
             )
 
             interest_by_hex: Dict[str, Any] = {}

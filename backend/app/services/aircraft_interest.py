@@ -16,7 +16,9 @@ SCORE_RARE = 200.0
 
 DEFAULT_RARE_SIGHTINGS = 3
 DEFAULT_ABSENT_DAYS = 30
-DEFAULT_WARMUP_DAYS = 7
+# Baseline must age in before NEW/RARE/RETURN fire — otherwise every unfamiliar
+# hex looks "special" and the matrix flashes yellow constantly.
+DEFAULT_WARMUP_DAYS = 45
 DEFAULT_WARMUP_HEXES = 50
 
 
@@ -49,6 +51,34 @@ class SiteBaseline:
     unique_hexes: int = 0
 
 
+@dataclass(frozen=True)
+class WarmupStatus:
+    """Progress toward a usable local regularity baseline."""
+
+    learning: bool
+    warmup_days: int
+    warmup_hexes: int
+    unique_hexes: int
+    age_days: float
+    days_remaining: float
+    hexes_remaining: int
+    earliest_first_seen: Optional[datetime] = None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "learning": self.learning,
+            "warmup_days": self.warmup_days,
+            "warmup_hexes": self.warmup_hexes,
+            "unique_hexes": self.unique_hexes,
+            "age_days": round(self.age_days, 2),
+            "days_remaining": round(self.days_remaining, 2),
+            "hexes_remaining": self.hexes_remaining,
+            "earliest_first_seen": (
+                self.earliest_first_seen.isoformat() if self.earliest_first_seen else None
+            ),
+        }
+
+
 def is_emergency_squawk(squawk: Optional[str]) -> bool:
     if not squawk:
         return False
@@ -62,25 +92,62 @@ def is_warmup(
     warmup_days: int = DEFAULT_WARMUP_DAYS,
     warmup_hexes: int = DEFAULT_WARMUP_HEXES,
 ) -> bool:
-    """True until either enough unique hexes or enough calendar age.
+    """True until both calendar age and unique-hex sample size are met.
 
-    Warmup ends when ``unique_hexes >= warmup_hexes`` **or**
-    ``age >= warmup_days`` (whichever comes first). Empty sites stay warm.
+    Learned alerts (NEW / RARE / RETURN) stay off while learning. Emergencies
+    still score during warmup. Empty sites stay learning.
     """
     now = now or datetime.utcnow()
     hex_target = max(1, int(warmup_hexes))
     day_target = max(0, int(warmup_days))
 
-    if baseline.unique_hexes >= hex_target:
-        return False
-    if baseline.earliest_first_seen is not None:
-        age = now - baseline.earliest_first_seen
-        if age >= timedelta(days=day_target):
-            return False
-    # No history yet, or still below both thresholds.
     if baseline.unique_hexes == 0 and baseline.earliest_first_seen is None:
         return True
-    return True
+
+    age_ok = False
+    if day_target == 0:
+        age_ok = True
+    elif baseline.earliest_first_seen is not None:
+        age = now - baseline.earliest_first_seen
+        age_ok = age >= timedelta(days=day_target)
+
+    hexes_ok = baseline.unique_hexes >= hex_target
+    return not (age_ok and hexes_ok)
+
+
+def warmup_status(
+    baseline: SiteBaseline,
+    *,
+    now: Optional[datetime] = None,
+    warmup_days: int = DEFAULT_WARMUP_DAYS,
+    warmup_hexes: int = DEFAULT_WARMUP_HEXES,
+) -> WarmupStatus:
+    """Return learning progress for UI/API."""
+    now = now or datetime.utcnow()
+    day_target = max(0, int(warmup_days))
+    hex_target = max(1, int(warmup_hexes))
+    unique = int(baseline.unique_hexes or 0)
+
+    if baseline.earliest_first_seen is not None:
+        age_days = max(0.0, (now - baseline.earliest_first_seen).total_seconds() / 86400.0)
+    else:
+        age_days = 0.0
+
+    return WarmupStatus(
+        learning=is_warmup(
+            baseline,
+            now=now,
+            warmup_days=day_target,
+            warmup_hexes=hex_target,
+        ),
+        warmup_days=day_target,
+        warmup_hexes=hex_target,
+        unique_hexes=unique,
+        age_days=age_days,
+        days_remaining=max(0.0, float(day_target) - age_days),
+        hexes_remaining=max(0, hex_target - unique),
+        earliest_first_seen=baseline.earliest_first_seen,
+    )
 
 
 def score_aircraft(

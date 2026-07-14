@@ -98,6 +98,29 @@ async def get_closest_aircraft():
     )
 
 
+@router.get("/interesting-status")
+async def get_interesting_status():
+    """Baseline learning progress for interesting-aircraft highlights."""
+    from app.api.config import get_user_config_sync
+    from app.services.aircraft_interest import DEFAULT_WARMUP_DAYS, DEFAULT_WARMUP_HEXES
+    from app.services.sighting_history import sighting_history
+
+    config = get_user_config_sync()
+    enabled = True if config is None else bool(
+        getattr(config, "interesting_alerts_enabled", True)
+    )
+    warmup_days = (
+        int(getattr(config, "interesting_warmup_days", DEFAULT_WARMUP_DAYS))
+        if config is not None
+        else DEFAULT_WARMUP_DAYS
+    )
+    return sighting_history.interesting_status(
+        warmup_days=warmup_days,
+        warmup_hexes=DEFAULT_WARMUP_HEXES,
+        enabled=enabled,
+    )
+
+
 @router.get("/logo/{icao}")
 async def get_airline_logo(icao: str):
     """Serve the airline logo PNG for an ICAO/IATA code, applying overrides."""
