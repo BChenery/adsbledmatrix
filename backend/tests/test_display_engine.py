@@ -484,3 +484,77 @@ def test_draw_image_thresholds_alpha_fringe(engine, tmp_path):
 
     red_pixels = [px for px in img.getdata() if px == (255, 0, 0)]
     assert not red_pixels, "Expected semi-transparent red fringe to be removed"
+
+
+def test_set_preview_layout_stores_and_clears(engine):
+    """Designer apply/clear should toggle the preview override without touching saved layouts."""
+    from types import SimpleNamespace
+
+    assert engine.get_preview_layout() is None
+
+    preview = SimpleNamespace(
+        name="draft",
+        width=256,
+        height=128,
+        elements=[],
+    )
+    engine.set_preview_layout(preview)
+    assert engine.get_preview_layout() is preview
+
+    engine.set_preview_layout(None)
+    assert engine.get_preview_layout() is None
+
+
+def test_preview_layout_used_when_rendering_idle(engine):
+    """An applied draft should render even when the engine would otherwise use idle layout."""
+    from types import SimpleNamespace
+    from app.services.display_engine import RenderContext
+
+    saved = SimpleNamespace(
+        name="saved",
+        width=64,
+        height=32,
+        elements=[
+            SimpleNamespace(
+                element_type="text",
+                x=0,
+                y=0,
+                width=64,
+                height=32,
+                z_index=0,
+                format_str="SAVED",
+                color="#ffffff",
+                bg_color=None,
+                font_family=None,
+                font_size=12,
+            )
+        ],
+    )
+    draft = SimpleNamespace(
+        name="draft",
+        width=64,
+        height=32,
+        elements=[
+            SimpleNamespace(
+                element_type="text",
+                x=0,
+                y=0,
+                width=64,
+                height=32,
+                z_index=0,
+                format_str="DRAFT",
+                color="#ffffff",
+                bg_color=None,
+                font_family=None,
+                font_size=12,
+            )
+        ],
+    )
+    engine.set_layout(saved, idle_layout=saved)
+    engine.set_preview_layout(draft)
+
+    layout = engine.get_preview_layout() or engine._idle_layout or engine._current_layout
+    img = engine._render_layout(layout, RenderContext(is_idle=True))
+    assert img is not None
+    # Draft text should produce non-black pixels.
+    assert any(px != (0, 0, 0) for px in img.getdata())

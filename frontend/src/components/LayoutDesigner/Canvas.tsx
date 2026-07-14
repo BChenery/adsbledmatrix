@@ -127,9 +127,24 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
       }
 
       if (text) {
+        // Match the LED engine: hard-clip to the element box. Long text is
+        // left-aligned and cropped (not horizontally squeezed via maxWidth).
+        const fontSize = el.font_size || 12;
         const metrics = ctx.measureText(text);
-        const textX = x + Math.max(0, (w - metrics.width) / 2);
-        ctx.fillText(text, textX, y + 4, w - 8);
+        const textWidth = metrics.width;
+        const textX =
+          textWidth > w ? x : x + Math.max(0, (w - textWidth) / 2);
+        const textHeight =
+          (metrics.actualBoundingBoxAscent || 0) +
+            (metrics.actualBoundingBoxDescent || 0) || fontSize;
+        const textY = y + Math.max(0, (fontSize - textHeight) / 2);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x, y, w, h);
+        ctx.clip();
+        ctx.fillText(text, textX, textY);
+        ctx.restore();
       }
 
       // Shape preview
@@ -248,6 +263,11 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         const showHeader = (extra.show_header as boolean) ?? true;
         const listAircraft = aircraft.slice(0, maxRows);
 
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(x, y, w, h);
+        ctx.clip();
+
         ctx.fillStyle = el.color || '#ffffff';
         ctx.font = `${Math.max(10, (el.font_size || 12))}px monospace`;
         ctx.textBaseline = 'top';
@@ -257,7 +277,7 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         if (showHeader) {
           ctx.fillStyle = el.color || '#ffaa00';
           const headerText = columns.map((c) => c.toUpperCase()).join('  ');
-          ctx.fillText(headerText, x + 4, rowY, w - 8);
+          ctx.fillText(headerText, x + 4, rowY);
           rowY += rowHeight;
           ctx.strokeStyle = '#333333';
           ctx.beginPath();
@@ -274,15 +294,17 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
               const val = ac[col as keyof Aircraft];
               return val !== undefined && val !== null ? String(val) : '---';
             }).join('  ');
-            ctx.fillText(rowText, x + 4, rowY, w - 8);
+            ctx.fillText(rowText, x + 4, rowY);
           } else {
             ctx.fillStyle = '#333333';
-            ctx.fillText('─'.repeat(Math.floor((w - 8) / 8)), x + 4, rowY, w - 8);
+            ctx.fillText('─'.repeat(Math.floor((w - 8) / 8)), x + 4, rowY);
             ctx.fillStyle = el.color || '#ffffff';
           }
           rowY += rowHeight;
           if (rowY > y + h) break;
         }
+
+        ctx.restore();
       }
 
       // Faint bounding box on every element so overlaps are visible in the

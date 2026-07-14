@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut, Monitor, Moon, Eye, Trash2 } from 'lucide-react';
+import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut, Monitor, Moon, Eye, Trash2, Play } from 'lucide-react';
 
 interface ToolbarProps {
   layouts: Layout[];
@@ -18,7 +18,12 @@ interface ToolbarProps {
   config: UserConfig | null;
   onSelectLayout: (layout: Layout | null) => void;
   onNew: () => void;
+  onApply: () => void;
   onSave: () => void;
+  isDirty?: boolean;
+  isApplied?: boolean;
+  isApplying?: boolean;
+  isSaving?: boolean;
   onDelete?: () => void;
   canDelete?: boolean;
   useMockData: boolean;
@@ -42,7 +47,12 @@ export default function Toolbar({
   config,
   onSelectLayout,
   onNew,
+  onApply,
   onSave,
+  isDirty = false,
+  isApplied = false,
+  isApplying = false,
+  isSaving = false,
   onDelete,
   canDelete = false,
   useMockData,
@@ -117,10 +127,40 @@ export default function Toolbar({
         </Button>
 
         {activeLayout && (
-          <Button onClick={onSave} size="sm" className="gap-2 shrink-0">
-            <Save size={14} />
-            <span className="hidden xs:inline sm:inline">Save</span>
-          </Button>
+          <>
+            <Button
+              variant="secondary"
+              onClick={onApply}
+              disabled={isApplying}
+              size="sm"
+              className="gap-2 shrink-0"
+              title="Show this draft on the LED matrix without saving"
+            >
+              <Play size={14} />
+              <span className="hidden xs:inline sm:inline">Apply</span>
+            </Button>
+            <Button
+              onClick={onSave}
+              disabled={isSaving}
+              size="sm"
+              className="gap-2 shrink-0"
+              title="Save layout permanently"
+            >
+              <Save size={14} />
+              <span className="hidden xs:inline sm:inline">Save</span>
+            </Button>
+          </>
+        )}
+
+        {isDirty && (
+          <Badge variant="secondary" className="hidden shrink-0 gap-1 text-led-amber sm:inline-flex">
+            Unsaved
+          </Badge>
+        )}
+        {isApplied && (
+          <Badge variant="secondary" className="hidden shrink-0 gap-1 text-led-accent sm:inline-flex">
+            Applied
+          </Badge>
         )}
 
         {activeLayout?.id && onDelete && (

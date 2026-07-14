@@ -70,6 +70,7 @@ class DisplayEngine:
         self._interesting_hex: Optional[str] = None
         self._interesting_since: Optional[datetime] = None
         self._layout_rotation_enabled = False
+        self._preview_layout: Optional[Any] = None
         self._test_color: Optional[Tuple[int, int, int]] = None
         self._brightness = settings.led_matrix_brightness
         self._night_mode_active = False
@@ -115,6 +116,17 @@ class DisplayEngine:
         self._layout_rotation_enabled = bool(rotation_enabled)
         if self._layout_index and self._playlist_layouts:
             self._layout_index %= max(1, len(self._playlist_layouts))
+
+    def set_preview_layout(self, layout: Optional[Any]) -> None:
+        """Temporarily force a designer draft onto the matrix without DB save.
+
+        When set, this layout is used for every frame (idle and aircraft) until
+        cleared. Idle/focus/playlist configuration is left intact.
+        """
+        self._preview_layout = layout
+
+    def get_preview_layout(self) -> Optional[Any]:
+        return self._preview_layout
 
     async def _render_loop(self):
         while self._running:
@@ -218,7 +230,7 @@ class DisplayEngine:
             self._proximity_focused = False
             self._interesting_hex = None
             self._interesting_since = None
-            layout = self._idle_layout or self._current_layout
+            layout = self._preview_layout or self._idle_layout or self._current_layout
             ctx = RenderContext(
                 aircraft=None,
                 enriched=None,
@@ -316,7 +328,7 @@ class DisplayEngine:
             if aircraft is None:
                 return
 
-            layout = self._resolve_aircraft_layout(
+            layout = self._preview_layout or self._resolve_aircraft_layout(
                 user_config,
                 selection.focused,
                 interesting=selection.interesting,

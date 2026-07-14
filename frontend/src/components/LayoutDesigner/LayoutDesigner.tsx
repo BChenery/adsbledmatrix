@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { useLayouts } from '@/hooks/useLayout';
 import { useAircraft } from '@/hooks/useAircraft';
 import { useDisplayDiagnostics } from '@/hooks/useDisplayDiagnostics';
@@ -38,11 +38,60 @@ const ELEMENT_TEMPLATES: Record<string, Partial<LayoutElement>> = Object.fromEnt
   ALL_PRESETS.map((p) => [p.key, p.template])
 );
 
+/** Stable snapshot of the fields that count as "saved content" for dirty checks. */
+function layoutSnapshot(layout: Layout | null): string {
+  if (!layout) return '';
+  return JSON.stringify({
+    name: layout.name,
+    description: layout.description ?? null,
+    width: layout.width,
+    height: layout.height,
+    elements: layout.elements,
+  });
+}
+
+function applyPayload(layout: Layout) {
+  return {
+    name: layout.name,
+    width: layout.width,
+    height: layout.height,
+    elements: layout.elements.map((el) => ({
+      element_type: el.element_type,
+      x: el.x,
+      y: el.y,
+      width: el.width,
+      height: el.height,
+      z_index: el.z_index ?? 0,
+      font_family: el.font_family,
+      font_size: el.font_size,
+      color: el.color,
+      bg_color: el.bg_color,
+      format_str: el.format_str,
+      data_field: el.data_field,
+      image_path: el.image_path,
+      image_url: el.image_url,
+      show_if: el.show_if,
+      extra: el.extra,
+      range_km: el.range_km,
+      ring_color: el.ring_color,
+      dot_color: el.dot_color,
+      user_dot_color: el.user_dot_color,
+      show_rings: el.show_rings,
+      show_ticks: el.show_ticks,
+      use_plane_symbol: el.use_plane_symbol,
+    })),
+  };
+}
+
 export default function LayoutDesigner() {
   const { layouts, loading, create, update, remove } = useLayouts();
   const aircraft = useAircraft();
   const diagnostics = useDisplayDiagnostics();
   const [activeLayout, setActiveLayout] = useState<Layout | null>(null);
+  const [savedSnapshot, setSavedSnapshot] = useState('');
+  const [isApplied, setIsApplied] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [selectedElement, setSelectedElement] = useState<LayoutElement | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -56,8 +105,33 @@ export default function LayoutDesigner() {
   const [mobilePanel, setMobilePanel] = useState<'palette' | 'props' | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  const isDirty = useMemo(
+    () => !!activeLayout && layoutSnapshot(activeLayout) !== savedSnapshot,
+    [activeLayout, savedSnapshot],
+  );
+
+  const clearPreviewOverride = useCallback(async () => {
+    try {
+      await api.post('/api/display/clear-apply');
+    } catch {
+      // Best-effort: matrix may already be cleared or offline.
+    }
+    setIsApplied(false);
+  }, []);
+
+  const markSaved = useCallback((layout: Layout) => {
+    setSavedSnapshot(layoutSnapshot(layout));
+  }, []);
+
   useEffect(() => {
     api.get<UserConfig>('/api/config').then(setConfig);
+  }, []);
+
+  // Leaving the designer should restore the saved active layout on the matrix.
+  useEffect(() => {
+    return () => {
+      void api.post('/api/display/clear-apply').catch(() => undefined);
+    };
   }, []);
 
   const refreshConfig = async () => {
@@ -115,8 +189,23 @@ export default function LayoutDesigner() {
   const errorMessage = (err: unknown, fallback: string) =>
     err instanceof Error ? err.message : fallback;
 
+  const handleApply = async () => {
+    if (!activeLayout) return;
+    setIsApplying(true);
+    try {
+      await api.post('/api/display/apply-layout', applyPayload(activeLayout));
+      setIsApplied(true);
+      toast.success('Applied to LED matrix (not saved)');
+    } catch (err: unknown) {
+      toast.error(`Apply failed: ${errorMessage(err, 'Apply failed')}`);
+    } finally {
+      setIsApplying(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!activeLayout) return;
+    setIsSaving(true);
     try {
       if (activeLayout.id) {
         const updated = await update(activeLayout.id, {
@@ -128,25 +217,33 @@ export default function LayoutDesigner() {
         });
         setActiveLayout(updated);
         setSelectedElement(null);
+        markSaved(updated);
+        await clearPreviewOverride();
         toast.success('Layout saved');
       } else {
         const created = await create(activeLayout);
         setActiveLayout(created);
+        markSaved(created);
+        await clearPreviewOverride();
         toast.success('Layout created');
       }
     } catch (err: unknown) {
       toast.error(`Save failed: ${errorMessage(err, 'Save failed')}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleCreateNew = async () => {
     setIsCreating(true);
     try {
+      await clearPreviewOverride();
       const created = await create({
         ...DEFAULT_LAYOUT,
         name: normalizeLayoutName(newLayoutName, DEFAULT_LAYOUT.name),
       });
       setActiveLayout(created);
+      markSaved(created);
       setSelectedElement(null);
       setShowNewModal(false);
       setNewLayoutName('');
@@ -167,6 +264,17 @@ export default function LayoutDesigner() {
       setActiveLayout((prev) =>
         prev ? { ...prev, name: updated.name, updated_at: updated.updated_at } : updated,
       );
+      // Keep dirty tracking in sync for the renamed name only.
+      setSavedSnapshot((prev) => {
+        if (!prev) return prev;
+        try {
+          const snap = JSON.parse(prev) as { name?: string };
+          snap.name = updated.name;
+          return JSON.stringify(snap);
+        } catch {
+          return prev;
+        }
+      });
       toast.success('Layout renamed');
     } catch (err: unknown) {
       toast.error(`Rename failed: ${errorMessage(err, 'Rename failed')}`);
@@ -182,6 +290,7 @@ export default function LayoutDesigner() {
     const deletedId = activeLayout.id;
     const deletedName = activeLayout.name;
     try {
+      await clearPreviewOverride();
       await remove(deletedId);
       const next =
         layouts.find((l) => l.id !== deletedId && l.is_default) ||
@@ -190,8 +299,10 @@ export default function LayoutDesigner() {
       if (next?.id) {
         const full = await api.get<Layout>(`/api/layouts/${next.id}`);
         setActiveLayout(full);
+        markSaved(full);
       } else {
         setActiveLayout(null);
+        setSavedSnapshot('');
       }
       setSelectedElement(null);
       setShowDeleteModal(false);
@@ -205,13 +316,16 @@ export default function LayoutDesigner() {
   };
 
   const handleSelectLayout = async (layout: Layout | null) => {
+    await clearPreviewOverride();
     if (!layout || !layout.id) {
       setActiveLayout(layout);
+      setSavedSnapshot(layoutSnapshot(layout));
       setSelectedElement(null);
       return;
     }
     const full = await api.get<Layout>(`/api/layouts/${layout.id}`);
     setActiveLayout(full);
+    markSaved(full);
     setSelectedElement(null);
   };
 
@@ -231,7 +345,12 @@ export default function LayoutDesigner() {
         config={config}
         onSelectLayout={handleSelectLayout}
         onNew={() => setShowNewModal(true)}
+        onApply={handleApply}
         onSave={handleSave}
+        isDirty={isDirty}
+        isApplied={isApplied}
+        isApplying={isApplying}
+        isSaving={isSaving}
         onDelete={() => setShowDeleteModal(true)}
         canDelete={canDeleteLayout}
         useMockData={useMockData}
