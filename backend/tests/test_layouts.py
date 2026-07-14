@@ -161,6 +161,65 @@ async def test_rename_and_description_persist(app, db_session, monkeypatch):
     assert body["description"] == "Custom night display"
 
 
+@pytest.mark.asyncio
+async def test_delete_last_layout_rejected(app, db_session):
+    """The last remaining layout cannot be deleted."""
+    result = await db_session.execute(select(Layout))
+    layout = result.scalar_one()
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.delete(f"/api/layouts/{layout.id}")
+
+    assert response.status_code == 400
+    assert "last remaining layout" in response.json()["detail"]
+
+    still = await db_session.execute(select(Layout).where(Layout.id == layout.id))
+    assert still.scalar_one_or_none() is not None
+
+
+@pytest.mark.asyncio
+async def test_delete_layout_reassigns_config_refs(app, db_session, monkeypatch):
+    """Deleting an in-use layout reassigns active/idle/focus and removes it from the playlist."""
+    calls = []
+
+    async def fake_apply(config, session=None):
+        calls.append(config.active_layout_id)
+
+    monkeypatch.setattr("app.services.layout_loader.apply_engine_layouts", fake_apply)
+
+    keep = Layout(name="Keep Me", width=256, height=128, is_default=True)
+    doomed = Layout(name="Doomed", width=256, height=128)
+    db_session.add_all([keep, doomed])
+    await db_session.commit()
+    await db_session.refresh(keep)
+    await db_session.refresh(doomed)
+
+    config_result = await db_session.execute(select(UserConfig).where(UserConfig.id == 1))
+    config = config_result.scalar_one()
+    config.active_layout_id = doomed.id
+    config.idle_layout_id = doomed.id
+    config.proximity_focus_layout_id = doomed.id
+    config.layout_playlist_ids = [doomed.id, keep.id]
+    config.layout_rotation_enabled = True
+    await db_session.commit()
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.delete(f"/api/layouts/{doomed.id}")
+
+    assert response.status_code == 204
+
+    await db_session.refresh(config)
+    assert config.active_layout_id == keep.id
+    assert config.idle_layout_id == keep.id
+    assert config.proximity_focus_layout_id == keep.id
+    assert doomed.id not in (config.layout_playlist_ids or [])
+    assert keep.id in (config.layout_playlist_ids or [])
+    assert len(calls) == 1
+
+    gone = await db_session.execute(select(Layout).where(Layout.id == doomed.id))
+    assert gone.scalar_one_or_none() is None
+
+
 def test_default_layouts_validate():
     """All layouts shipped in data/default_layouts.json must pass the design-system validator."""
     errors = validate()

@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut, Monitor, Moon, Eye } from 'lucide-react';
+import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut, Monitor, Moon, Eye, Trash2 } from 'lucide-react';
 
 interface ToolbarProps {
   layouts: Layout[];
@@ -19,6 +19,8 @@ interface ToolbarProps {
   onSelectLayout: (layout: Layout | null) => void;
   onNew: () => void;
   onSave: () => void;
+  onDelete?: () => void;
+  canDelete?: boolean;
   useMockData: boolean;
   onToggleMockData: () => void;
   zoom: number;
@@ -41,6 +43,8 @@ export default function Toolbar({
   onSelectLayout,
   onNew,
   onSave,
+  onDelete,
+  canDelete = false,
   useMockData,
   onToggleMockData,
   zoom,
@@ -116,6 +120,24 @@ export default function Toolbar({
           <Button onClick={onSave} size="sm" className="gap-2 shrink-0">
             <Save size={14} />
             <span className="hidden xs:inline sm:inline">Save</span>
+          </Button>
+        )}
+
+        {activeLayout?.id && onDelete && (
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={onDelete}
+            disabled={!canDelete}
+            className="h-9 w-9 shrink-0 text-red-400 hover:bg-red-500/15 hover:text-red-300 disabled:opacity-40"
+            title={
+              canDelete
+                ? 'Delete this layout'
+                : 'At least one layout must remain'
+            }
+            aria-label={canDelete ? 'Delete layout' : 'Cannot delete last layout'}
+          >
+            <Trash2 size={16} />
           </Button>
         )}
       </div>

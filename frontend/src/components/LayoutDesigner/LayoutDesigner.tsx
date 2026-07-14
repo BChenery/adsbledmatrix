@@ -39,14 +39,16 @@ const ELEMENT_TEMPLATES: Record<string, Partial<LayoutElement>> = Object.fromEnt
 );
 
 export default function LayoutDesigner() {
-  const { layouts, loading, create, update } = useLayouts();
+  const { layouts, loading, create, update, remove } = useLayouts();
   const aircraft = useAircraft();
   const diagnostics = useDisplayDiagnostics();
   const [activeLayout, setActiveLayout] = useState<Layout | null>(null);
   const [selectedElement, setSelectedElement] = useState<LayoutElement | null>(null);
   const [showNewModal, setShowNewModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newLayoutName, setNewLayoutName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [useMockData, setUseMockData] = useState(false);
   const [panelPreview, setPanelPreview] = useState(false);
   const [zoom, setZoom] = useState(3);
@@ -172,6 +174,36 @@ export default function LayoutDesigner() {
     }
   };
 
+  const canDeleteLayout = !!activeLayout?.id && layouts.length > 1;
+
+  const handleDeleteLayout = async () => {
+    if (!activeLayout?.id || !canDeleteLayout) return;
+    setIsDeleting(true);
+    const deletedId = activeLayout.id;
+    const deletedName = activeLayout.name;
+    try {
+      await remove(deletedId);
+      const next =
+        layouts.find((l) => l.id !== deletedId && l.is_default) ||
+        layouts.find((l) => l.id !== deletedId) ||
+        null;
+      if (next?.id) {
+        const full = await api.get<Layout>(`/api/layouts/${next.id}`);
+        setActiveLayout(full);
+      } else {
+        setActiveLayout(null);
+      }
+      setSelectedElement(null);
+      setShowDeleteModal(false);
+      await refreshConfig();
+      toast.success(`Deleted “${deletedName}”`);
+    } catch (err: unknown) {
+      toast.error(`Delete failed: ${errorMessage(err, 'Delete failed')}`);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleSelectLayout = async (layout: Layout | null) => {
     if (!layout || !layout.id) {
       setActiveLayout(layout);
@@ -200,6 +232,8 @@ export default function LayoutDesigner() {
         onSelectLayout={handleSelectLayout}
         onNew={() => setShowNewModal(true)}
         onSave={handleSave}
+        onDelete={() => setShowDeleteModal(true)}
+        canDelete={canDeleteLayout}
         useMockData={useMockData}
         onToggleMockData={() => setUseMockData((v) => !v)}
         zoom={zoom}
@@ -243,6 +277,36 @@ export default function LayoutDesigner() {
             <Button onClick={handleCreateNew} disabled={isCreating} className="flex-1 gap-2">
               <Plus size={16} />
               Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete layout?</DialogTitle>
+            <DialogDescription>
+              {activeLayout
+                ? `“${activeLayout.name}” will be permanently removed. If it was active, idle, or in a playlist, those roles switch to another layout automatically. At least one layout is always kept.`
+                : 'This layout will be permanently removed.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => setShowDeleteModal(false)}
+              disabled={isDeleting}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteLayout}
+              disabled={isDeleting || !canDeleteLayout}
+              className="flex-1 gap-2 bg-red-600 text-white hover:bg-red-500"
+            >
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>

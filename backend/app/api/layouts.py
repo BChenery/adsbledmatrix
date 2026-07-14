@@ -178,8 +178,51 @@ async def delete_layout(layout_id: int, session: AsyncSession = Depends(get_db))
     layout = result.scalar_one_or_none()
     if not layout:
         raise HTTPException(status_code=404, detail="Layout not found")
+
+    # Always keep at least one layout so the display and designer have a fallback.
+    count_result = await session.execute(select(Layout))
+    all_layouts = list(count_result.scalars().all())
+    if len(all_layouts) <= 1:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot delete the last remaining layout",
+        )
+
+    fallback = next(
+        (l for l in all_layouts if l.id != layout_id and l.is_default),
+        None,
+    )
+    if fallback is None:
+        fallback = next(l for l in all_layouts if l.id != layout_id)
+
+    config_result = await session.execute(select(UserConfig).where(UserConfig.id == 1))
+    config = config_result.scalar_one_or_none()
+    needs_engine_refresh = False
+    if config:
+        if config.active_layout_id == layout_id:
+            config.active_layout_id = fallback.id
+            needs_engine_refresh = True
+        if config.idle_layout_id == layout_id:
+            config.idle_layout_id = fallback.id
+            needs_engine_refresh = True
+        if config.proximity_focus_layout_id == layout_id:
+            config.proximity_focus_layout_id = fallback.id
+            needs_engine_refresh = True
+        playlist = list(config.layout_playlist_ids or [])
+        if layout_id in playlist:
+            playlist = [pid for pid in playlist if pid != layout_id]
+            if not playlist and config.layout_rotation_enabled:
+                playlist = [fallback.id]
+            config.layout_playlist_ids = playlist
+            needs_engine_refresh = True
+
     await session.delete(layout)
     await session.commit()
+
+    if config and needs_engine_refresh:
+        from app.services.layout_loader import apply_engine_layouts
+
+        await apply_engine_layouts(config, session)
 
 
 @router.post("/{layout_id}/elements", response_model=ElementResponse, status_code=201)
