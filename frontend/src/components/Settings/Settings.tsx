@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff, Loader2, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff, Loader2, CheckCircle2, XCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
 import { useDisplayPreview } from '@/hooks/useDisplayPreview';
@@ -70,6 +70,13 @@ export default function Settings() {
         layout_rotation_enabled: raw.layout_rotation_enabled ?? false,
         layout_playlist_ids: raw.layout_playlist_ids ?? [],
         layout_rotation_interval_sec: raw.layout_rotation_interval_sec ?? 30,
+        interesting_alerts_enabled: raw.interesting_alerts_enabled ?? true,
+        interesting_record_range_km: raw.interesting_record_range_km ?? 50,
+        interesting_rare_sightings: raw.interesting_rare_sightings ?? 3,
+        interesting_absent_days: raw.interesting_absent_days ?? 30,
+        interesting_warmup_days: raw.interesting_warmup_days ?? 7,
+        interesting_layout_id: raw.interesting_layout_id ?? null,
+        interesting_hold_sec: raw.interesting_hold_sec ?? 8,
       });
     });
     api.get<UpdateStatus>('/api/system/update').then(setUpdateStatus).catch(() => {});
@@ -225,6 +232,11 @@ export default function Settings() {
       proximity_focus_km: Math.min(50, Math.max(0.1, config.proximity_focus_km ?? 3)),
       layout_rotation_interval_sec: clampInt(config.layout_rotation_interval_sec ?? 30, 5, 600),
       layout_playlist_ids: config.layout_playlist_ids ?? [],
+      interesting_record_range_km: Math.min(200, Math.max(1, config.interesting_record_range_km ?? 50)),
+      interesting_rare_sightings: clampInt(config.interesting_rare_sightings ?? 3, 1, 20),
+      interesting_absent_days: clampInt(config.interesting_absent_days ?? 30, 1, 60),
+      interesting_warmup_days: clampInt(config.interesting_warmup_days ?? 7, 0, 60),
+      interesting_hold_sec: clampInt(config.interesting_hold_sec ?? 8, 1, 120),
       // Persist the same defaults the time inputs display when modes are enabled.
       night_mode_start: config.night_mode
         ? (config.night_mode_start || '22:00')
@@ -273,12 +285,16 @@ export default function Settings() {
   const activeLayout = layouts.find((l) => l.id === config?.active_layout_id);
   const idleLayout = layouts.find((l) => l.id === config?.idle_layout_id);
   const focusLayout = layouts.find((l) => l.id === config?.proximity_focus_layout_id);
+  const interestingLayout = layouts.find((l) => l.id === config?.interesting_layout_id);
   const isCycleMode = config?.display_mode === 'cycle' || config?.display_mode === 'cycle3';
   const cycleCount = clampInt(config?.cycle_count ?? 3, 1, 10);
   const distanceUnit = config?.distance_unit || 'km';
   const proximityDisplay = config
     ? roundDistance(kmToDisplay(config.proximity_focus_km ?? 3, distanceUnit))
     : 3;
+  const interestingRangeDisplay = config
+    ? roundDistance(kmToDisplay(config.interesting_record_range_km ?? 50, distanceUnit))
+    : 50;
 
   if (!config) {
     return (
@@ -661,6 +677,118 @@ export default function Settings() {
                   onSelect={(id) => update('proximity_focus_layout_id', id ?? null)}
                   highlightMode="active"
                   selectLabel="Use for focus"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <Separator />
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <Label className="flex items-center gap-2">
+                <Sparkles size={14} className="text-white/50" />
+                Highlight interesting aircraft
+              </Label>
+              <p className="text-xs text-white/40 mt-0.5">
+                Learns regulars at your location and prioritises emergencies, first-time visitors,
+                rare visitors, and aircraft returning after a long gap. Takes priority over proximity focus.
+              </p>
+            </div>
+            <Switch
+              checked={config.interesting_alerts_enabled !== false}
+              onCheckedChange={(v) => update('interesting_alerts_enabled', v)}
+            />
+          </div>
+          {config.interesting_alerts_enabled !== false && (
+            <div className="space-y-3">
+              <FormGrid>
+                <div className="space-y-2">
+                  <Label>Record range</Label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={distanceUnit === 'mi' ? 124 : 200}
+                      step={1}
+                      value={interestingRangeDisplay}
+                      onChange={(e) => {
+                        const raw = parseFloat(e.target.value);
+                        if (Number.isNaN(raw)) return;
+                        update('interesting_record_range_km', displayToKm(raw, distanceUnit));
+                      }}
+                      className="w-28"
+                    />
+                    <span className="text-sm text-white/60">{distanceUnit}</span>
+                  </div>
+                  <p className="text-xs text-white/40">Only log aircraft within this distance (60-day history, one row per plane).</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Rare if fewer than</Label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={20}
+                      value={clampInt(config.interesting_rare_sightings ?? 3, 1, 20)}
+                      onChange={(e) => update('interesting_rare_sightings', clampInt(parseInt(e.target.value || '3', 10), 1, 20))}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-white/60">visits</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Return after</Label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={60}
+                      value={clampInt(config.interesting_absent_days ?? 30, 1, 60)}
+                      onChange={(e) => update('interesting_absent_days', clampInt(parseInt(e.target.value || '30', 10), 1, 60))}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-white/60">days away</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Hold on matrix</Label>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={120}
+                      value={clampInt(config.interesting_hold_sec ?? 8, 1, 120)}
+                      onChange={(e) => update('interesting_hold_sec', clampInt(parseInt(e.target.value || '8', 10), 1, 120))}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-white/60">seconds</span>
+                  </div>
+                </div>
+              </FormGrid>
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <Label className="flex items-center gap-2">
+                      <LayoutTemplate size={14} className="text-white/50" />
+                      Interesting layout (optional)
+                    </Label>
+                    <p className="text-xs text-white/40 mt-0.5">
+                      Used while highlighting an interesting aircraft. Leave unset to keep the current layout (border flash still applies).
+                    </p>
+                  </div>
+                  {interestingLayout && (
+                    <Badge variant="outline" className="shrink-0">Alert</Badge>
+                  )}
+                </div>
+                <LayoutPicker
+                  layouts={layouts}
+                  selectedId={config.interesting_layout_id ?? undefined}
+                  onSelect={(id) => update('interesting_layout_id', id ?? null)}
+                  highlightMode="active"
+                  selectLabel="Use for interesting"
                 />
               </div>
             </div>

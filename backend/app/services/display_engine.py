@@ -26,6 +26,8 @@ class RenderContext:
     total_cycles: int = 1
     route: Optional[Any] = None
     all_routes: Optional[Dict[str, Any]] = None
+    is_interesting: bool = False
+    interest_reason: Optional[str] = None
 
 
 class DisplayEngine:
@@ -64,6 +66,9 @@ class DisplayEngine:
         self._proximity_focused = False
         self._playlist_layouts: List[Any] = []
         self._focus_layout: Optional[Any] = None
+        self._interesting_layout: Optional[Any] = None
+        self._interesting_hex: Optional[str] = None
+        self._interesting_since: Optional[datetime] = None
         self._layout_rotation_enabled = False
         self._test_color: Optional[Tuple[int, int, int]] = None
         self._brightness = settings.led_matrix_brightness
@@ -100,10 +105,12 @@ class DisplayEngine:
         focus_layout: Optional[Any] = None,
         playlist: Optional[List[Any]] = None,
         rotation_enabled: bool = False,
+        interesting_layout: Optional[Any] = None,
     ):
         self._current_layout = layout
         self._idle_layout = idle_layout
         self._focus_layout = focus_layout
+        self._interesting_layout = interesting_layout
         self._playlist_layouts = list(playlist or [])
         self._layout_rotation_enabled = bool(rotation_enabled)
         if self._layout_index and self._playlist_layouts:
@@ -134,8 +141,17 @@ class DisplayEngine:
             max_rows = max(max_rows, rows)
         return max_rows
 
-    def _resolve_aircraft_layout(self, user_config: Any, focused: bool) -> Optional[Any]:
+    def _resolve_aircraft_layout(
+        self,
+        user_config: Any,
+        focused: bool,
+        interesting: bool = False,
+    ) -> Optional[Any]:
         from app.services.display_selection import select_layout_index
+
+        if interesting and self._interesting_layout is not None:
+            self._layout_time = datetime.utcnow()
+            return self._interesting_layout
 
         if focused and self._focus_layout is not None:
             # Freeze layout rotation clock while using a dedicated focus layout.
@@ -147,13 +163,14 @@ class DisplayEngine:
             or (user_config and getattr(user_config, "layout_rotation_enabled", False))
         )
         playlist = self._playlist_layouts
-        if rotation_enabled and playlist and focused:
-            # Pause layout rotation while proximity-focused (even without focus layout).
+        freeze_rotation = focused or interesting
+        if rotation_enabled and playlist and freeze_rotation:
+            # Pause layout rotation while proximity/interesting focused.
             self._layout_time = datetime.utcnow()
             idx = self._layout_index % len(playlist)
             return playlist[idx]
 
-        if rotation_enabled and playlist and not focused:
+        if rotation_enabled and playlist and not freeze_rotation:
             interval = 30
             if user_config is not None:
                 interval = int(getattr(user_config, "layout_rotation_interval_sec", 30) or 30)
@@ -199,6 +216,8 @@ class DisplayEngine:
 
         if is_idle:
             self._proximity_focused = False
+            self._interesting_hex = None
+            self._interesting_since = None
             layout = self._idle_layout or self._current_layout
             ctx = RenderContext(
                 aircraft=None,
@@ -215,15 +234,57 @@ class DisplayEngine:
             proximity_km = float(
                 getattr(user_config, "proximity_focus_km", 3.0) if user_config else 3.0
             )
+            interesting_enabled = bool(
+                user_config is None
+                or getattr(user_config, "interesting_alerts_enabled", True)
+            )
+            hold_sec = int(
+                getattr(user_config, "interesting_hold_sec", 8) if user_config else 8
+            )
+            hold_sec = max(1, min(hold_sec, 120))
+            rare_sightings = int(
+                getattr(user_config, "interesting_rare_sightings", 3) if user_config else 3
+            )
+            absent_days = int(
+                getattr(user_config, "interesting_absent_days", 30) if user_config else 30
+            )
+            warmup_days = int(
+                getattr(user_config, "interesting_warmup_days", 7) if user_config else 7
+            )
+
+            interest_by_hex: Dict[str, Any] = {}
+            if interesting_enabled:
+                from app.services.aircraft_interest import score_aircraft
+                from app.services.sighting_history import sighting_history
+
+                baseline = sighting_history.baseline
+                for ac in focus_pool:
+                    hex_code = (ac.hex_code or "").upper()
+                    interest_by_hex[hex_code] = score_aircraft(
+                        hex_code=hex_code,
+                        squawk=ac.squawk,
+                        distance_km=ac.distance_km,
+                        history=sighting_history.get_snapshot(hex_code),
+                        baseline=baseline,
+                        rare_sightings=rare_sightings,
+                        absent_days=absent_days,
+                        warmup_days=warmup_days,
+                    )
+
+            now = datetime.utcnow()
+            hold_active = False
+            if self._interesting_hex and self._interesting_since is not None:
+                hold_active = (now - self._interesting_since).total_seconds() < hold_sec
 
             was_focused = self._proximity_focused
-            if not was_focused:
-                if (datetime.utcnow() - self._cycle_time).total_seconds() >= cycle_interval:
+            freeze_cycle = was_focused or hold_active or bool(self._interesting_hex)
+            if not freeze_cycle:
+                if (now - self._cycle_time).total_seconds() >= cycle_interval:
                     self._cycle_index = (self._cycle_index + 1) % max(1, min(cycle_count, len(focus_pool)))
-                    self._cycle_time = datetime.utcnow()
+                    self._cycle_time = now
             else:
-                # Freeze cycle clock while proximity-focused so release does not jump.
-                self._cycle_time = datetime.utcnow()
+                # Freeze cycle clock while proximity/interesting so release does not jump.
+                self._cycle_time = now
 
             selection = select_aircraft(
                 focus_pool,
@@ -233,16 +294,33 @@ class DisplayEngine:
                 proximity_enabled=proximity_enabled,
                 proximity_km=proximity_km,
                 currently_focused=was_focused,
+                interesting_enabled=interesting_enabled,
+                interest_by_hex=interest_by_hex,
+                currently_interesting_hex=self._interesting_hex,
+                interesting_hold_active=hold_active,
             )
             self._proximity_focused = selection.focused
             if selection.mode == "cycle":
                 self._cycle_index = selection.cycle_index
 
+            if selection.interesting and selection.aircraft is not None:
+                hex_code = (selection.aircraft.hex_code or "").upper()
+                if hex_code != self._interesting_hex:
+                    self._interesting_hex = hex_code
+                    self._interesting_since = now
+            else:
+                self._interesting_hex = None
+                self._interesting_since = None
+
             aircraft = selection.aircraft
             if aircraft is None:
                 return
 
-            layout = self._resolve_aircraft_layout(user_config, selection.focused)
+            layout = self._resolve_aircraft_layout(
+                user_config,
+                selection.focused,
+                interesting=selection.interesting,
+            )
             if not layout:
                 return
 
@@ -273,10 +351,14 @@ class DisplayEngine:
                 total_cycles=max(1, total_cycles),
                 route=route,
                 all_routes=all_routes,
+                is_interesting=selection.interesting,
+                interest_reason=selection.interest_reason,
             )
 
         if layout:
             img = self._render_layout(layout, ctx)
+            if getattr(ctx, "is_interesting", False):
+                self._draw_interesting_border(img, ctx)
             # Offload the matrix output to a thread so a slow/blocking panel
             # (or no panel connected) doesn't starve the asyncio event loop.
             await asyncio.to_thread(self._output_to_matrix, img)
@@ -698,6 +780,8 @@ class DisplayEngine:
             "cycle_index": str(ctx.cycle_index + 1),
             "total_cycles": str(ctx.total_cycles),
             "current_time": self._local_now(config).strftime("%H:%M:%S"),
+            "is_interesting": "1" if ctx.is_interesting else "0",
+            "interest_reason": ctx.interest_reason or "---",
         })
 
         # Route data
@@ -733,7 +817,25 @@ class DisplayEngine:
             return ctx.is_idle
         if condition == "not_idle":
             return not ctx.is_idle
+        if condition == "is_interesting":
+            return bool(ctx.is_interesting)
+        if condition == "not_interesting":
+            return not bool(ctx.is_interesting)
         return True
+
+    def _draw_interesting_border(self, img: Image.Image, ctx: RenderContext) -> None:
+        """Subtle animated border when an interesting aircraft is shown."""
+        draw = ImageDraw.Draw(img)
+        # Pulse amber/red for emergency, amber for others.
+        reason = (ctx.interest_reason or "").upper()
+        phase = int(datetime.utcnow().timestamp() * 4) % 2
+        if reason == "EMERGENCY":
+            color = (255, 40, 40) if phase == 0 else (180, 20, 20)
+        else:
+            color = (255, 180, 40) if phase == 0 else (160, 110, 20)
+        w, h = img.size
+        draw.rectangle([0, 0, w - 1, h - 1], outline=color)
+        draw.rectangle([1, 1, w - 2, h - 2], outline=color)
 
     def _parse_color(self, color_str: Optional[str]) -> Optional[Tuple[int, int, int]]:
         if not color_str:

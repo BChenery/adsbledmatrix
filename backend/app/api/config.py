@@ -29,6 +29,13 @@ class ConfigResponse(BaseModel):
     layout_rotation_enabled: bool = False
     layout_playlist_ids: list = Field(default_factory=list)
     layout_rotation_interval_sec: int = 30
+    interesting_alerts_enabled: bool = True
+    interesting_record_range_km: float = 50.0
+    interesting_rare_sightings: int = 3
+    interesting_absent_days: int = 30
+    interesting_warmup_days: int = 7
+    interesting_layout_id: Optional[int] = None
+    interesting_hold_sec: int = 8
     active_layout_id: Optional[int]
     idle_layout_id: Optional[int]
     onboarding_complete: bool
@@ -64,6 +71,13 @@ class ConfigUpdate(BaseModel):
     layout_rotation_enabled: Optional[bool] = None
     layout_playlist_ids: Optional[list] = None
     layout_rotation_interval_sec: Optional[int] = None
+    interesting_alerts_enabled: Optional[bool] = None
+    interesting_record_range_km: Optional[float] = None
+    interesting_rare_sightings: Optional[int] = None
+    interesting_absent_days: Optional[int] = None
+    interesting_warmup_days: Optional[int] = None
+    interesting_layout_id: Optional[int] = None
+    interesting_hold_sec: Optional[int] = None
     active_layout_id: Optional[int] = None
     idle_layout_id: Optional[int] = None
     onboarding_complete: Optional[bool] = None
@@ -145,6 +159,41 @@ class ConfigUpdate(BaseModel):
             seen.add(item)
             cleaned.append(item)
         return cleaned
+
+    @field_validator("interesting_record_range_km")
+    @classmethod
+    def validate_interesting_record_range(cls, v):
+        if v is not None and not (1.0 <= v <= 200.0):
+            raise ValueError("interesting_record_range_km must be between 1 and 200")
+        return v
+
+    @field_validator("interesting_rare_sightings")
+    @classmethod
+    def validate_interesting_rare_sightings(cls, v):
+        if v is not None and not (1 <= v <= 20):
+            raise ValueError("interesting_rare_sightings must be between 1 and 20")
+        return v
+
+    @field_validator("interesting_absent_days")
+    @classmethod
+    def validate_interesting_absent_days(cls, v):
+        if v is not None and not (1 <= v <= 60):
+            raise ValueError("interesting_absent_days must be between 1 and 60")
+        return v
+
+    @field_validator("interesting_warmup_days")
+    @classmethod
+    def validate_interesting_warmup_days(cls, v):
+        if v is not None and not (0 <= v <= 60):
+            raise ValueError("interesting_warmup_days must be between 0 and 60")
+        return v
+
+    @field_validator("interesting_hold_sec")
+    @classmethod
+    def validate_interesting_hold_sec(cls, v):
+        if v is not None and not (1 <= v <= 120):
+            raise ValueError("interesting_hold_sec must be between 1 and 120")
+        return v
 
 
 class GeocodeResponse(BaseModel):
@@ -258,6 +307,7 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
         "active_layout_id",
         "idle_layout_id",
         "proximity_focus_layout_id",
+        "interesting_layout_id",
         "layout_playlist_ids",
         "layout_rotation_enabled",
     }
@@ -269,6 +319,11 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
     if "led_matrix_brightness" in update_data:
         from app.services.display_engine import engine
         engine.set_brightness(config.led_matrix_brightness)
+
+    if "interesting_record_range_km" in update_data:
+        from app.services.sighting_history import sighting_history
+
+        sighting_history.set_record_range_km(float(config.interesting_record_range_km))
 
     # Apply receiver source changes
     receiver_fields = {"receiver_source", "network_readsb_host", "network_readsb_port"}

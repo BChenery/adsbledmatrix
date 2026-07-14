@@ -117,6 +117,55 @@ async def migrate_db():
                     text("ALTER TABLE user_config ADD COLUMN layout_rotation_interval_sec INTEGER NOT NULL DEFAULT 30")
                 )
 
+            # Interesting aircraft alerts
+            interesting_cols = [
+                ("interesting_alerts_enabled", "BOOLEAN NOT NULL DEFAULT 1"),
+                ("interesting_record_range_km", "FLOAT NOT NULL DEFAULT 50.0"),
+                ("interesting_rare_sightings", "INTEGER NOT NULL DEFAULT 3"),
+                ("interesting_absent_days", "INTEGER NOT NULL DEFAULT 30"),
+                ("interesting_warmup_days", "INTEGER NOT NULL DEFAULT 7"),
+                ("interesting_layout_id", "INTEGER"),
+                ("interesting_hold_sec", "INTEGER NOT NULL DEFAULT 8"),
+            ]
+            for col_name, col_type in interesting_cols:
+                if col_name not in columns:
+                    sync_conn.execute(
+                        text(f"ALTER TABLE user_config ADD COLUMN {col_name} {col_type}")
+                    )
+
+            # Seen aircraft history columns (table may already exist without new fields)
+            result = sync_conn.execute(
+                text(
+                    "SELECT name FROM sqlite_master WHERE type='table' "
+                    "AND name='seen_aircraft_history'"
+                )
+            )
+            if result.fetchone():
+                result = sync_conn.execute(text("PRAGMA table_info(seen_aircraft_history)"))
+                hist_cols = {row[1] for row in result}
+                if "type_code" not in hist_cols:
+                    sync_conn.execute(
+                        text("ALTER TABLE seen_aircraft_history ADD COLUMN type_code VARCHAR(10)")
+                    )
+                if "last_visit_start" not in hist_cols:
+                    sync_conn.execute(
+                        text(
+                            "ALTER TABLE seen_aircraft_history "
+                            "ADD COLUMN last_visit_start DATETIME"
+                        )
+                    )
+                # Best-effort unique index on hex_code (ignore if duplicates exist)
+                try:
+                    sync_conn.execute(
+                        text(
+                            "CREATE UNIQUE INDEX IF NOT EXISTS "
+                            "ix_seen_aircraft_history_hex_code_unique "
+                            "ON seen_aircraft_history (hex_code)"
+                        )
+                    )
+                except Exception:
+                    pass
+
             # Radar element settings added after initial schema
             result = sync_conn.execute(
                 text("SELECT name FROM sqlite_master WHERE type='table' AND name='layout_elements'")

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, List, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 FOCUS_POOL_CAP = 20
 EXIT_HYSTERESIS = 1.15
@@ -13,7 +13,9 @@ class SelectionResult:
     aircraft: Any
     mode: str
     cycle_index: int
-    focused: bool
+    focused: bool  # proximity focus
+    interesting: bool = False
+    interest_reason: Optional[str] = None
 
 
 def normalize_display_mode(mode: Optional[str]) -> str:
@@ -33,16 +35,67 @@ def select_aircraft(
     proximity_enabled: bool,
     proximity_km: float,
     currently_focused: bool = False,
+    interesting_enabled: bool = False,
+    interest_by_hex: Optional[Dict[str, Any]] = None,
+    currently_interesting_hex: Optional[str] = None,
+    interesting_hold_active: bool = False,
 ) -> SelectionResult:
     """Pick which aircraft to show.
 
     ``focus_pool`` must be ordered nearest-first (as from get_closest).
+
+    Priority:
+      1. Interesting alerts (if enabled) — beats proximity
+      2. Proximity focus
+      3. Normal closest / cycle / list
     """
     mode = normalize_display_mode(display_mode)
     n = max(1, min(int(cycle_count or 3), 10))
     pool = list(focus_pool)[:FOCUS_POOL_CAP]
     cycle_pool = pool[:n] if pool else []
+    interest_by_hex = interest_by_hex or {}
 
+    # --- 1. Interesting focus (holds, then best score) ---
+    if interesting_enabled and pool:
+        held_hex = (currently_interesting_hex or "").upper() or None
+        if held_hex and interesting_hold_active:
+            for ac in pool:
+                if (getattr(ac, "hex_code", "") or "").upper() == held_hex:
+                    res = interest_by_hex.get(held_hex)
+                    reason = getattr(res, "primary_reason", None) if res else None
+                    return SelectionResult(
+                        aircraft=ac,
+                        mode="interesting",
+                        cycle_index=cycle_index,
+                        focused=False,
+                        interesting=True,
+                        interest_reason=reason,
+                    )
+
+        best_ac = None
+        best_score = -1.0
+        best_reason: Optional[str] = None
+        for ac in pool:
+            hex_code = (getattr(ac, "hex_code", "") or "").upper()
+            res = interest_by_hex.get(hex_code)
+            if res is None or not getattr(res, "is_interesting", False):
+                continue
+            score = float(getattr(res, "score", 0.0) or 0.0)
+            if score > best_score:
+                best_score = score
+                best_ac = ac
+                best_reason = getattr(res, "primary_reason", None)
+        if best_ac is not None:
+            return SelectionResult(
+                aircraft=best_ac,
+                mode="interesting",
+                cycle_index=cycle_index,
+                focused=False,
+                interesting=True,
+                interest_reason=best_reason,
+            )
+
+    # --- 2. Proximity focus ---
     threshold = float(proximity_km if proximity_km is not None else 3.0)
     exit_threshold = threshold * EXIT_HYSTERESIS if currently_focused else threshold
 
@@ -61,6 +114,7 @@ def select_aircraft(
                 focused=True,
             )
 
+    # --- 3. Normal modes ---
     if not cycle_pool:
         return SelectionResult(
             aircraft=None,

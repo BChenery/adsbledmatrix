@@ -2,6 +2,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from app.services.aircraft_interest import InterestResult
 from app.services.display_selection import (
     EXIT_HYSTERESIS,
     MAX_PLAYLIST_SIZE,
@@ -12,8 +13,8 @@ from app.services.display_selection import (
 )
 
 
-def _ac(hex_code: str, distance_km: float):
-    return SimpleNamespace(hex_code=hex_code, distance_km=distance_km)
+def _ac(hex_code: str, distance_km: float, squawk=None):
+    return SimpleNamespace(hex_code=hex_code, distance_km=distance_km, squawk=squawk)
 
 
 POOL = [
@@ -177,6 +178,76 @@ def test_select_layout_index_advance():
     assert select_layout_index(3, rotation_enabled=True, current_index=2, advance=True) == 0
     assert select_layout_index(3, rotation_enabled=False, current_index=2, advance=True) == 0
     assert select_layout_index(0, rotation_enabled=True, current_index=1, advance=True) == 0
+
+
+def test_interesting_beats_proximity():
+    pool = [
+        _ac("close", 1.0),
+        _ac("rare", 12.0),
+    ]
+    interest = {
+        "CLOSE": InterestResult(False, [], 0.0, None),
+        "RARE": InterestResult(True, ["first_seen"], 400.0, "NEW"),
+    }
+    result = select_aircraft(
+        pool,
+        display_mode="closest",
+        cycle_count=3,
+        cycle_index=0,
+        proximity_enabled=True,
+        proximity_km=3.0,
+        interesting_enabled=True,
+        interest_by_hex=interest,
+    )
+    assert result.mode == "interesting"
+    assert result.interesting is True
+    assert result.aircraft.hex_code == "rare"
+    assert result.interest_reason == "NEW"
+    assert result.focused is False
+
+
+def test_interesting_hold_keeps_hex():
+    pool = [
+        _ac("aaa", 2.0),
+        _ac("bbb", 5.0),
+    ]
+    interest = {
+        "AAA": InterestResult(True, ["rare"], 200.0, "RARE"),
+        "BBB": InterestResult(True, ["first_seen"], 400.0, "NEW"),
+    }
+    result = select_aircraft(
+        pool,
+        display_mode="cycle",
+        cycle_count=2,
+        cycle_index=0,
+        proximity_enabled=False,
+        proximity_km=3.0,
+        interesting_enabled=True,
+        interest_by_hex=interest,
+        currently_interesting_hex="aaa",
+        interesting_hold_active=True,
+    )
+    assert result.mode == "interesting"
+    assert result.aircraft.hex_code == "aaa"
+
+
+def test_proximity_when_interesting_disabled():
+    pool = [_ac("close", 1.0), _ac("rare", 12.0)]
+    interest = {
+        "RARE": InterestResult(True, ["first_seen"], 400.0, "NEW"),
+    }
+    result = select_aircraft(
+        pool,
+        display_mode="closest",
+        cycle_count=3,
+        cycle_index=0,
+        proximity_enabled=True,
+        proximity_km=3.0,
+        interesting_enabled=False,
+        interest_by_hex=interest,
+    )
+    assert result.mode == "proximity"
+    assert result.aircraft.hex_code == "close"
 
 
 def test_resolve_playlist_ids():

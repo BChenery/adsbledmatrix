@@ -13,6 +13,13 @@ export interface UserConfig {
   layout_rotation_enabled: boolean;
   layout_playlist_ids: number[];
   layout_rotation_interval_sec: number;
+  interesting_alerts_enabled: boolean;
+  interesting_record_range_km: number;
+  interesting_rare_sightings: number;
+  interesting_absent_days: number;
+  interesting_warmup_days: number;
+  interesting_layout_id?: number | null;
+  interesting_hold_sec: number;
   active_layout_id?: number;
   idle_layout_id?: number;
   onboarding_complete: boolean;

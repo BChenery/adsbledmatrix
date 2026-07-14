@@ -61,6 +61,15 @@ class UserConfig(Base):
     timezone = Column(String(50))
     led_matrix_brightness = Column(Integer, nullable=False, default=70)
 
+    # Interesting aircraft alerts (local regularity)
+    interesting_alerts_enabled = Column(Boolean, nullable=False, default=True, server_default=text("1"))
+    interesting_record_range_km = Column(Float, nullable=False, default=50.0, server_default=text("50.0"))
+    interesting_rare_sightings = Column(Integer, nullable=False, default=3, server_default=text("3"))
+    interesting_absent_days = Column(Integer, nullable=False, default=30, server_default=text("30"))
+    interesting_warmup_days = Column(Integer, nullable=False, default=7, server_default=text("7"))
+    interesting_layout_id = Column(Integer, ForeignKey("layouts.id"), nullable=True)
+    interesting_hold_sec = Column(Integer, nullable=False, default=8, server_default=text("8"))
+
     # Receiver source
     receiver_source = Column(String(20), nullable=False, default="local", server_default=text("'local'"))
     network_readsb_host = Column(String(255))
@@ -69,6 +78,7 @@ class UserConfig(Base):
     active_layout = relationship("Layout", foreign_keys=[active_layout_id])
     idle_layout = relationship("Layout", foreign_keys=[idle_layout_id])
     proximity_focus_layout = relationship("Layout", foreign_keys=[proximity_focus_layout_id])
+    interesting_layout = relationship("Layout", foreign_keys=[interesting_layout_id])
 
 
 class Layout(Base):
@@ -134,13 +144,17 @@ class Route(Base):
 
 
 class SeenAircraftHistory(Base):
+    """One row per ICAO hex seen near this site (visit-level, not message-level)."""
+
     __tablename__ = "seen_aircraft_history"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    hex_code = Column(String(6), nullable=False, index=True)
+    hex_code = Column(String(6), nullable=False, unique=True, index=True)
     callsign = Column(String(20))
+    type_code = Column(String(10))
     first_seen = Column(DateTime, default=datetime.utcnow)
-    last_seen = Column(DateTime, default=datetime.utcnow)
+    last_seen = Column(DateTime, default=datetime.utcnow, index=True)
+    last_visit_start = Column(DateTime, default=datetime.utcnow)
     max_distance = Column(Float)
     min_distance = Column(Float)
     sightings = Column(Integer, default=1)

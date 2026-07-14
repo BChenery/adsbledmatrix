@@ -88,6 +88,16 @@ async def lifespan(app: FastAPI):
     await receiver.start()
     await engine.start()
 
+    from app.api.config import get_user_config_sync
+    from app.services.sighting_history import sighting_history
+
+    cached = get_user_config_sync()
+    if cached is not None:
+        range_km = getattr(cached, "interesting_record_range_km", None)
+        if range_km is not None:
+            sighting_history.set_record_range_km(float(range_km))
+    await sighting_history.start()
+
     # Start websocket broadcaster
     broadcaster = asyncio.create_task(broadcast_aircraft())
 
@@ -102,6 +112,7 @@ async def lifespan(app: FastAPI):
     except asyncio.CancelledError:
         pass
 
+    await sighting_history.stop()
     await receiver.stop()
     await engine.stop()
     await updater.close()
