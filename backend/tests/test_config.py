@@ -482,3 +482,45 @@ async def test_update_config_fills_default_night_sleep_times(app_with_db):
     assert data["sleep_mode"] is True
     assert data["sleep_mode_start"] == "23:00"
     assert data["sleep_mode_end"] == "06:00"
+
+
+@pytest.mark.asyncio
+async def test_update_config_rejects_out_of_range_latitude(app_with_db):
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put("/api/config", json={"latitude": 91})
+
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_config_rejects_out_of_range_longitude(app_with_db):
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put("/api/config", json={"longitude": -181})
+
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_update_config_accepts_boundary_coordinates(app_with_db):
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put("/api/config", json={"latitude": -90, "longitude": 180})
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["latitude"] == -90
+    assert data["longitude"] == 180
+
+
+@pytest.mark.asyncio
+async def test_update_config_clears_setup_screen_when_onboarding_completes(app_with_db, monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        "app.services.onboarding_display.clear_setup_screen",
+        lambda: calls.append(True),
+    )
+
+    async with AsyncClient(transport=ASGITransport(app=app_with_db), base_url="http://test") as client:
+        response = await client.put("/api/config", json={"onboarding_complete": True})
+
+    assert response.status_code == 200
+    assert len(calls) == 1

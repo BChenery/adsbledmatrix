@@ -84,9 +84,16 @@ async def lifespan(app: FastAPI):
 
         await apply_engine_layouts(config, session)
         engine.set_brightness(config.led_matrix_brightness)
+        needs_onboarding = not config.onboarding_complete
 
     await receiver.start()
     await engine.start()
+
+    # While onboarding is incomplete the matrix itself shows how to connect.
+    if needs_onboarding:
+        from app.services.onboarding_display import show_setup_screen
+
+        show_setup_screen()
 
     from app.api.config import get_user_config_sync
     from app.services.sighting_history import sighting_history

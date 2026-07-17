@@ -159,15 +159,17 @@ curl -fsSL https://raw.githubusercontent.com/BChenery/adsbledmatrix/main/scripts
 
 After installation and reboot:
 
-1. The Pi creates a WiFi access point: `ADSB-Display-XXXX`
+1. The Pi creates a WiFi access point: `ADSB-Display-XXXX` (the LED matrix also shows the hotspot name, password, and setup URL)
 2. Connect to it with password: `adsbsetup`
 3. Open http://192.168.4.1 in your browser
 4. Follow the wizard:
-   - Set your latitude/longitude
-   - Choose a display layout
-   - Enter home WiFi credentials
+   - Set your latitude/longitude (nearest town is fine; refine later in Settings)
+   - Choose a display layout (previews live on the matrix)
+   - Pick your home network from the scanned list and enter its password
 5. The Pi will restart and join your home network
 6. Access it at http://adsb-display.local or your router's assigned IP
+
+To change WiFi later: **Settings → WiFi** (the device reboots to apply). If it cannot join the new network it automatically reopens the `ADSB-Display-XXXX` hotspot.
 
 ## Troubleshooting
 

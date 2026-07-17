@@ -11,6 +11,7 @@ Strategy:
 """
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -451,6 +452,140 @@ def read_config_from_db():
     return {"onboarding_complete": False, "wifi_ssid": None, "wifi_password": None}
 
 
+# ---------------------------------------------------------------------------
+# WiFi network scanning (used by the onboarding UI to suggest SSIDs)
+# ---------------------------------------------------------------------------
+
+def dbm_to_quality(dbm):
+    """Convert signal dBm to a rough 0-100 quality percentage."""
+    try:
+        quality = 2 * (float(dbm) + 100)
+    except (TypeError, ValueError):
+        return 0
+    return max(0, min(100, int(round(quality))))
+
+
+def parse_iw_scan(text):
+    """Parse `iw dev <iface> scan` output into network dicts."""
+    networks = []
+    current = None
+    for line in text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("BSS "):
+            if current is not None:
+                networks.append(current)
+            current = {"ssid": "", "signal": 0, "secured": False}
+        elif current is None:
+            continue
+        elif stripped.startswith("SSID:"):
+            current["ssid"] = stripped[5:].strip()
+        elif stripped.startswith("signal:"):
+            # e.g. "signal: -45.00 dBm"
+            try:
+                dbm = float(stripped.split(":", 1)[1].replace("dBm", "").strip())
+                current["signal"] = dbm_to_quality(dbm)
+            except (ValueError, IndexError):
+                pass
+        elif stripped.startswith(("RSN:", "WPA:")) or "Privacy" in stripped:
+            current["secured"] = True
+    if current is not None:
+        networks.append(current)
+    return networks
+
+
+def _split_nmcli_terse(line):
+    """Split nmcli -t output on unescaped colons (escaped `\\:` stays literal)."""
+    fields = []
+    buf = []
+    i = 0
+    while i < len(line):
+        ch = line[i]
+        if ch == "\\" and i + 1 < len(line):
+            buf.append(line[i + 1])
+            i += 2
+            continue
+        if ch == ":":
+            fields.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+        i += 1
+    fields.append("".join(buf))
+    return fields
+
+
+def parse_nmcli_wifi(text):
+    """Parse `nmcli -t -f SSID,SIGNAL,SECURITY device wifi list` output."""
+    networks = []
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        parts = _split_nmcli_terse(line)
+        if len(parts) < 3:
+            continue
+        ssid, signal, security = parts[0], parts[1], parts[2]
+        try:
+            signal_pct = int(signal)
+        except ValueError:
+            signal_pct = 0
+        networks.append({
+            "ssid": ssid,
+            "signal": max(0, min(100, signal_pct)),
+            "secured": bool(security and security != "--"),
+        })
+    return networks
+
+
+def dedupe_strongest(networks):
+    """Drop hidden/empty SSIDs, keep the strongest entry per SSID, sort desc."""
+    best = {}
+    for net in networks:
+        ssid = (net.get("ssid") or "").strip()
+        if not ssid or ssid.startswith("\\x00"):
+            continue
+        if ssid not in best or net.get("signal", 0) > best[ssid]["signal"]:
+            best[ssid] = {
+                "ssid": ssid,
+                "signal": net.get("signal", 0),
+                "secured": bool(net.get("secured")),
+            }
+    return sorted(best.values(), key=lambda n: n["signal"], reverse=True)
+
+
+def _nm_manages_device(iface):
+    result = run(["nmcli", "-t", "-f", "DEVICE,STATE", "device"], check=False)
+    for line in result.stdout.splitlines():
+        parts = _split_nmcli_terse(line)
+        if len(parts) >= 2 and parts[0] == iface:
+            return parts[1] != "unmanaged"
+    return False
+
+
+def cmd_scan(_args):
+    """Scan for nearby WiFi networks; print JSON on stdout for the backend."""
+    iface = get_wlan_interface()
+    try:
+        if using_network_manager() and _nm_manages_device(iface):
+            result = run(
+                ["nmcli", "-t", "-f", "SSID,SIGNAL,SECURITY",
+                 "device", "wifi", "list", "ifname", iface],
+                check=False,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(result.stderr.strip() or "nmcli scan failed")
+            networks = parse_nmcli_wifi(result.stdout)
+        else:
+            # hostapd owns the interface in AP mode; iw scan still works on brcmfmac.
+            result = run(["iw", "dev", iface, "scan"], check=False)
+            if result.returncode != 0:
+                raise RuntimeError(result.stderr.strip() or "iw scan failed")
+            networks = parse_iw_scan(result.stdout)
+        print(json.dumps({"networks": dedupe_strongest(networks)}))
+    except Exception as exc:
+        logger.warning("WiFi scan failed: %s", exc)
+        print(json.dumps({"networks": [], "error": str(exc)}))
+
+
 def cmd_setup_ap(_args):
     iface = get_wlan_interface()
     if using_network_manager():
@@ -526,6 +661,7 @@ def main():
 
     sub.add_parser("auto", help="Auto-configure based on DB state")
     sub.add_parser("status", help="Show WiFi status")
+    sub.add_parser("scan", help="Scan for nearby WiFi networks (JSON on stdout)")
 
     args = parser.parse_args()
     if not args.command:
@@ -540,6 +676,8 @@ def main():
         cmd_auto(args)
     elif args.command == "status":
         cmd_status(args)
+    elif args.command == "scan":
+        cmd_scan(args)
 
 
 if __name__ == "__main__":

@@ -223,3 +223,53 @@ async def apply_wifi(req: WiFiApplyRequest):
     # Reboot after a short delay so the HTTP response can be sent.
     subprocess.Popen(["bash", "-c", "sleep 5 && sudo reboot"])
     return {"message": "WiFi configured. The device will reboot and connect to your network."}
+
+
+class WifiNetwork(BaseModel):
+    ssid: str
+    signal: int
+    secured: bool
+
+
+class WifiScanResponse(BaseModel):
+    networks: list[WifiNetwork]
+    error: Optional[str] = None
+
+
+@router.get("/wifi/networks", response_model=WifiScanResponse)
+async def scan_wifi_networks():
+    """Best-effort scan of nearby WiFi networks for the onboarding SSID picker.
+
+    Always returns 200; on any failure the list is empty and the UI falls
+    back to manual SSID entry.
+    """
+    import json
+
+    try:
+        result = subprocess.run(
+            [
+                "sudo", "-n",
+                "/opt/adsbledmatrix/venv/bin/python3",
+                "/opt/adsbledmatrix/scripts/wifi_manager.py",
+                "scan",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=15,
+            check=False,
+        )
+        payload = json.loads(result.stdout or "{}")
+    except Exception as exc:
+        logger.warning("WiFi scan unavailable: %s", exc)
+        return WifiScanResponse(networks=[], error="scan_unavailable")
+
+    networks = [
+        WifiNetwork(
+            ssid=str(net.get("ssid", "")),
+            signal=int(net.get("signal", 0)),
+            secured=bool(net.get("secured", False)),
+        )
+        for net in payload.get("networks", [])
+        if net.get("ssid")
+    ]
+    return WifiScanResponse(networks=networks, error=payload.get("error"))

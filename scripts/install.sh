@@ -99,7 +99,8 @@ apt-get install -y \
   avahi-daemon \
   raspi-config \
   sqlite3 \
-  rfkill
+  rfkill \
+  iw
 
 # Install readsb (ADS-B decoder)
 echo "[3/8] Installing readsb..."

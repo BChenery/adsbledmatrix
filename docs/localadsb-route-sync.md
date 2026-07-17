@@ -17,7 +17,7 @@ Pis keep themselves up to date automatically.
 └──────────────────┘               │  - commits data/localadsb/*         │
                                    └─────────────────────────────────────┘
                                                       │
-                                                      │  daily / hourly
+                                                      │  hourly
                                                       ▼
                                    ┌─────────────────────────────────────┐
                                    │  Raspberry Pi                       │
@@ -34,37 +34,31 @@ Pis keep themselves up to date automatically.
    - Sends a `localadsb-updated` repository dispatch event to the adsbledmatrix repo.
 
 2. **adsbledmatrix** — `.github/workflows/sync-localadsb.yml`
-   - Triggered by the dispatch event, hourly (`cron: '0 * * * *`), or manually.
+   - Triggered by the dispatch event, hourly (`cron: '0 * * * *'`), or manually.
    - Checks out the private localadsb repo using `secrets.LOCALADSB_PAT`.
    - Copies `flights.db` and `aircraft_type_names.json` into `data/localadsb/`.
-   - Runs `scripts/import_localadsb.py` to regenerate `data/aircraft_db.sqlite3`.
-   - Commits and pushes the updated data files to `main`.
+   - Runs `scripts/import_localadsb.py` to regenerate `data/aircraft_db.sqlite3`
+     (validation only in CI; that file is not committed).
+   - Commits and pushes `data/localadsb/*` to `main`.
 
 ## On-device sync
 
-The Pi runs `systemd/adsbledmatrix-sync.timer`, which triggers
-`scripts/sync_data.py`:
+The Pi runs `systemd/adsbledmatrix-sync.timer` (`OnCalendar=hourly`, up to
+5 minutes random delay), which triggers `scripts/sync_data.py`:
 
-- Downloads `data/localadsb/flights.db` and `data/aircraft_db.sqlite3` from the
+- Downloads `data/localadsb/flights.db` (and other data files) from the
   adsbledmatrix repo if they have changed.
-- If `flights.db` changed, runs `scripts/import_localadsb.py`.
+- If `flights.db` changed (or is newer than the local DB), runs
+  `scripts/import_localadsb.py` to rebuild `data/aircraft_db.sqlite3` on the Pi.
 - Restarts the `adsbledmatrix` service to clear the in-memory route cache so
   new routes appear immediately.
 
 ## Default schedule
 
 - GitHub Action: hourly (`0 * * * *`)
-- Pi sync: daily at 03:00 with up to 30 minutes random delay
+- Pi sync: hourly (`OnCalendar=hourly`, `RandomizedDelaySec=300`)
 
-If you want routes to appear faster on the Pi, change
-`systemd/adsbledmatrix-sync.timer` to run hourly:
-
-```ini
-[Timer]
-OnCalendar=hourly
-```
-
-Then reload and restart the timer:
+To change the Pi schedule, edit `systemd/adsbledmatrix-sync.timer`, then:
 
 ```bash
 sudo systemctl daemon-reload

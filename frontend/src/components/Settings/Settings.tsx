@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff, Loader2, CheckCircle2, XCircle, AlertCircle, Sparkles, Hourglass } from 'lucide-react';
+import { Save, RotateCcw, Moon, Sun, Monitor, Cpu, Activity, LayoutTemplate, Plane, ListOrdered, Crosshair, Radio, Power, PowerOff, Loader2, CheckCircle2, XCircle, AlertCircle, Sparkles, Hourglass, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useDisplayStatus } from '@/hooks/useDisplayStatus';
@@ -36,12 +36,18 @@ import { useUpdateProgress } from '@/hooks/useUpdateProgress';
 import { UPDATE_STAGES, type UpdateProgressStatus } from '@/types/update';
 import LocationLookup from '@/components/LocationLookup/LocationLookup';
 import LocationMapPreview from '@/components/LocationLookup/LocationMapPreview';
+import WifiCredentialsForm, { WIFI_PASSWORD_MIN } from '@/components/WifiCredentialsForm/WifiCredentialsForm';
 import SettingsSection from './SettingsSection';
 import FormGrid from './FormGrid';
 
 export default function Settings() {
   const [config, setConfig] = useState<UserConfig | null>(null);
   const [powerAction, setPowerAction] = useState<'reboot' | 'shutdown' | null>(null);
+  const [wifiSsid, setWifiSsid] = useState('');
+  const [wifiPassword, setWifiPassword] = useState('');
+  const [wifiConfirmOpen, setWifiConfirmOpen] = useState(false);
+  const [wifiApplying, setWifiApplying] = useState(false);
+  const [wifiApplied, setWifiApplied] = useState(false);
   const [brightnessSaved, setBrightnessSaved] = useState(false);
   const brightnessTimer = useRef<number | null>(null);
   type UpdateStatus = {
@@ -93,9 +99,31 @@ export default function Settings() {
         interesting_layout_id: raw.interesting_layout_id ?? null,
         interesting_hold_sec: raw.interesting_hold_sec ?? 8,
       });
+      setWifiSsid(raw.wifi_ssid ?? '');
     });
     api.get<UpdateStatus>('/api/system/update').then(setUpdateStatus).catch(() => {});
   }, []);
+
+  const handleWifiApply = async () => {
+    setWifiConfirmOpen(false);
+    setWifiApplying(true);
+    try {
+      await api.put('/api/config', {
+        wifi_ssid: wifiSsid.trim(),
+        wifi_password: wifiPassword,
+      });
+      await api.post('/api/system/wifi/apply', {
+        ssid: wifiSsid.trim(),
+        password: wifiPassword,
+      });
+      setWifiApplied(true);
+      toast.success('WiFi updated — the device is rebooting');
+    } catch {
+      toast.error('Could not apply WiFi settings. Try again.');
+    } finally {
+      setWifiApplying(false);
+    }
+  };
 
   useEffect(() => {
     if (!config || config.interesting_alerts_enabled === false) {
@@ -1200,6 +1228,37 @@ export default function Settings() {
         )}
       </SettingsSection>
 
+      <SettingsSection title="WiFi" icon={Wifi} description="Change the network the device connects to. Applying reboots the device.">
+        {config.wifi_ssid && (
+          <p className="text-sm text-white/50">
+            Current network: <span className="text-white/80">{config.wifi_ssid}</span>
+          </p>
+        )}
+        {wifiApplied ? (
+          <p className="text-sm text-led-green">
+            Rebooting to join {wifiSsid}. Reopen this page at http://adsb-display.local in a couple
+            of minutes. If it doesn't come back, the device will reopen the ADSB-Display hotspot.
+          </p>
+        ) : (
+          <>
+            <WifiCredentialsForm
+              ssid={wifiSsid}
+              password={wifiPassword}
+              onSsidChange={setWifiSsid}
+              onPasswordChange={setWifiPassword}
+            />
+            <Button
+              onClick={() => setWifiConfirmOpen(true)}
+              disabled={!wifiSsid.trim() || wifiPassword.length < WIFI_PASSWORD_MIN || wifiApplying}
+              className="gap-2"
+            >
+              {wifiApplying ? <Loader2 size={16} className="animate-spin" /> : <Wifi size={16} />}
+              Apply & reconnect
+            </Button>
+          </>
+        )}
+      </SettingsSection>
+
       <SettingsSection title="System" icon={Power} description="Update, reboot, or reset the device.">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -1460,6 +1519,24 @@ export default function Settings() {
             >
               {powerAction === 'reboot' ? 'Reboot Pi' : 'Shut Down Pi'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={wifiConfirmOpen} onOpenChange={setWifiConfirmOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change WiFi network?</DialogTitle>
+            <DialogDescription>
+              The device will reboot and join “{wifiSsid}”. If the password is wrong it will reopen
+              the ADSB-Display hotspot so you can recover it.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setWifiConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleWifiApply}>Apply & reboot</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

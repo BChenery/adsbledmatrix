@@ -104,3 +104,75 @@ async def test_status_includes_receiver_info(app, monkeypatch):
     assert data["receiver_connected"] is True
     assert data["readsb_host"] == "10.0.0.158"
     assert data["readsb_port"] == 30003
+
+
+
+@pytest.mark.asyncio
+async def test_wifi_scan_returns_networks(app):
+    payload = '{"networks": [{"ssid": "HomeNet", "signal": 82, "secured": true}]}'
+    with patch("app.api.system.subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout=payload, stderr="")
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/api/system/wifi/networks")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["networks"] == [{"ssid": "HomeNet", "signal": 82, "secured": True}]
+    assert data["error"] is None
+    cmd = mock_run.call_args.args[0]
+    assert cmd[:2] == ["sudo", "-n"]
+    assert cmd[-1] == "scan"
+
+
+@pytest.mark.asyncio
+async def test_wifi_scan_command_missing_returns_empty_networks(app):
+    with patch("app.api.system.subprocess.run", side_effect=FileNotFoundError("sudo")):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/api/system/wifi/networks")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["networks"] == []
+    assert data["error"] == "scan_unavailable"
+
+
+@pytest.mark.asyncio
+async def test_wifi_scan_timeout_returns_empty_networks(app):
+    import subprocess as sp
+
+    with patch(
+        "app.api.system.subprocess.run",
+        side_effect=sp.TimeoutExpired(cmd="scan", timeout=15),
+    ):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/api/system/wifi/networks")
+
+    assert response.status_code == 200
+    assert response.json()["networks"] == []
+    assert response.json()["error"] == "scan_unavailable"
+
+
+@pytest.mark.asyncio
+async def test_wifi_scan_unparseable_output_returns_empty_networks(app):
+    with patch("app.api.system.subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=1, stdout="not json", stderr="boom")
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/api/system/wifi/networks")
+
+    assert response.status_code == 200
+    assert response.json()["networks"] == []
+    assert response.json()["error"] == "scan_unavailable"
+
+
+@pytest.mark.asyncio
+async def test_wifi_scan_propagates_manager_error_field(app):
+    payload = '{"networks": [], "error": "iw scan failed"}'
+    with patch("app.api.system.subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout=payload, stderr="")
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+            response = await client.get("/api/system/wifi/networks")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["networks"] == []
+    assert data["error"] == "iw scan failed"

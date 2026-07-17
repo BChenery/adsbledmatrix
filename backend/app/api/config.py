@@ -103,6 +103,20 @@ class ConfigUpdate(BaseModel):
             raise ValueError("receiver_source must be 'local' or 'network'")
         return v
 
+    @field_validator("latitude")
+    @classmethod
+    def validate_latitude(cls, v):
+        if v is not None and not (-90 <= v <= 90):
+            raise ValueError("latitude must be between -90 and 90")
+        return v
+
+    @field_validator("longitude")
+    @classmethod
+    def validate_longitude(cls, v):
+        if v is not None and not (-180 <= v <= 180):
+            raise ValueError("longitude must be between -180 and 180")
+        return v
+
     @field_validator("network_readsb_port")
     @classmethod
     def validate_port(cls, v):
@@ -329,6 +343,12 @@ async def update_config(update: ConfigUpdate, session: AsyncSession = Depends(ge
     receiver_fields = {"receiver_source", "network_readsb_host", "network_readsb_port"}
     if receiver_fields & set(update_data.keys()):
         await apply_receiver_source(config)
+
+    # Onboarding finished — hand the matrix back to normal layouts
+    if update_data.get("onboarding_complete"):
+        from app.services.onboarding_display import clear_setup_screen
+
+        clear_setup_screen()
 
     return ConfigResponse.model_validate(config)
 

@@ -97,6 +97,8 @@ Go to the WiFi settings on your phone or computer. You will see `ADSB-Display-XX
 
 **`adsbsetup`**
 
+The LED matrix shows these details too — `SETUP REQUIRED`, the hotspot name, the password, and the setup address — so you can read them straight off the display.
+
 > 💡 **Tip:** While you are connected to this network, your phone will say "No internet." That is normal. The Pi is not giving you internet — it is just giving you a direct line to talk to it.
 
 #### Step 3: The setup page should pop up by itself
@@ -112,9 +114,9 @@ Then press Enter. The setup wizard will appear.
 The wizard has four little steps:
 
 1. **Welcome** — Tap "Get Started."
-2. **Location** — Type your town, suburb, or address into the search box. Pick the right result, or type your latitude and longitude if you know them. This tells the box where it is so it can work out how far away the aeroplanes are.
-3. **Layout** — Pick how you want the information to look on the LED screen. You can change this later.
-4. **WiFi** — Type the name of your home WiFi network and its password. This is so the Pi can leave its temporary hotspot and join your real internet.
+2. **Location** — Type your latitude and longitude. The nearest town is plenty — it is only used to work out how far away the aeroplanes are. (Address lookup and the map need internet, so they wake up once the Pi is online. You can refine your location later in **Settings → Location & Units**.)
+3. **Layout** — Pick how you want aeroplanes to look on the LED screen. Your matrix previews your choice live, and you can change or design layouts later.
+4. **WiFi** — Pick your home network from the scanned list (or type its name) and enter the password. This is so the Pi can leave its temporary hotspot and join your real internet.
 
 When you tap **Finish Setup**, the Pi saves everything, switches to your home WiFi, and restarts.
 
@@ -127,6 +129,8 @@ Now that the Pi is on your home network, you can visit it in your browser using 
 **`http://adsb-display.local`**
 
 If that does not work, you can also look at your router's list of connected devices to find the Pi's new IP address.
+
+> 💡 **Tip:** Need to change WiFi networks later? Open **Settings → WiFi** — no need to reset anything.
 
 ---
 
@@ -152,7 +156,7 @@ If that does not work, you can also look at your router's list of connected devi
   - Make sure your home WiFi is a normal 2.4 GHz or 5 GHz network with a password (not a special office or hotel login page).
 
 - **I typed the wrong WiFi password.**
-  - Connect to `ADSB-Display-XXXX` again, open `http://192.168.4.1`, and go through the wizard once more.
+  - The Pi notices it cannot connect and reopens the `ADSB-Display-XXXX` hotspot after a couple of minutes. Connect to it, open `http://192.168.4.1`, and fix the password under **Settings → WiFi** — no need to go through the whole setup again.
 
 ---
 

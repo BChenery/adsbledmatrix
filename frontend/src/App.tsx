@@ -168,7 +168,7 @@ export default function App() {
   }
 
   if (!config?.onboarding_complete) {
-    return <OnboardingWizard onComplete={(c) => setConfig(c)} />;
+    return <OnboardingWizard config={config} />;
   }
 
   return (
