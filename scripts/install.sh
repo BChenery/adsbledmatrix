@@ -178,13 +178,31 @@ npm install
 npm run build
 cd "$INSTALL_DIR"
 
-# Sync all data assets for offline use
+# Sync all data assets for offline use (uses the venv we just created)
 echo "[6.6/8] Syncing data assets (aircraft DB, routes, logos)..."
-python3 scripts/sync_data.py --force || echo "Data sync incomplete (some assets may be missing)"
+if ! python3 scripts/sync_data.py --force; then
+  echo "WARNING: Data sync incomplete — will still try localadsb import from the git tree"
+fi
 
-# Import localadsb databases if present
+# Import localadsb databases if present (rego / airline / type / routes).
+# This is required for the matrix to show anything beyond raw ADS-B fields.
 echo "[6.7/8] Importing localadsb aircraft and route databases..."
-python3 scripts/import_localadsb.py || echo "localadsb import skipped or failed"
+if [ -f "${INSTALL_DIR}/data/localadsb/flights.db" ]; then
+  if ! python3 scripts/import_localadsb.py; then
+    echo "ERROR: localadsb import failed — aircraft metadata and routes will be missing"
+    exit 1
+  fi
+  AIRCRAFT_COUNT=$(python3 -c "import sqlite3; print(sqlite3.connect('${INSTALL_DIR}/data/aircraft_db.sqlite3').execute('SELECT COUNT(*) FROM aircraft').fetchone()[0])" 2>/dev/null || echo 0)
+  ROUTE_COUNT=$(python3 -c "import sqlite3; print(sqlite3.connect('${INSTALL_DIR}/data/aircraft_db.sqlite3').execute('SELECT COUNT(*) FROM routes').fetchone()[0])" 2>/dev/null || echo 0)
+  echo "  Imported ${AIRCRAFT_COUNT} aircraft and ${ROUTE_COUNT} routes"
+  if [ "${AIRCRAFT_COUNT}" -lt 1000 ]; then
+    echo "ERROR: aircraft table only has ${AIRCRAFT_COUNT} rows (expected thousands). Install aborted."
+    exit 1
+  fi
+else
+  echo "ERROR: data/localadsb/flights.db missing from install tree — cannot seed aircraft DB"
+  exit 1
+fi
 
 # Set up WiFi access point for onboarding
 echo "[7/8] Setting up WiFi access point..."

@@ -19,7 +19,9 @@ class RouteService:
     async def lookup(self, callsign: str) -> Optional[Route]:
         if not callsign:
             return None
-        callsign = callsign.upper()
+        callsign = callsign.strip().upper()
+        if not callsign:
+            return None
         if callsign in self._cache:
             return self._cache[callsign]
         async with AsyncSessionLocal() as session:
@@ -27,7 +29,10 @@ class RouteService:
                 select(Route).where(Route.callsign == callsign)
             )
             route = result.scalar_one_or_none()
-            self._cache[callsign] = route
+            # Only cache hits. Misses must re-query so a later data import
+            # (install/sync) can fill routes without requiring a process restart.
+            if route is not None:
+                self._cache[callsign] = route
             return route
 
     async def import_from_csv(self, path: Path) -> int:

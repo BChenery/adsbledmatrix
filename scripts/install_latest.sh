@@ -292,6 +292,38 @@ main() {
 
     fix_ownership
 
+    # Seed aircraft/route metadata so the matrix shows rego, airline, type, routes.
+    # Fresh installs always import; updates re-import when the source is newer.
+    write_progress "installing" 65 "Importing aircraft and route databases..." "" "$STARTED_AT"
+    if [ -x "${INSTALL_DIR}/venv/bin/python3" ]; then
+        PY="${INSTALL_DIR}/venv/bin/python3"
+    else
+        PY="python3"
+    fi
+    if [ -f "${INSTALL_DIR}/data/localadsb/flights.db" ]; then
+        log "Importing localadsb aircraft/route data"
+        if ! (cd "${INSTALL_DIR}" && "${PY}" scripts/import_localadsb.py); then
+            log "ERROR: localadsb import failed"
+            if [ "$MODE" = "fresh" ]; then
+                exit 1
+            fi
+        else
+            AIRCRAFT_COUNT=$("${PY}" -c "import sqlite3; print(sqlite3.connect('${INSTALL_DIR}/data/aircraft_db.sqlite3').execute('SELECT COUNT(*) FROM aircraft').fetchone()[0])" 2>/dev/null || echo 0)
+            ROUTE_COUNT=$("${PY}" -c "import sqlite3; print(sqlite3.connect('${INSTALL_DIR}/data/aircraft_db.sqlite3').execute('SELECT COUNT(*) FROM routes').fetchone()[0])" 2>/dev/null || echo 0)
+            log "Aircraft DB ready: ${AIRCRAFT_COUNT} aircraft, ${ROUTE_COUNT} routes"
+            if [ "$MODE" = "fresh" ] && [ "${AIRCRAFT_COUNT}" -lt 1000 ]; then
+                log "ERROR: aircraft table only has ${AIRCRAFT_COUNT} rows after import"
+                exit 1
+            fi
+        fi
+    else
+        log "WARNING: data/localadsb/flights.db missing — enrichment data will be empty"
+        if [ "$MODE" = "fresh" ]; then
+            exit 1
+        fi
+    fi
+    chown -R "${SERVICE_USER}:${SERVICE_USER}" "${INSTALL_DIR}/data" 2>/dev/null || true
+
     log "Starting services"
     write_progress "installing" 70 "Restarting services..." "" "$STARTED_AT"
     systemctl start adsbledmatrix.service || true
