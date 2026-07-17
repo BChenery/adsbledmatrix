@@ -93,6 +93,27 @@ def test_is_readsb_available_subprocess_permission_error_returns_false(caplog):
         assert manager.is_readsb_available() is False
 
 
+def test_run_systemctl_uses_sudo_when_not_root(monkeypatch):
+    """After LED privilege drop the app is uid≠0 and must elevate systemctl."""
+    monkeypatch.setattr(manager.os, "geteuid", lambda: 1000)
+    with patch.object(manager.subprocess, "run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+        manager._run_systemctl("start", "readsb.service")
+    mock_run.assert_called_once()
+    cmd = mock_run.call_args.args[0]
+    assert cmd[:3] == ["sudo", "-n", "systemctl"]
+    assert cmd[3:] == ["start", "readsb.service"]
+
+
+def test_run_systemctl_no_sudo_when_root(monkeypatch):
+    monkeypatch.setattr(manager.os, "geteuid", lambda: 0)
+    with patch.object(manager.subprocess, "run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+        manager._run_systemctl("stop", "readsb.service")
+    cmd = mock_run.call_args.args[0]
+    assert cmd == ["systemctl", "stop", "readsb.service"]
+
+
 @pytest.mark.asyncio
 async def test_apply_local_config_starts_service_and_clears_flag(mock_receiver, clear_flag_file):
     c = fake_config("local")

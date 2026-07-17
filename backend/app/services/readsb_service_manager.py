@@ -1,4 +1,5 @@
 import logging
+import os
 import subprocess
 from pathlib import Path
 
@@ -12,8 +13,17 @@ NETWORK_FLAG_FILE = Path(settings.data_dir) / ".network_receiver_enabled"
 
 
 def _run_systemctl(*args: str) -> subprocess.CompletedProcess:
+    """Run systemctl, elevating with passwordless sudo when not root.
+
+    The LED matrix library drops the main process from root to the ``adsb``
+    user after GPIO init. Local RTL-SDR mode depends on start/stop of
+    ``readsb.service`` from that process, so non-root calls must use sudo.
+    """
+    cmd = ["systemctl", *args]
+    if os.geteuid() != 0:
+        cmd = ["sudo", "-n", *cmd]
     return subprocess.run(
-        ["systemctl", *args],
+        cmd,
         capture_output=True,
         text=True,
         check=False,
@@ -76,7 +86,12 @@ def set_network_flag(enabled: bool) -> None:
 
 
 async def apply_receiver_source(config: UserConfig) -> None:
-    """Apply receiver source configuration: endpoint + local service state + flag file."""
+    """Apply receiver source configuration: endpoint + local service state + flag file.
+
+    Local RTL-SDR (the default for shipped units) clears the network flag and
+    starts ``readsb.service``. Network mode sets the flag (so systemd will not
+    auto-start local readsb on boot) and stops the service to free the dongle.
+    """
     host, port = _resolve_receiver_config(config)
     await receiver.set_endpoint(host, port)
 

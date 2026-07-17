@@ -178,9 +178,13 @@ install_or_update_code() {
 
 install_sudoers() {
     log "Installing sudoers rules for ${SERVICE_USER}"
+    # App drops root→adsb after LED init; local RTL-SDR needs passwordless
+    # systemctl start/stop of readsb.service from that unprivileged process.
     cat > /etc/sudoers.d/adsbledmatrix <<EOF
 ${SERVICE_USER} ALL=(ALL) NOPASSWD: ${INSTALL_DIR}/venv/bin/python3 ${INSTALL_DIR}/scripts/wifi_manager.py *
 ${SERVICE_USER} ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/reboot, /sbin/shutdown, /usr/sbin/shutdown, /usr/sbin/nmcli, /usr/sbin/iptables, /usr/sbin/netfilter-persistent, /bin/systemctl restart adsbledmatrix, /bin/systemctl restart adsbledmatrix.service, /bin/systemctl start adsbledmatrix-update.service, /bin/systemctl start --no-block adsbledmatrix-update.service
+${SERVICE_USER} ALL=(ALL) NOPASSWD: /bin/systemctl start readsb, /bin/systemctl start readsb.service, /bin/systemctl stop readsb, /bin/systemctl stop readsb.service, /bin/systemctl restart readsb, /bin/systemctl restart readsb.service, /bin/systemctl status readsb, /bin/systemctl status readsb.service, /bin/systemctl is-active readsb, /bin/systemctl is-active readsb.service
+${SERVICE_USER} ALL=(ALL) NOPASSWD: /usr/bin/systemctl start readsb, /usr/bin/systemctl start readsb.service, /usr/bin/systemctl stop readsb, /usr/bin/systemctl stop readsb.service, /usr/bin/systemctl restart readsb, /usr/bin/systemctl restart readsb.service, /usr/bin/systemctl status readsb, /usr/bin/systemctl status readsb.service, /usr/bin/systemctl is-active readsb, /usr/bin/systemctl is-active readsb.service
 EOF
     chmod 440 /etc/sudoers.d/adsbledmatrix
 }
