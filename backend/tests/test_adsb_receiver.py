@@ -50,6 +50,62 @@ async def test_set_endpoint_restarts_running_loop(receiver):
 
 
 @pytest.mark.asyncio
+async def test_stop_swallows_connection_reset_from_wait_closed(receiver):
+    """SBS peers often RST on close; stop must not raise so config save works."""
+    reader = AsyncMock()
+    writer = MagicMock()
+    writer.wait_closed = AsyncMock(side_effect=ConnectionResetError(104, "Connection reset by peer"))
+    hold = asyncio.Event()
+
+    async def blocking_read(*args, **kwargs):
+        await hold.wait()
+        return b""
+
+    reader.read.side_effect = blocking_read
+
+    with patch("app.services.adsb_receiver.asyncio.open_connection", new_callable=AsyncMock) as mock_open:
+        mock_open.return_value = (reader, writer)
+        await receiver.start()
+        # Let the loop connect
+        for _ in range(50):
+            if receiver.connected:
+                break
+            await asyncio.sleep(0.02)
+        assert receiver.connected is True
+
+        await receiver.stop()
+
+    assert receiver.connected is False
+    assert receiver._task is None
+    assert receiver._running is False
+    writer.close.assert_called()
+    writer.wait_closed.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_set_endpoint_recovers_dead_task_without_endpoint_change(receiver):
+    """After a failed stop leaves a done task, re-applying the same endpoint restarts."""
+
+    async def already_failed():
+        raise ConnectionResetError(104, "Connection reset by peer")
+
+    dead = asyncio.create_task(already_failed())
+    with pytest.raises(ConnectionResetError):
+        await dead
+
+    receiver._task = dead
+    receiver._running = False
+    receiver._readsb_host = "10.0.0.158"
+    receiver._readsb_port = 30003
+
+    with patch.object(receiver, "start", new_callable=AsyncMock) as mock_start, \
+         patch.object(receiver, "stop", new_callable=AsyncMock) as mock_stop:
+        await receiver.set_endpoint("10.0.0.158", 30003)
+        mock_stop.assert_awaited_once()
+        mock_start.assert_awaited_once()
+
+
+@pytest.mark.asyncio
 async def test_read_loop_sets_connected_true(receiver):
     reader = AsyncMock()
     writer = MagicMock()

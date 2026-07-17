@@ -63,11 +63,18 @@ class ADSBReceiver:
         return self._readsb_host, self._readsb_port
 
     async def set_endpoint(self, host: str, port: int) -> None:
-        if host == self._readsb_host and port == self._readsb_port:
-            return
+        endpoint_changed = host != self._readsb_host or port != self._readsb_port
         self._readsb_host = host
         self._readsb_port = port
-        if self._running and self._task is not None:
+
+        task_alive = self._task is not None and not self._task.done()
+        # Skip restart when the endpoint is unchanged and the read loop is healthy.
+        if not endpoint_changed and task_alive:
+            return
+
+        # Restart when the endpoint changed, or recover a dead/stopped task that
+        # was previously started (e.g. after a failed stop during config save).
+        if self._running or self._task is not None:
             await self.stop()
             await self.start()
 
@@ -96,14 +103,30 @@ class ADSBReceiver:
 
     async def stop(self):
         self._running = False
-        if self._task:
-            self._task.cancel()
+        task = self._task
+        self._task = None
+        self._connected = False
+        if task is not None:
+            task.cancel()
             try:
-                await self._task
+                await task
             except asyncio.CancelledError:
                 pass
-            self._task = None
+            except Exception as e:
+                # Peer resets and similar close races are common on SBS streams;
+                # never let them fail config saves or leave the task orphaned.
+                logger.debug("Receiver task ended with error during stop: %s", e)
         logger.info("ADSB receiver stopped")
+
+    async def _close_writer(self, writer) -> None:
+        if writer is None:
+            return
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            # Closing a reset SBS socket often raises ConnectionResetError.
+            pass
 
     async def _read_loop(self):
         while self._running:
@@ -139,9 +162,7 @@ class ADSBReceiver:
                 await asyncio.sleep(5)
             finally:
                 self._connected = False
-                if writer is not None:
-                    writer.close()
-                    await writer.wait_closed()
+                await self._close_writer(writer)
 
     def _parse_line(self, line: str):
         # SBS/BaseStation format (CSV)
