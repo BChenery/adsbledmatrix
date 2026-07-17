@@ -5,6 +5,18 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.48] - 2026-07-18
+
+### Fixed
+- Fresh install and OTA now **require** a full aircraft/route import from localadsb (`flights.db`); install aborts if enrichment data is missing or too small (no more callsign-only devices with ~65 aircraft)
+- Network SBS receiver no longer dies or blocks **Save** when switching receiver host/port
+- Local RTL-SDR `readsb` can start/stop again after the LED stack drops privileges to `adsb`
+- Route lookups no longer permanently cache “not found”, so new routes appear after a data sync without a process restart
+
+### Changed
+- Production layouts from the field Pi are now the shipped defaults (including Radar); design-system palette/safe-margin checks relaxed for designer-customized layouts
+- Heading arrow in the designer preview rotates with aircraft heading, scales with box size, and has an **Arrow Size** control
+
 ## [0.1.40] - 2026-07-15
 
 ### Added
