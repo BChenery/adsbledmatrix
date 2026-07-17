@@ -153,6 +153,25 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
           </div>
         )}
 
+        {element.element_type === 'heading_arrow' && (
+          <div className="space-y-1">
+            <Label htmlFor="heading-arrow-size">Arrow Size</Label>
+            <Input
+              id="heading-arrow-size"
+              type="number"
+              min={8}
+              value={Math.min(element.width || 40, element.height || 40)}
+              onChange={(e) => {
+                const size = Math.max(8, parseInt(e.target.value) || 8);
+                onChange({ ...element, width: size, height: size });
+              }}
+            />
+            <p className="text-[11px] text-led-faint">
+              Square size in pixels. Also editable via Width/Height or the canvas resize handle.
+            </p>
+          </div>
+        )}
+
         <div className="space-y-1">
           <Label>Color</Label>
           <div className="flex gap-2">

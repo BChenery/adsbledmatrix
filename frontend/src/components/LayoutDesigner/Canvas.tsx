@@ -100,7 +100,6 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
       let text = '';
       if (el.element_type === 'text') text = el.format_str || 'Text';
       else if (el.element_type === 'data_field') text = getDisplayValue(el) || el.format_str || `{${el.data_field}}`;
-      else if (el.element_type === 'heading_arrow') text = getDisplayValue(el) || '→';
       else if (el.element_type === 'vertical_rate') text = getDisplayValue(el) || '▲ 1200';
       else if (el.element_type === 'distance_bar') text = getDisplayValue(el) || '|||||';
       else if (el.element_type === 'radar_blip') text = '◎';
@@ -153,16 +152,38 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         ctx.strokeRect(x, y, w, h);
       }
 
+      // Heading arrow: match LED engine — filled triangle rotated by aircraft
+      // heading, sized to the element box (min(width, height)).
       if (el.element_type === 'heading_arrow') {
-        ctx.strokeStyle = el.color || '#ffffff';
+        const ac = aircraft[0];
+        // Preview default north when no live heading is available
+        const heading =
+          ac?.heading !== undefined && ac?.heading !== null
+            ? Number(ac.heading)
+            : 0;
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+        const radius = Math.max(2, Math.min(w, h) / 2 - 2);
+        // 0° is up (north), same convention as display_engine._draw_heading_arrow
+        const angle = ((heading - 90) * Math.PI) / 180;
+        const tipX = cx + radius * Math.cos(angle);
+        const tipY = cy + radius * Math.sin(angle);
+        const leftX = cx + radius * 0.5 * Math.cos(angle + 2.5);
+        const leftY = cy + radius * 0.5 * Math.sin(angle + 2.5);
+        const rightX = cx + radius * 0.5 * Math.cos(angle - 2.5);
+        const rightY = cy + radius * 0.5 * Math.sin(angle - 2.5);
+        const dotR = Math.max(1, Math.min(2, radius * 0.15));
+
+        ctx.fillStyle = el.color || '#00ff88';
         ctx.beginPath();
-        ctx.moveTo(x + w / 2, y + 4);
-        ctx.lineTo(x + w / 2, y + h - 4);
-        ctx.moveTo(x + w / 2, y + 4);
-        ctx.lineTo(x + w / 2 - 6, y + 12);
-        ctx.moveTo(x + w / 2, y + 4);
-        ctx.lineTo(x + w / 2 + 6, y + 12);
-        ctx.stroke();
+        ctx.moveTo(tipX, tipY);
+        ctx.lineTo(leftX, leftY);
+        ctx.lineTo(rightX, rightY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx, cy, dotR, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       // Radar preview

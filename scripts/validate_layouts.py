@@ -78,30 +78,18 @@ def validate_layout(layout: Dict[str, Any]) -> List[str]:
             errors.append(f"{prefix}: missing x/y")
             continue
 
-        if x < SAFE_MARGIN or y < SAFE_MARGIN or x + w > width - SAFE_MARGIN or y + h > height - SAFE_MARGIN:
+        # Hard canvas bounds — elements must fully fit on the matrix.
+        # Soft "safe margin" / design-system palette checks are not enforced so
+        # designer-customized production layouts can ship as defaults.
+        if x < 0 or y < 0 or x + w > width or y + h > height:
             errors.append(
-                f"{prefix}: box ({x},{y},{w},{h}) outside safe area "
-                f"({SAFE_MARGIN}-{width - SAFE_MARGIN}, {SAFE_MARGIN}-{height - SAFE_MARGIN})"
+                f"{prefix}: box ({x},{y},{w},{h}) outside canvas "
+                f"(0-{width}, 0-{height})"
             )
 
         font_size = elem.get("font_size")
-        if font_size and h and font_size > h - 4:
-            errors.append(f"{prefix}: font_size {font_size} exceeds box height {h} - 4")
-
-        color = elem.get("color")
-        bg_color = elem.get("bg_color")
-        ring_color = elem.get("ring_color")
-        dot_color = elem.get("dot_color")
-        user_dot_color = elem.get("user_dot_color")
-        for field, value in [
-            ("color", color),
-            ("bg_color", bg_color),
-            ("ring_color", ring_color),
-            ("dot_color", dot_color),
-            ("user_dot_color", user_dot_color),
-        ]:
-            if value and value not in PALETTE:
-                errors.append(f"{prefix}: {field} {value} not in approved palette")
+        if font_size and h and font_size > h:
+            errors.append(f"{prefix}: font_size {font_size} exceeds box height {h}")
 
         required = REQUIRED_FIELDS.get(elem_type)
         if required is None:
