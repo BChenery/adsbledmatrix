@@ -42,6 +42,11 @@ class LiveAircraft:
 class ADSBReceiver:
     """Reads SBS/BaseStation format from readsb TCP port 30003."""
 
+    # Reconnect if no SBS bytes arrive for this long (half-open / stalled TCP).
+    # Quiet airspace can still produce heartbeats from distant aircraft; 45s is
+    # long enough to avoid thrashing while recovering stuck sessions quickly.
+    STALL_TIMEOUT_SECONDS = 45.0
+
     def __init__(self):
         self.aircraft: Dict[str, LiveAircraft] = {}
         self._running = False
@@ -53,10 +58,15 @@ class ADSBReceiver:
         self._readsb_host = settings.readsb_host
         self._readsb_port = settings.readsb_port
         self._connected = False
+        self._last_data_at: Optional[datetime] = None
 
     @property
     def connected(self) -> bool:
-        return self._connected
+        """True while a TCP session is open and not yet stalled."""
+        if not self._connected or self._last_data_at is None:
+            return False
+        idle = (datetime.utcnow() - self._last_data_at).total_seconds()
+        return idle < self.STALL_TIMEOUT_SECONDS
 
     @property
     def endpoint(self) -> tuple[str, int]:
@@ -131,11 +141,13 @@ class ADSBReceiver:
     async def _read_loop(self):
         while self._running:
             writer = None
+            retry_delay = 1.0
             try:
                 reader, writer = await asyncio.open_connection(
                     self._readsb_host, self._readsb_port
                 )
                 self._connected = True
+                self._last_data_at = datetime.utcnow()
                 logger.info(
                     f"Connected to readsb at {self._readsb_host}:{self._readsb_port}"
                 )
@@ -146,12 +158,27 @@ class ADSBReceiver:
                             reader.read(4096), timeout=10.0
                         )
                         if not data:
+                            logger.warning("readsb connection closed by peer")
                             break
+                        self._last_data_at = datetime.utcnow()
                         buffer += data.decode("utf-8", errors="ignore")
                         while "\n" in buffer:
                             line, buffer = buffer.split("\n", 1)
                             self._parse_line(line.strip())
                     except asyncio.TimeoutError:
+                        # Drop zombies even when the wire is quiet.
+                        self._clean_stale()
+                        idle = (
+                            (datetime.utcnow() - self._last_data_at).total_seconds()
+                            if self._last_data_at
+                            else 0.0
+                        )
+                        if idle >= self.STALL_TIMEOUT_SECONDS:
+                            logger.warning(
+                                "readsb stall: no data for %.0fs, reconnecting",
+                                idle,
+                            )
+                            break
                         continue
             except asyncio.CancelledError:
                 self._connected = False
@@ -159,10 +186,13 @@ class ADSBReceiver:
             except Exception as e:
                 self._connected = False
                 logger.warning(f"readsb connection error: {e}, retrying in 5s...")
-                await asyncio.sleep(5)
+                retry_delay = 5.0
             finally:
                 self._connected = False
                 await self._close_writer(writer)
+            # Pause before reconnect so we don't spin on a hard fail / stall.
+            if self._running:
+                await asyncio.sleep(retry_delay)
 
     def _parse_line(self, line: str):
         # SBS/BaseStation format (CSV)
@@ -185,8 +215,9 @@ class ADSBReceiver:
         except ValueError:
             timestamp = datetime.utcnow()
 
-        # Extract fields based on message type
-        updates = {"last_seen": timestamp}
+        # last_seen is always wall-clock receive time (set in LiveAircraft.update).
+        # Do not trust the feeder's SBS clock for staleness.
+        updates: dict = {}
 
         if msg_type in ("1", "5", "6"):  # ES ID, Surveillance ID, ADS-R ID
             callsign = parts[10].strip()
@@ -337,6 +368,7 @@ class ADSBReceiver:
         return valid[:n]
 
     def get_all(self) -> List[LiveAircraft]:
+        self._clean_stale()
         return list(self.aircraft.values())
 
     @staticmethod

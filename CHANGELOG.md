@@ -5,6 +5,13 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.51] - 2026-07-23
+
+### Fixed
+- Network SBS TCP client now **reconnects after ~45s with no data** (half-open / stalled sessions no longer leave the display stuck on “No aircraft in range” while the feeder is healthy)
+- Stale aircraft are pruned on idle timeouts and when listing live traffic
+- Soft **Restart** schedules `systemctl` more reliably (detached session + absolute path)
+
 ## [0.1.48] - 2026-07-18
 
 ### Fixed

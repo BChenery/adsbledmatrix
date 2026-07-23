@@ -190,7 +190,17 @@ async def get_update_progress():
 
 @router.post("/restart")
 async def restart_system():
-    subprocess.Popen(["systemctl", "restart", "adsbledmatrix"])
+    # Detach so systemd can stop this process cleanly; use absolute path.
+    try:
+        subprocess.Popen(
+            ["/bin/systemctl", "restart", "adsbledmatrix"],
+            start_new_session=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception as e:
+        logger.exception("Failed to schedule service restart: %s", e)
+        return {"message": f"Restart failed: {e}"}
     return {"message": "Restarting..."}
 
 
