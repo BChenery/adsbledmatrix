@@ -5,6 +5,11 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.56] - 2026-07-28
+
+### Fixed
+- Helicopter fallback logo redesigned as a clear side-profile silhouette (rotor, cabin, boom, skids) instead of a hard-to-read blob
+
 ## [0.1.55] - 2026-07-28
 
 ### Fixed
