@@ -16,6 +16,13 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from app.config import settings
 from app.database import AsyncSessionLocal
 from app.models import AirlineLogo
+from app.services.aircraft_icons import (
+    LOGO_FALLBACK_AIRLINER,
+    LOGO_FALLBACK_BIZJET,
+    LOGO_FALLBACK_HELICOPTER,
+    LOGO_FALLBACK_PROP,
+    classify_logo_fallback,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -172,6 +179,31 @@ class LogoManager:
     def _unknown_path(self) -> Path:
         return settings.logos_dir / "UNKNOWN.png"
 
+    # Type-aware fallbacks when no airline brand logo exists (private GA, helos, etc.).
+    _FALLBACK_LOGO_FILES = {
+        LOGO_FALLBACK_HELICOPTER: "UNKNOWN_HELI.png",
+        LOGO_FALLBACK_PROP: "UNKNOWN_PROP.png",
+        LOGO_FALLBACK_BIZJET: "UNKNOWN_BIZJET.png",
+        LOGO_FALLBACK_AIRLINER: "UNKNOWN.png",
+    }
+
+    def type_fallback_logo_path(
+        self,
+        type_code: Optional[str] = None,
+        type_name: Optional[str] = None,
+    ) -> Path:
+        """Return a silhouette logo for aircraft with no airline brand.
+
+        Helicopters, props, and bizjets get distinct white-on-transparent
+        silhouettes so an R44 does not show a generic airliner glyph.
+        """
+        kind = classify_logo_fallback(type_code, type_name)
+        filename = self._FALLBACK_LOGO_FILES.get(kind, "UNKNOWN.png")
+        path = settings.logos_dir / filename
+        if path.exists():
+            return path
+        return self._unknown_path()
+
     def logo_path_for_icao(self, icao_code: str) -> Optional[Path]:
         """Return the local logo path for an ICAO, applying known overrides."""
         if not icao_code:
@@ -198,6 +230,8 @@ class LogoManager:
         operator_icao: Optional[str],
         callsign: Optional[str],
         registration: Optional[str] = None,
+        type_code: Optional[str] = None,
+        type_name: Optional[str] = None,
     ) -> Optional[Path]:
         """Return the local logo path for an aircraft, using the callsign prefix first.
 
@@ -207,7 +241,8 @@ class LogoManager:
         the brand that should be shown on the display than the registered operator.
 
         Falls back to the operator ICAO logo when no callsign is available or the
-        prefix cannot be resolved to a known airline.
+        prefix cannot be resolved to a known airline. When no brand logo exists,
+        returns a type-aware silhouette (heli / prop / bizjet / airliner).
         """
         # Callsign brand wins for logos (wet-lease / codeshare). Return early
         # when a logo exists so a foreign marketing callsign can still render.
@@ -223,7 +258,8 @@ class LogoManager:
                     return path
 
         # Australian-registered aircraft with a non-Australian operator code are
-        # almost always bad registry data — show UNKNOWN rather than a foreign logo.
+        # almost always bad registry data — show a type silhouette rather than a
+        # foreign airline logo.
         if registration and registration.upper().strip().startswith("VH-"):
             candidate: Optional[str] = None
             if operator_icao:
@@ -236,10 +272,16 @@ class LogoManager:
                     or _LOGO_ICAO_OVERRIDES.get(icao, icao)
                 )
             if candidate and candidate.upper() not in _AUSTRALIAN_OPERATOR_ICAOS:
-                return self._unknown_path()
+                return self.type_fallback_logo_path(type_code, type_name)
 
         if operator_icao:
-            return self.logo_path_for_icao(operator_icao)
+            brand_path = self.logo_path_for_icao(operator_icao)
+            if brand_path is not None:
+                return brand_path
+
+        # No airline brand available — type-aware silhouette for GA / helo / bizjet.
+        if type_code or type_name:
+            return self.type_fallback_logo_path(type_code, type_name)
 
         return None
 

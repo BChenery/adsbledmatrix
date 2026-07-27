@@ -265,6 +265,156 @@ _HEAVY_NAME_RE = re.compile(
     r"\b(777|787|a330|a340|a350|a300|a310|il-?96|md-?11|dc-?10)\b",
     re.IGNORECASE,
 )
+_BIZJET_NAME_RE = re.compile(
+    r"""
+    citation|mustang|m2\b|cj[1234]|
+    gulfstream|global\s*express|glex|
+    learjet|lear\s*jet|
+    falcon\s*\d|dassault\s*falcon|
+    challenger|global\s*5|global\s*6|
+    phenom|legacy\s*5|praetor|
+    hawker|premier|horizon|
+    eclipse|vision\s*jet|sf50|
+    embraer\s*legacy|embraer\s*phenom|
+    bombardier\s*global|bombardier\s*challenger|
+    cessna\s*citation|beechjet|hawker\s*800|
+    pc-?24|pilatus\s*pc-?24
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+# ICAO type-code prefixes / exact codes commonly used for business jets.
+_BIZJET_CODES = frozenset(
+    {
+        # Cessna Citation family
+        "C25A",
+        "C25B",
+        "C25C",
+        "C25M",
+        "C500",
+        "C501",
+        "C525",
+        "C526",
+        "C550",
+        "C551",
+        "C560",
+        "C56X",
+        "C650",
+        "C680",
+        "C68A",
+        "C700",
+        "C750",
+        "C25A",
+        # Gulfstream
+        "GLF2",
+        "GLF3",
+        "GLF4",
+        "GLF5",
+        "GLF6",
+        "GL5T",
+        "GL7T",
+        "GLEX",
+        "GA6C",
+        "GA5C",
+        "GA7C",
+        # Bombardier Challenger / Global
+        "CL30",
+        "CL35",
+        "CL60",
+        "CL6B",
+        "GLEX",
+        # Learjet
+        "LJ23",
+        "LJ24",
+        "LJ25",
+        "LJ28",
+        "LJ31",
+        "LJ35",
+        "LJ40",
+        "LJ45",
+        "LJ55",
+        "LJ60",
+        "LJ70",
+        "LJ75",
+        "LJ85",
+        # Dassault Falcon
+        "FA10",
+        "FA20",
+        "FA50",
+        "FA7X",
+        "FA8X",
+        "F2TH",
+        "F900",
+        "F2TH",
+        # Embraer Phenom / Legacy / Praetor
+        "E50P",
+        "E55P",
+        "E35L",
+        "E545",
+        "E550",
+        "E55P",
+        "PRM1",
+        # Hawker / Beechjet
+        "H25A",
+        "H25B",
+        "H25C",
+        "BE40",
+        "BE4W",
+        "PRM1",
+        # Others
+        "EA50",
+        "SF50",
+        "HDJT",
+        "GALX",
+        "SBR1",
+        "PC24",
+        "ASTR",
+        "WW24",
+        "H25B",
+    }
+)
+_BIZJET_PREFIXES = (
+    "C25",
+    "C56",
+    "C68",
+    "C75",
+    "GLF",
+    "GLE",
+    "GL5",
+    "GL7",
+    "CL3",
+    "CL6",
+    "LJ",
+    "FA1",
+    "FA2",
+    "FA5",
+    "FA7",
+    "FA8",
+    "F2T",
+    "F90",
+    "E50",
+    "E55",
+    "E35",
+    "H25",
+    "BE4",
+    "HDJ",
+    "GAL",
+    "SBR",
+    "PC24",
+    "SF50",
+    "EA50",
+    "WW24",
+    "ASTR",
+    "GA5C",
+    "GA6C",
+    "GA7C",
+)
+
+# Fallback logo kinds used when no airline brand logo is available.
+LOGO_FALLBACK_HELICOPTER = "helicopter"
+LOGO_FALLBACK_PROP = "prop"
+LOGO_FALLBACK_BIZJET = "bizjet"
+LOGO_FALLBACK_AIRLINER = "airliner"
 
 
 @lru_cache(maxsize=1)
@@ -356,6 +506,58 @@ def classify_aircraft_icon(
             return ICON_HELICOPTER
 
     return ICON_JET
+
+
+def is_bizjet_type(
+    type_code: Optional[str] = None,
+    type_name: Optional[str] = None,
+) -> bool:
+    """True for business jets (Citation, Gulfstream, Lear, Falcon, …)."""
+    code = (type_code or "").strip().upper()
+    name = (type_name or "").strip()
+
+    if code:
+        if code in _BIZJET_CODES:
+            return True
+        if any(code.startswith(prefix) for prefix in _BIZJET_PREFIXES):
+            # Avoid airline families that share a short prefix (none currently).
+            return True
+
+    if name and _BIZJET_NAME_RE.search(name):
+        return True
+
+    # ICAO doc 8643: light twin-jets with WTC L are almost always light bizjets
+    # (CJ2 etc.). Medium twin-jets are ambiguous (CRJ vs Citation X), so only
+    # apply the metadata rule for WTC L.
+    if code:
+        meta = _load_icao_types().get(code)
+        if meta:
+            desc = (meta.get("desc") or "").upper()
+            wtc = (meta.get("wtc") or "").upper()
+            if len(desc) >= 3 and desc[0] == "L" and desc[2] == "J" and wtc == "L":
+                # Exclude small fighter/trainer jets that are also L*J/L.
+                if not code.startswith(("F1", "F1", "T3", "T3", "L39", "MB3", "HAW")):
+                    return True
+    return False
+
+
+def classify_logo_fallback(
+    type_code: Optional[str] = None,
+    type_name: Optional[str] = None,
+) -> str:
+    """Pick a silhouette class for the no-airline-logo fallback.
+
+    Returns one of LOGO_FALLBACK_* so private GA / helos / bizjets do not all
+    share the generic airliner UNKNOWN.png.
+    """
+    icon = classify_aircraft_icon(type_code, type_name)
+    if icon == ICON_HELICOPTER:
+        return LOGO_FALLBACK_HELICOPTER
+    if icon in (ICON_LIGHT_GA, ICON_TURBOPROP):
+        return LOGO_FALLBACK_PROP
+    if is_bizjet_type(type_code, type_name):
+        return LOGO_FALLBACK_BIZJET
+    return LOGO_FALLBACK_AIRLINER
 
 
 def aircraft_icon_polygon(

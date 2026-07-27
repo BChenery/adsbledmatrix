@@ -63,6 +63,30 @@ def test_classify_unknown_defaults_to_jet():
     assert classify_aircraft_icon("XXXX") == ICON_JET
 
 
+def test_classify_logo_fallback_kinds():
+    from app.services.aircraft_icons import (
+        LOGO_FALLBACK_AIRLINER,
+        LOGO_FALLBACK_BIZJET,
+        LOGO_FALLBACK_HELICOPTER,
+        LOGO_FALLBACK_PROP,
+        classify_logo_fallback,
+        is_bizjet_type,
+    )
+
+    assert classify_logo_fallback("R44") == LOGO_FALLBACK_HELICOPTER
+    assert classify_logo_fallback("EC35") == LOGO_FALLBACK_HELICOPTER
+    assert classify_logo_fallback("C172") == LOGO_FALLBACK_PROP
+    assert classify_logo_fallback("PC12") == LOGO_FALLBACK_PROP
+    assert classify_logo_fallback("C25A", "Cessna Citation CJ2") == LOGO_FALLBACK_BIZJET
+    assert classify_logo_fallback("GLF5") == LOGO_FALLBACK_BIZJET
+    assert classify_logo_fallback("B738") == LOGO_FALLBACK_AIRLINER
+    assert classify_logo_fallback("A320") == LOGO_FALLBACK_AIRLINER
+    assert is_bizjet_type("C25A")
+    assert is_bizjet_type("GLF4")
+    assert not is_bizjet_type("B738")
+    assert not is_bizjet_type("C172")
+
+
 def test_polygons_differ_by_class():
     """Key families must produce visibly different silhouettes."""
     shapes = {

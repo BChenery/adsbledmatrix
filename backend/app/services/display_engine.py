@@ -520,15 +520,22 @@ class DisplayEngine:
             icao = ctx.enriched.get("operator_icao")
             callsign = ctx.aircraft.callsign if ctx.aircraft else None
             registration = ctx.enriched.get("registration")
-            logo_path = logo_manager.logo_path_for_aircraft(icao, callsign, registration)
+            type_code = ctx.enriched.get("type_code")
+            type_name = ctx.enriched.get("type_name")
+            logo_path = logo_manager.logo_path_for_aircraft(
+                icao,
+                callsign,
+                registration,
+                type_code=type_code,
+                type_name=type_name,
+            )
             if logo_path and logo_path.exists():
                 path = str(logo_path)
             else:
-                # No ICAO known for this aircraft — fall back to the unknown logo
-                # rather than drawing nothing.
-                unknown_path = settings.logos_dir / "UNKNOWN.png"
-                if unknown_path.exists():
-                    path = str(unknown_path)
+                # No brand logo — type-aware silhouette (heli / prop / bizjet / airliner).
+                fallback = logo_manager.type_fallback_logo_path(type_code, type_name)
+                if fallback.exists():
+                    path = str(fallback)
 
         if not path:
             return
@@ -828,14 +835,23 @@ class DisplayEngine:
 
     def _evaluate_condition(self, condition: str, ctx: RenderContext) -> bool:
         if condition == "has_logo":
-            icao = (ctx.enriched or {}).get("operator_icao")
+            enriched = ctx.enriched or {}
+            icao = enriched.get("operator_icao")
             callsign = ctx.aircraft.callsign if ctx.aircraft else None
-            registration = (ctx.enriched or {}).get("registration")
-            logo_path = logo_manager.logo_path_for_aircraft(icao, callsign, registration)
+            registration = enriched.get("registration")
+            type_code = enriched.get("type_code")
+            type_name = enriched.get("type_name")
+            logo_path = logo_manager.logo_path_for_aircraft(
+                icao,
+                callsign,
+                registration,
+                type_code=type_code,
+                type_name=type_name,
+            )
             if logo_path and logo_path.exists():
                 return True
-            # Fallback logo is always available
-            return (settings.logos_dir / "UNKNOWN.png").exists()
+            # Type-aware silhouette fallbacks are always available when shipped.
+            return logo_manager.type_fallback_logo_path(type_code, type_name).exists()
         if condition == "altitude>0":
             return (ctx.aircraft.altitude or 0) > 0 if ctx.aircraft else False
         if condition == "is_idle":

@@ -100,13 +100,66 @@ def test_fd_callsign_hs_registration_uses_thai_airasia_logo(fake_logos_dir):
 
 
 def test_vh_registration_with_foreign_operator_uses_unknown(fake_logos_dir):
-    """VH- registered aircraft with bad foreign operator data show UNKNOWN."""
+    """VH- registered aircraft with bad foreign operator data show a type silhouette."""
     _make_logo(fake_logos_dir, "SAS")
     _make_logo(fake_logos_dir, "UNKNOWN")
 
     path = logo_manager.logo_path_for_aircraft("SAS", None, "VH-SZS")
 
     assert path == fake_logos_dir / "UNKNOWN.png"
+
+
+def test_vh_registration_foreign_operator_r44_uses_heli_fallback(fake_logos_dir):
+    """An R44 with bad foreign operator data should show the helicopter silhouette."""
+    _make_logo(fake_logos_dir, "SAS")
+    _make_logo(fake_logos_dir, "UNKNOWN")
+    _make_logo(fake_logos_dir, "UNKNOWN_HELI")
+
+    path = logo_manager.logo_path_for_aircraft(
+        "SAS", None, "VH-HEL", type_code="R44", type_name="Robinson R44"
+    )
+
+    assert path == fake_logos_dir / "UNKNOWN_HELI.png"
+
+
+def test_ga_without_airline_logo_uses_prop_fallback(fake_logos_dir):
+    """Private Cessna with no operator logo should show the prop silhouette."""
+    _make_logo(fake_logos_dir, "UNKNOWN_PROP")
+    _make_logo(fake_logos_dir, "UNKNOWN")
+
+    path = logo_manager.logo_path_for_aircraft(
+        None, None, "VH-ABC", type_code="C172", type_name="Cessna 172"
+    )
+
+    assert path == fake_logos_dir / "UNKNOWN_PROP.png"
+
+
+def test_bizjet_without_airline_logo_uses_bizjet_fallback(fake_logos_dir):
+    """Citation / Gulfstream with no brand logo should show the bizjet silhouette."""
+    _make_logo(fake_logos_dir, "UNKNOWN_BIZJET")
+    _make_logo(fake_logos_dir, "UNKNOWN")
+
+    path = logo_manager.logo_path_for_aircraft(
+        None, None, "VH-JET", type_code="C25A", type_name="Cessna Citation CJ2"
+    )
+    assert path == fake_logos_dir / "UNKNOWN_BIZJET.png"
+
+    path = logo_manager.logo_path_for_aircraft(
+        None, None, "VH-GSF", type_code="GLF5", type_name="Gulfstream G500"
+    )
+    assert path == fake_logos_dir / "UNKNOWN_BIZJET.png"
+
+
+def test_airline_logo_still_preferred_over_type_fallback(fake_logos_dir):
+    """A real airline brand must win even when type would pick a silhouette."""
+    _make_logo(fake_logos_dir, "QFA")
+    _make_logo(fake_logos_dir, "UNKNOWN_BIZJET")
+
+    path = logo_manager.logo_path_for_aircraft(
+        "QFA", "QFA123", "VH-OQI", type_code="C25A"
+    )
+
+    assert path == fake_logos_dir / "QFA.png"
 
 
 def test_vh_registration_with_australian_operator_uses_logo(fake_logos_dir):
