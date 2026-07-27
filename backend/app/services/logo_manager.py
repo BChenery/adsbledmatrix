@@ -373,7 +373,7 @@ class LogoManager:
             try:
                 response = await client.get(url)
                 if response.status_code == 200 and len(response.content) > 200:
-                    resized = self._resize_image(response.content)
+                    resized = self._resize_image(response.content, icao=icao)
                     if resized:
                         dest.write_bytes(resized)
                         logger.info(f"Downloaded logo for {icao} from {url}")
@@ -386,7 +386,7 @@ class LogoManager:
         logger.warning(f"Could not find logo for airline {icao}")
         return None
 
-    def _resize_image(self, data: bytes) -> Optional[bytes]:
+    def _resize_image(self, data: bytes, icao: Optional[str] = None) -> Optional[bytes]:
         """Resize downloaded image to standard LOGO_SIZE with transparency."""
         try:
             img = Image.open(BytesIO(data))
@@ -399,6 +399,7 @@ class LogoManager:
             r, g, b, a = img.split()
             a = a.point(lambda p: 255 if p > 64 else 0)
             img = Image.merge("RGBA", (r, g, b, a))
+            img = self._apply_logo_color_fixups(img, icao)
             # Save to bytes
             out = BytesIO()
             img.save(out, format="PNG", optimize=True)
@@ -406,6 +407,31 @@ class LogoManager:
         except Exception as e:
             logger.debug(f"Image resize failed: {e}")
             return None
+
+    def _apply_logo_color_fixups(self, img: Image.Image, icao: Optional[str]) -> Image.Image:
+        """Fix logos that use black ink invisible on a black LED matrix."""
+        if not icao or icao.upper() != "JST":
+            return img
+        # Jetstar wordmark is black "Jet" + orange star. Black disappears on the
+        # matrix; recolor near-black opaque pixels to silver so the word reads.
+        return self._recolor_near_black_to_silver(img)
+
+    @staticmethod
+    def _recolor_near_black_to_silver(img: Image.Image, silver: tuple[int, int, int] = (200, 200, 200)) -> Image.Image:
+        """Recolor dark, low-chroma pixels to silver while preserving alpha."""
+        pixels = img.load()
+        width, height = img.size
+        sr, sg, sb = silver
+        for y in range(height):
+            for x in range(width):
+                r, g, b, a = pixels[x, y]
+                if a <= 10:
+                    continue
+                luma = max(r, g, b)
+                chroma = luma - min(r, g, b)
+                if luma < 60 and chroma < 40:
+                    pixels[x, y] = (sr, sg, sb, a)
+        return img
 
     async def _record_logo(self, icao: str, iata: Optional[str], name: str, path: Path, url: str) -> None:
         """Upsert logo metadata into the database."""
@@ -510,7 +536,7 @@ class LogoManager:
         """Resize and copy a single logo from the bulk import."""
         try:
             data = source.read_bytes()
-            resized = self._resize_image(data)
+            resized = self._resize_image(data, icao=icao)
             if not resized:
                 return False
             dest.write_bytes(resized)

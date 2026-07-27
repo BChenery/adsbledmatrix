@@ -53,7 +53,9 @@ def parse_changelog(text: str) -> list[ChangelogEntry]:
             if current is not None:
                 if section is not None and section.items:
                     current.sections.append(section)
-                entries.append(current)
+                # Drop empty headings (e.g. blank ## Unreleased placeholders).
+                if current.sections:
+                    entries.append(current)
             version = (version_match.group("bracked") or version_match.group("plain") or "").strip()
             current = ChangelogEntry(version=version, date=version_match.group("date"))
             section = None
@@ -80,7 +82,8 @@ def parse_changelog(text: str) -> list[ChangelogEntry]:
     if current is not None:
         if section is not None and section.items:
             current.sections.append(section)
-        entries.append(current)
+        if current.sections:
+            entries.append(current)
 
     return entries
 

@@ -45,6 +45,14 @@ function formatDate(date?: string | null): string | null {
   });
 }
 
+/** Semver-style tags get a v prefix; labels like Unreleased / Earlier do not. */
+function formatVersionLabel(version: string): string {
+  const cleaned = version.replace(/^v/i, '').trim();
+  if (!cleaned) return version;
+  if (/^\d+\.\d+/.test(cleaned)) return `v${cleaned}`;
+  return cleaned;
+}
+
 /** Strip light markdown (bold / links) so bullets read cleanly without a MD lib. */
 function stripMarkdownLight(text: string): string {
   let out = text;
@@ -84,7 +92,7 @@ function EntryCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-lg font-medium tracking-tight text-[#f5f5f5] sm:text-xl">
-              v{entry.version}
+              {formatVersionLabel(entry.version)}
             </span>
             {isCurrent && (
               <Badge variant="default" className="gap-1">

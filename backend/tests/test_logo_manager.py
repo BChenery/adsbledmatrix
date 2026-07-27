@@ -1,5 +1,9 @@
 import pytest
+from io import BytesIO
 from pathlib import Path
+
+from PIL import Image
+
 from app.config import settings
 from app.services.logo_manager import logo_manager
 
@@ -121,6 +125,33 @@ def test_vh_registration_operator_icao_override_is_allowed(fake_logos_dir):
     path = logo_manager.logo_path_for_aircraft("VA", None, "VH-VZZ")
 
     assert path == fake_logos_dir / "VOZ.png"
+
+
+def test_jst_logo_recolors_black_wordmark_to_silver():
+    """Jetstar's black 'Jet' wordmark should become silver for LED visibility."""
+    img = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    # Black wordmark pixels
+    for x in range(0, 8):
+        for y in range(4, 12):
+            img.putpixel((x, y), (0, 0, 0, 255))
+    # Orange star pixels (must stay orange)
+    for x in range(8, 16):
+        for y in range(4, 12):
+            img.putpixel((x, y), (248, 88, 16, 255))
+
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    out = logo_manager._resize_image(buf.getvalue(), icao="JST")
+    assert out is not None
+
+    result = Image.open(BytesIO(out)).convert("RGBA")
+    # Input is 16x16; resize targets 96x96. Sample scaled centers of each half.
+    silver_px = result.getpixel((24, 48))
+    assert silver_px[0] >= 180 and silver_px[1] >= 180 and silver_px[2] >= 180
+    assert silver_px[3] == 255
+    # Orange preserved
+    orange_px = result.getpixel((72, 48))
+    assert orange_px[0] > 200 and orange_px[1] < 120 and orange_px[2] < 80
 
 
 def test_airline_display_name_prefers_callsign_over_operator():

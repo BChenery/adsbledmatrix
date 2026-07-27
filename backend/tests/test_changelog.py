@@ -62,6 +62,20 @@ def test_parse_changelog_skips_empty_sections():
     assert [s.title for s in entries[0].sections] == ["Fixed"]
 
 
+def test_parse_changelog_skips_empty_version_headings():
+    text = """## Unreleased
+
+## [0.1.53] - 2026-07-27
+
+### Added
+- Type-aware radar icons
+"""
+    entries = parse_changelog(text)
+    assert len(entries) == 1
+    assert entries[0].version == "0.1.53"
+    assert entries[0].sections[0].items == ["Type-aware radar icons"]
+
+
 def test_load_changelog_missing_file(tmp_path: Path):
     assert load_changelog(tmp_path / "nope.md") == []
 

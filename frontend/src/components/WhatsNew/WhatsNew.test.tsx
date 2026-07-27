@@ -63,6 +63,28 @@ describe('WhatsNew', () => {
     expect(apiModule.api.get).toHaveBeenCalledWith('/api/system/changelog');
   });
 
+  it('does not prefix non-semver labels like Unreleased with v', async () => {
+    vi.mocked(apiModule.api.get).mockResolvedValue({
+      current_version: '0.1.40',
+      entries: [
+        {
+          version: 'Unreleased',
+          date: null,
+          sections: [{ title: 'Added', items: ['WIP notes'] }],
+        },
+        ...sample.entries,
+      ],
+    });
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText('Unreleased')).toBeTruthy();
+    });
+    expect(screen.queryByText('vUnreleased')).toBeNull();
+    expect(screen.getByText('WIP notes')).toBeTruthy();
+  });
+
   it('shows an empty state when there are no entries', async () => {
     vi.mocked(apiModule.api.get).mockResolvedValue({
       current_version: '0.1.0',
