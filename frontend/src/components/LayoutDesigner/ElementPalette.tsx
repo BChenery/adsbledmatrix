@@ -148,6 +148,12 @@ export const QUICK_ADD_PRESETS: PalettePreset[] = [
     template: { element_type: 'data_field', x: 10, y: 10, width: 125, height: 12, color: '#888888', font_size: 7, data_field: 'model', format_str: '{model}' },
   },
   {
+    key: 'airline',
+    label: 'Airline',
+    icon: <Building2 size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 100, height: 12, color: '#ffffff', font_size: 8, data_field: 'airline', format_str: '{airline}' },
+  },
+  {
     key: 'operator',
     label: 'Operator',
     icon: <Building2 size={18} />,

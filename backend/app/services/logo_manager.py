@@ -28,6 +28,66 @@ _LOGO_DISPLAY_ALIASES: Dict[str, str] = {
     "QLK": "QFA",     # QantasLink flights carry Qantas branding
 }
 
+# Short marketing names for the designer/LED "airline" field. Prefer these over
+# full legal operator strings from the aircraft registry (e.g. "Qantas Airways
+# Pty Ltd"). Keyed by ICAO. Callsign-brand codes (QLK) keep their own name even
+# when the logo is aliased to the parent brand.
+_AIRLINE_DISPLAY_NAMES: Dict[str, str] = {
+    "QFA": "Qantas",
+    "QLK": "QantasLink",
+    "JST": "Jetstar",
+    "VOZ": "Virgin Australia",
+    "RXA": "Rex",
+    "UTY": "Alliance Airlines",
+    "TGW": "Tigerair",
+    "ANZ": "Air New Zealand",
+    "NJS": "National Jet Systems",
+    "SSQ": "Sunstate",
+    "EAQ": "Eastern Australia",
+    "NWK": "Network Aviation",
+    "FJI": "Fiji Airways",
+    "BAW": "British Airways",
+    "UAL": "United",
+    "AAL": "American",
+    "DAL": "Delta",
+    "SIA": "Singapore Airlines",
+    "UAE": "Emirates",
+    "QTR": "Qatar Airways",
+    "CPA": "Cathay Pacific",
+    "MAS": "Malaysia Airlines",
+    "RFDS": "Flying Doctor",
+    "ANO": "Airnorth",
+}
+
+# Strip these legal/corporate suffixes when falling back to the registry operator
+# string so the LED can show a readable short brand.
+_OPERATOR_NAME_SUFFIX_RE = re.compile(
+    r"""
+    (?:,?\s+)?
+    (
+        Pty\.?\s*Ltd\.?
+        | Limited
+        | Ltd\.?
+        | Incorporated
+        | Inc\.?
+        | Corporation
+        | Corp\.?
+        | Co\.?
+        | LLC
+        | L\.?L\.?C\.?
+        | GmbH
+        | AG
+        | S\.?A\.?
+        | N\.?V\.?
+        | B\.?V\.?
+        | PLC
+        | Group
+    )
+    \s*$
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
 # The aircraft database sometimes stores IATA codes (or wrong codes) in the
 # operator_icao field. Map those to the real ICAO used in the logo filenames.
 # These are only used as a fallback when the original code's logo is missing.
@@ -149,26 +209,32 @@ class LogoManager:
         Falls back to the operator ICAO logo when no callsign is available or the
         prefix cannot be resolved to a known airline.
         """
-        resolved_icao: Optional[str] = None
+        # Callsign brand wins for logos (wet-lease / codeshare). Return early
+        # when a logo exists so a foreign marketing callsign can still render.
         if callsign:
             prefix_icao = self._callsign_prefix_to_icao(callsign, registration)
             if prefix_icao:
-                resolved_icao = (
+                callsign_brand = (
                     _LOGO_DISPLAY_ALIASES.get(prefix_icao)
                     or _LOGO_ICAO_OVERRIDES.get(prefix_icao, prefix_icao)
                 )
-                path = settings.logos_dir / f"{resolved_icao}.png"
+                path = settings.logos_dir / f"{callsign_brand}.png"
                 if path.exists():
                     return path
 
+        # Australian-registered aircraft with a non-Australian operator code are
+        # almost always bad registry data — show UNKNOWN rather than a foreign logo.
         if registration and registration.upper().strip().startswith("VH-"):
-            candidate = resolved_icao
-            if not candidate and operator_icao:
+            candidate: Optional[str] = None
+            if operator_icao:
                 # Normalise operator_icao the same way callsign prefixes are,
                 # so wrong-code entries like "VA" map to "VOZ" before the
                 # Australian-operator sanity check.
                 icao = operator_icao.upper()
-                candidate = _LOGO_ICAO_OVERRIDES.get(icao, icao)
+                candidate = (
+                    _LOGO_DISPLAY_ALIASES.get(icao)
+                    or _LOGO_ICAO_OVERRIDES.get(icao, icao)
+                )
             if candidate and candidate.upper() not in _AUSTRALIAN_OPERATOR_ICAOS:
                 return self._unknown_path()
 
@@ -176,6 +242,91 @@ class LogoManager:
             return self.logo_path_for_icao(operator_icao)
 
         return None
+
+    def resolve_airline_icao(
+        self,
+        operator_icao: Optional[str] = None,
+        callsign: Optional[str] = None,
+        registration: Optional[str] = None,
+        *,
+        for_logo: bool = False,
+    ) -> Optional[str]:
+        """Resolve the brand ICAO for an aircraft.
+
+        Prefers the callsign prefix (marketing brand) over the registered
+        operator. When ``for_logo`` is True, applies logo display aliases
+        (e.g. QLK → QFA). For text display names, aliases are not applied so
+        QantasLink stays QantasLink.
+        """
+        if callsign:
+            prefix_icao = self._callsign_prefix_to_icao(callsign, registration)
+            if prefix_icao:
+                if for_logo:
+                    return (
+                        _LOGO_DISPLAY_ALIASES.get(prefix_icao)
+                        or _LOGO_ICAO_OVERRIDES.get(prefix_icao, prefix_icao)
+                    )
+                # Prefer own ICAO for names; still normalise IATA/wrong codes.
+                return _LOGO_ICAO_OVERRIDES.get(prefix_icao, prefix_icao)
+
+        if operator_icao:
+            icao = operator_icao.upper().strip()
+            if for_logo:
+                return _LOGO_DISPLAY_ALIASES.get(icao) or _LOGO_ICAO_OVERRIDES.get(icao, icao)
+            return _LOGO_ICAO_OVERRIDES.get(icao, icao)
+
+        return None
+
+    def airline_display_name(
+        self,
+        operator_icao: Optional[str] = None,
+        callsign: Optional[str] = None,
+        registration: Optional[str] = None,
+        operator_name: Optional[str] = None,
+    ) -> Optional[str]:
+        """Return a short airline brand name for LED / designer display.
+
+        Resolution order:
+        1. Callsign prefix → short brand (QLK123 on Alliance metal → "QantasLink")
+        2. Operator ICAO → short brand from overrides / airlines.csv
+        3. Shortened legal operator name ("Qantas Airways Pty Ltd" → "Qantas Airways")
+        4. Raw operator name
+        """
+        brand_icao = self.resolve_airline_icao(
+            operator_icao=operator_icao,
+            callsign=callsign,
+            registration=registration,
+            for_logo=False,
+        )
+        if brand_icao:
+            short = _AIRLINE_DISPLAY_NAMES.get(brand_icao)
+            if short:
+                return short
+            csv_name = self._icao_to_name.get(brand_icao)
+            if csv_name:
+                return self._shorten_operator_name(csv_name) or csv_name
+
+        if operator_name:
+            cleaned = self._shorten_operator_name(operator_name)
+            if cleaned:
+                return cleaned
+            return operator_name.strip() or None
+
+        return None
+
+    @staticmethod
+    def _shorten_operator_name(name: str) -> Optional[str]:
+        """Strip common legal suffixes from a registry operator string."""
+        if not name:
+            return None
+        cleaned = name.strip()
+        # Peel suffixes repeatedly (e.g. "Foo Airways Pty Ltd")
+        for _ in range(3):
+            next_val = _OPERATOR_NAME_SUFFIX_RE.sub("", cleaned).strip(" ,.-")
+            if next_val == cleaned:
+                break
+            cleaned = next_val
+        return cleaned or None
 
     def _callsign_prefix_to_icao(
         self, callsign: str, registration: Optional[str] = None

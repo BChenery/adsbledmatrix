@@ -5,6 +5,7 @@ from typing import Set
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.services.adsb_receiver import receiver
 from app.services.aircraft_db import db
+from app.services.logo_manager import logo_manager
 from app.services.route_service import route_service
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,12 @@ async def broadcast_aircraft():
         for ac in recent:
             enriched = await db.enrich(ac.hex_code)
             route = await route_service.lookup(ac.callsign) if ac.callsign else None
+            airline = logo_manager.airline_display_name(
+                operator_icao=enriched.get("operator_icao"),
+                callsign=ac.callsign,
+                registration=enriched.get("registration"),
+                operator_name=enriched.get("operator"),
+            )
             data.append({
                 "hex_code": ac.hex_code,
                 "callsign": ac.callsign,
@@ -38,6 +45,7 @@ async def broadcast_aircraft():
                 "model": enriched.get("model"),
                 "operator": enriched.get("operator"),
                 "operator_icao": enriched.get("operator_icao"),
+                "airline": airline,
                 "type_code": enriched.get("type_code"),
                 "type_name": enriched.get("type_name"),
                 "messages": ac.messages,

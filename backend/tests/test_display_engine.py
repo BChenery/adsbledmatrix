@@ -418,6 +418,67 @@ def test_draw_radar_plane_symbol_falls_back_when_no_heading(engine):
     assert not red_pixels_east, "Did not expect plane pixels east of the aircraft position"
 
 
+def _radar_plane_pixels(engine, type_code, type_name=None, heading=0.0):
+    """Render a radar with plane symbol and return red pixel set."""
+    from unittest.mock import MagicMock
+    from app.services.display_engine import RenderContext
+    from PIL import Image, ImageDraw
+
+    element = MagicMock()
+    element.element_type = 'radar'
+    element.x = 0
+    element.y = 0
+    element.width = 100
+    element.height = 100
+    element.range_km = 20
+    element.ring_color = '#333333'
+    element.dot_color = '#ff0000'
+    element.user_dot_color = '#00ff00'
+    element.show_rings = False
+    element.show_ticks = False
+    element.bg_color = None
+    element.use_plane_symbol = True
+
+    aircraft = MagicMock()
+    aircraft.distance_km = 0.0  # centre of radar for easy comparison
+    aircraft.bearing = 0.0
+    aircraft.heading = heading
+
+    ctx = RenderContext(
+        aircraft=aircraft,
+        enriched={"type_code": type_code, "type_name": type_name},
+    )
+
+    img = Image.new('RGB', (100, 100), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    engine._draw_radar(draw, img, element, ctx)
+
+    return {
+        (px, py)
+        for px in range(100)
+        for py in range(100)
+        if img.getpixel((px, py)) == (255, 0, 0)
+    }
+
+
+def test_draw_radar_plane_symbol_varies_by_aircraft_type(engine):
+    """Helicopter, Cessna, A320 and B747 should not all paint the same pixels."""
+    heli = _radar_plane_pixels(engine, "EC35", "Airbus Helicopters H135")
+    cessna = _radar_plane_pixels(engine, "C172", "Cessna 172 Skyhawk")
+    a320 = _radar_plane_pixels(engine, "A320", "Airbus A320")
+    jumbo = _radar_plane_pixels(engine, "B744", "Boeing 747-400")
+
+    assert heli, "Expected helicopter silhouette pixels"
+    assert cessna, "Expected Cessna silhouette pixels"
+    assert a320, "Expected A320 silhouette pixels"
+    assert jumbo, "Expected 747 silhouette pixels"
+
+    assert heli != a320, "Helicopter should look different from A320"
+    assert cessna != a320, "Cessna should look different from A320"
+    assert jumbo != a320, "747 should look different from A320"
+    assert heli != cessna, "Helicopter should look different from Cessna"
+
+
 def test_vertical_rate_uses_custom_font_size(engine):
     """A larger explicit font_size should render more text pixels than the default."""
     from unittest.mock import MagicMock

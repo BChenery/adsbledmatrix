@@ -5,6 +5,12 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## Unreleased
+
+### Added
+- Radar **aircraft symbols** now vary by type: helicopters, light GA (Cessna-class), turboprops, narrowbody jets (A320/B737), heavy widebodies (B777/B787/A330), and jumbos (B747/A380)
+- Designer/LED **Airline** data field: short brand name driven by callsign first (e.g. QLK on Alliance metal → “QantasLink”), separate from full legal **Operator**
+
 ## [0.1.51] - 2026-07-23
 
 ### Fixed

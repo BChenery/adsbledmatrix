@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Layout, LayoutElement } from '@/types/layout';
 import { Aircraft } from '@/types/aircraft';
 import { getAircraftDisplayValue } from '@/lib/layoutDisplay';
+import { aircraftIconPolygon } from '@/lib/aircraftIcons';
 
 function rotatePoint(px: number, py: number, cx: number, cy: number, angleDeg: number): [number, number] {
   const angle = (angleDeg * Math.PI) / 180;
@@ -250,14 +251,7 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
 
           if (el.use_plane_symbol && ac.heading !== undefined && ac.heading !== null) {
             const heading = Number(ac.heading);
-            const plane: [number, number][] = [
-              [0, -4],
-              [-3, 2],
-              [-1, 1],
-              [0, 3],
-              [1, 1],
-              [3, 2],
-            ];
+            const plane = aircraftIconPolygon(ac.type_code, ac.type_name);
             ctx.beginPath();
             const [startX, startY] = rotatePoint(dotX + plane[0][0], dotY + plane[0][1], dotX, dotY, heading);
             ctx.moveTo(startX, startY);

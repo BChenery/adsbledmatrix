@@ -121,3 +121,47 @@ def test_vh_registration_operator_icao_override_is_allowed(fake_logos_dir):
     path = logo_manager.logo_path_for_aircraft("VA", None, "VH-VZZ")
 
     assert path == fake_logos_dir / "VOZ.png"
+
+
+def test_airline_display_name_prefers_callsign_over_operator():
+    """QLK callsign on Alliance metal should show QantasLink, not Alliance."""
+    name = logo_manager.airline_display_name(
+        operator_icao="UTY",
+        callsign="QLK2341",
+        registration="VH-XUE",
+        operator_name="Alliance Airlines Pty Limited",
+    )
+    assert name == "QantasLink"
+
+
+def test_airline_display_name_qantas_from_callsign():
+    name = logo_manager.airline_display_name(
+        operator_icao="QFA",
+        callsign="QFA123",
+        operator_name="Qantas Airways Pty Ltd",
+    )
+    assert name == "Qantas"
+
+
+def test_airline_display_name_shortens_legal_operator_when_no_callsign():
+    name = logo_manager.airline_display_name(
+        operator_icao=None,
+        callsign=None,
+        operator_name="Qantas Airways Pty Ltd",
+    )
+    assert name == "Qantas Airways"
+
+
+def test_airline_display_name_voz_wet_lease():
+    """Virgin callsign on Alliance aircraft → Virgin Australia brand name."""
+    name = logo_manager.airline_display_name(
+        operator_icao="UTY",
+        callsign="VOZ456",
+        operator_name="Alliance Airlines Pty Limited",
+    )
+    assert name == "Virgin Australia"
+
+
+def test_resolve_airline_icao_keeps_qlk_for_names_but_aliases_for_logos():
+    assert logo_manager.resolve_airline_icao("UTY", "QLK1", for_logo=False) == "QLK"
+    assert logo_manager.resolve_airline_icao("UTY", "QLK1", for_logo=True) == "QFA"

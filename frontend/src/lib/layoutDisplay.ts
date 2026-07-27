@@ -1,5 +1,6 @@
 import { Aircraft } from '@/types/aircraft';
 import { LayoutElement } from '@/types/layout';
+import { resolveAirlineDisplayName } from '@/lib/airlineDisplay';
 
 export function getAircraftDisplayValue(ac: Aircraft | undefined, el: LayoutElement): string {
   if (!ac) return '';
@@ -9,6 +10,17 @@ export function getAircraftDisplayValue(ac: Aircraft | undefined, el: LayoutElem
     return template.replace(/\{(\w+)\}/g, (_, key) => {
       if (key === 'distance' && ac.distance_km != null) {
         return ac.distance_display || `${ac.distance_km.toFixed(1)} km`;
+      }
+      if (key === 'airline') {
+        if (ac.airline) return ac.airline;
+        return (
+          resolveAirlineDisplayName({
+            callsign: ac.callsign,
+            operatorIcao: ac.operator_icao,
+            operatorName: ac.operator,
+            registration: ac.registration,
+          }) || ''
+        );
       }
       const val = ac[key as keyof Aircraft];
       if (val !== undefined && val !== null) return String(val);

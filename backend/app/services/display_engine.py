@@ -8,6 +8,7 @@ from typing import Optional, List, Dict, Any, Tuple
 from zoneinfo import ZoneInfo
 from PIL import Image, ImageDraw, ImageFont
 from app.config import settings
+from app.services.aircraft_icons import aircraft_icon_polygon
 from app.services.geocalc import convert_distance, convert_altitude, convert_speed, format_heading
 from app.services.logo_manager import logo_manager
 from app.services.route_service import route_service
@@ -740,16 +741,16 @@ class DisplayEngine:
             heading = getattr(ac, 'heading', None)
 
             if use_plane and heading is not None:
-                # Simple plane silhouette pointing up (0° heading = North)
-                plane = [
-                    (0, -4),
-                    (-3, 2),
-                    (-1, 1),
-                    (0, 3),
-                    (1, 1),
-                    (3, 2),
+                # Type-aware silhouette pointing up (0° heading = North), then rotated.
+                enriched = ctx.enriched or {}
+                plane = aircraft_icon_polygon(
+                    type_code=enriched.get("type_code"),
+                    type_name=enriched.get("type_name"),
+                )
+                rotated = [
+                    self._rotate_point(dot_x + px, dot_y + py, dot_x, dot_y, heading)
+                    for px, py in plane
                 ]
-                rotated = [self._rotate_point(dot_x + px, dot_y + py, dot_x, dot_y, heading) for px, py in plane]
                 draw.polygon(rotated, fill=dot_color)
             else:
                 draw.ellipse([dot_x - 3, dot_y - 3, dot_x + 3, dot_y + 3], fill=dot_color)
@@ -781,14 +782,26 @@ class DisplayEngine:
                 "last_seen": ac.last_seen.strftime("%H:%M:%S"),
             })
 
+        callsign = ac.callsign if ac else None
+        registration = enriched.get("registration")
+        airline = logo_manager.airline_display_name(
+            operator_icao=enriched.get("operator_icao"),
+            callsign=callsign,
+            registration=registration,
+            operator_name=enriched.get("operator"),
+        )
+
         values.update({
-            "registration": enriched.get("registration") or "---",
+            "registration": registration or "---",
             "manufacturer": enriched.get("manufacturer") or "---",
             "model": enriched.get("model") or "---",
             "type_code": enriched.get("type_code") or "---",
             "type_name": enriched.get("type_name") or "---",
             "operator": enriched.get("operator") or "---",
             "operator_icao": enriched.get("operator_icao") or "---",
+            # Short brand name preferred over legal operator; callsign wins
+            # (e.g. QLK on Alliance metal → "QantasLink").
+            "airline": airline or "---",
             "cycle_index": str(ctx.cycle_index + 1),
             "total_cycles": str(ctx.total_cycles),
             "current_time": self._local_now(config).strftime("%H:%M:%S"),

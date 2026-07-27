@@ -275,6 +275,7 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
                 <SelectItem value="distance">Distance</SelectItem>
                 <SelectItem value="vertical_rate">Vertical Rate</SelectItem>
                 <SelectItem value="model">Model</SelectItem>
+                <SelectItem value="airline">Airline</SelectItem>
                 <SelectItem value="operator">Operator</SelectItem>
                 <SelectItem value="operator_icao">Operator ICAO</SelectItem>
                 <SelectItem value="type_code">Type Code</SelectItem>
@@ -439,7 +440,7 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
                 onChange={(e) => update('use_plane_symbol', e.target.checked)}
                 className="w-4 h-4 rounded border-gray-600"
               />
-              <Label htmlFor="use_plane_symbol" className="cursor-pointer">Use Plane Symbol</Label>
+              <Label htmlFor="use_plane_symbol" className="cursor-pointer">Use Aircraft Symbol</Label>
             </div>
           </>
         )}

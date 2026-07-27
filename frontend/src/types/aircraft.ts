@@ -20,6 +20,8 @@ export interface Aircraft {
   type_name?: string;
   operator?: string;
   operator_icao?: string;
+  /** Short brand name (callsign-first). Prefer over full legal operator. */
+  airline?: string;
   route?: string;
   origin?: string;
   destination?: string;

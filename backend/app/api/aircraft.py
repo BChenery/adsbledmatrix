@@ -32,47 +32,20 @@ class AircraftResponse(BaseModel):
     type_name: Optional[str]
     operator: Optional[str]
     operator_icao: Optional[str]
+    airline: Optional[str]
 
 
-@router.get("/live", response_model=List[AircraftResponse])
-async def get_live_aircraft():
-    all_ac = receiver.get_all()
-    result = []
-    for ac in all_ac:
-        enriched = await db.enrich(ac.hex_code)
-        result.append(AircraftResponse(
-            hex_code=ac.hex_code,
-            callsign=ac.callsign,
-            latitude=ac.latitude,
-            longitude=ac.longitude,
-            altitude=ac.altitude,
-            ground_speed=ac.ground_speed,
-            heading=ac.heading,
-            vertical_rate=ac.vertical_rate,
-            squawk=ac.squawk,
-            distance_km=ac.distance_km,
-            distance_display=f"{ac.distance_km:.1f} km" if ac.distance_km else None,
-            bearing=ac.bearing,
-            last_seen=ac.last_seen.isoformat(),
-            messages=ac.messages,
-            registration=enriched.get("registration"),
-            manufacturer=enriched.get("manufacturer"),
-            model=enriched.get("model"),
-            type_code=enriched.get("type_code"),
-            type_name=enriched.get("type_name"),
-            operator=enriched.get("operator"),
-            operator_icao=enriched.get("operator_icao"),
-        ))
-    return result
+def _airline_for(ac, enriched: dict) -> Optional[str]:
+    """Short brand name from callsign first, then operator ICAO/name."""
+    return logo_manager.airline_display_name(
+        operator_icao=enriched.get("operator_icao"),
+        callsign=getattr(ac, "callsign", None),
+        registration=enriched.get("registration"),
+        operator_name=enriched.get("operator"),
+    )
 
 
-@router.get("/closest")
-async def get_closest_aircraft():
-    closest = receiver.get_closest(n=1)
-    if not closest:
-        return {"message": "No aircraft in range"}
-    ac = closest[0]
-    enriched = await db.enrich(ac.hex_code)
+def _aircraft_response(ac, enriched: dict) -> AircraftResponse:
     return AircraftResponse(
         hex_code=ac.hex_code,
         callsign=ac.callsign,
@@ -95,7 +68,28 @@ async def get_closest_aircraft():
         type_name=enriched.get("type_name"),
         operator=enriched.get("operator"),
         operator_icao=enriched.get("operator_icao"),
+        airline=_airline_for(ac, enriched),
     )
+
+
+@router.get("/live", response_model=List[AircraftResponse])
+async def get_live_aircraft():
+    all_ac = receiver.get_all()
+    result = []
+    for ac in all_ac:
+        enriched = await db.enrich(ac.hex_code)
+        result.append(_aircraft_response(ac, enriched))
+    return result
+
+
+@router.get("/closest")
+async def get_closest_aircraft():
+    closest = receiver.get_closest(n=1)
+    if not closest:
+        return {"message": "No aircraft in range"}
+    ac = closest[0]
+    enriched = await db.enrich(ac.hex_code)
+    return _aircraft_response(ac, enriched)
 
 
 @router.get("/interesting-status")
