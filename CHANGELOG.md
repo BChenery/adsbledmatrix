@@ -5,6 +5,12 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.60] - 2026-07-31
+
+### Added
+- Layout designer route fields for non-enthusiasts: **origin/destination IATA** (3-letter, e.g. BNE from YBBN) and **origin/destination city** (e.g. Brisbane)
+- Shipped `data/airports.csv` (~9.5k airports) used to resolve ICAO/IATA codes to city names on the LED and web preview
+
 ## [0.1.59] - 2026-07-31
 
 ### Fixed

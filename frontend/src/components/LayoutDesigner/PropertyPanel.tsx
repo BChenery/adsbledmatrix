@@ -265,6 +265,10 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
                   weather_wind: 'W {weather_wind}',
                   weather_local_time: '{weather_local_time}',
                   current_time: '{current_time}',
+                  origin_iata: '{origin_iata}',
+                  destination_iata: '{destination_iata}',
+                  origin_city: '{origin_city}',
+                  destination_city: '{destination_city}',
                 };
                 onChange({
                   ...element,
@@ -295,8 +299,12 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
                 <SelectItem value="squawk">Squawk</SelectItem>
                 <SelectItem value="messages">Messages</SelectItem>
                 <SelectItem value="route">Route</SelectItem>
-                <SelectItem value="origin">Origin</SelectItem>
-                <SelectItem value="destination">Destination</SelectItem>
+                <SelectItem value="origin">Origin (ICAO/code)</SelectItem>
+                <SelectItem value="destination">Destination (ICAO/code)</SelectItem>
+                <SelectItem value="origin_iata">Origin IATA (3-letter)</SelectItem>
+                <SelectItem value="destination_iata">Destination IATA (3-letter)</SelectItem>
+                <SelectItem value="origin_city">Origin City</SelectItem>
+                <SelectItem value="destination_city">Destination City</SelectItem>
                 <SelectItem value="current_time">Current Time</SelectItem>
                 <SelectItem value="weather_city">Weather City</SelectItem>
                 <SelectItem value="weather_country">Weather Country</SelectItem>

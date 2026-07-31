@@ -25,4 +25,12 @@ export interface Aircraft {
   route?: string;
   origin?: string;
   destination?: string;
+  /** 3-letter IATA for origin (e.g. BNE from YBBN). */
+  origin_iata?: string;
+  /** 3-letter IATA for destination. */
+  destination_iata?: string;
+  /** City name for origin (e.g. Brisbane). */
+  origin_city?: string;
+  /** City name for destination. */
+  destination_city?: string;
 }

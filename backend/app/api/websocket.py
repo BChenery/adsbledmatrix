@@ -6,6 +6,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from app.services.adsb_receiver import receiver
 from app.services.aircraft_db import db
 from app.services.logo_manager import logo_manager
+from app.services.airport_service import airport_service
 from app.services.route_service import route_service
 
 logger = logging.getLogger(__name__)
@@ -32,6 +33,9 @@ async def broadcast_aircraft():
                 registration=enriched.get("registration"),
                 operator_name=enriched.get("operator"),
             )
+            origin = route.origin if route else None
+            destination = route.destination if route else None
+            airport_fields = airport_service.display_values_for_route(origin, destination)
             data.append({
                 "hex_code": ac.hex_code,
                 "callsign": ac.callsign,
@@ -51,9 +55,13 @@ async def broadcast_aircraft():
                 "messages": ac.messages,
                 "last_seen": ac.last_seen.isoformat() if ac.last_seen else None,
                 "bearing": ac.bearing,
-                "route": f"{route.origin}-{route.destination}" if route else None,
-                "origin": route.origin if route else None,
-                "destination": route.destination if route else None,
+                "route": f"{origin}-{destination}" if route else None,
+                "origin": origin,
+                "destination": destination,
+                "origin_iata": airport_fields.get("origin_iata"),
+                "destination_iata": airport_fields.get("destination_iata"),
+                "origin_city": airport_fields.get("origin_city"),
+                "destination_city": airport_fields.get("destination_city"),
             })
 
         message = json.dumps({"type": "aircraft", "data": data})

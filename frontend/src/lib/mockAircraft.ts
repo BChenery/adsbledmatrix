@@ -26,6 +26,10 @@ export const MOCK_AIRCRAFT: Aircraft = {
   route: 'BNE-SFO',
   origin: 'BNE',
   destination: 'SFO',
+  origin_iata: 'BNE',
+  destination_iata: 'SFO',
+  origin_city: 'Brisbane',
+  destination_city: 'San Francisco',
 };
 
 export const MOCK_AIRCRAFT_FLEET: Aircraft[] = [
@@ -56,6 +60,10 @@ export const MOCK_AIRCRAFT_FLEET: Aircraft[] = [
     route: 'MEL-PER',
     origin: 'MEL',
     destination: 'PER',
+    origin_iata: 'MEL',
+    destination_iata: 'PER',
+    origin_city: 'Melbourne',
+    destination_city: 'Perth',
   },
   {
     // Wet-lease example: Alliance metal flying as QantasLink by callsign.
@@ -84,6 +92,10 @@ export const MOCK_AIRCRAFT_FLEET: Aircraft[] = [
     route: 'SYD-BNE',
     origin: 'SYD',
     destination: 'BNE',
+    origin_iata: 'SYD',
+    destination_iata: 'BNE',
+    origin_city: 'Sydney',
+    destination_city: 'Brisbane',
   },
   {
     hex_code: 'A0B1C2',
@@ -111,6 +123,10 @@ export const MOCK_AIRCRAFT_FLEET: Aircraft[] = [
     route: 'SFO-SYD',
     origin: 'SFO',
     destination: 'SYD',
+    origin_iata: 'SFO',
+    destination_iata: 'SYD',
+    origin_city: 'San Francisco',
+    destination_city: 'Sydney',
   },
   {
     hex_code: 'C3D4E5',
@@ -138,6 +154,10 @@ export const MOCK_AIRCRAFT_FLEET: Aircraft[] = [
     route: 'LHR-SIN',
     origin: 'LHR',
     destination: 'SIN',
+    origin_iata: 'LHR',
+    destination_iata: 'SIN',
+    origin_city: 'London',
+    destination_city: 'Singapore',
   },
   {
     hex_code: 'E5F6A7',
@@ -165,6 +185,10 @@ export const MOCK_AIRCRAFT_FLEET: Aircraft[] = [
     route: 'SIN-SYD',
     origin: 'SIN',
     destination: 'SYD',
+    origin_iata: 'SIN',
+    destination_iata: 'SYD',
+    origin_city: 'Singapore',
+    destination_city: 'Sydney',
   },
   {
     hex_code: 'F7A8B9',
@@ -192,5 +216,9 @@ export const MOCK_AIRCRAFT_FLEET: Aircraft[] = [
     route: 'OOL-MEL',
     origin: 'OOL',
     destination: 'MEL',
+    origin_iata: 'OOL',
+    destination_iata: 'MEL',
+    origin_city: 'Gold Coast',
+    destination_city: 'Melbourne',
   },
 ];

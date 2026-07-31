@@ -25,7 +25,23 @@ export function getAircraftDisplayValue(ac: Aircraft | undefined, el: LayoutElem
       const val = ac[key as keyof Aircraft];
       if (val !== undefined && val !== null) return String(val);
       // Route-related fields show a placeholder instead of blank when missing
-      if (['route', 'origin', 'destination'].includes(key)) return '---';
+      if (
+        [
+          'route',
+          'origin',
+          'destination',
+          'origin_iata',
+          'destination_iata',
+          'origin_city',
+          'destination_city',
+          'from_iata',
+          'to_iata',
+          'from_city',
+          'to_city',
+        ].includes(key)
+      ) {
+        return '---';
+      }
       return '';
     });
   }

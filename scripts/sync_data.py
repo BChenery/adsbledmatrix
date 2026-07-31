@@ -30,6 +30,7 @@ from app.database import init_db
 DATA_FILES = [
     "data/aircraft_db.csv",
     "data/airlines.csv",
+    "data/airports.csv",
     "data/routes.csv",
     "data/localadsb/flights.db",
     "data/localadsb/aircraft_type_names.json",

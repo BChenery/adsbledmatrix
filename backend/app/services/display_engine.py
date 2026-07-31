@@ -711,21 +711,28 @@ class DisplayEngine:
             }
 
             # Route data from pre-fetched all_routes
+            from app.services.airport_service import airport_service
+
             route = (ctx.all_routes or {}).get(ac.callsign) if ac.callsign else None
             if route:
                 values["route"] = f"{route.origin}-{route.destination}"
                 values["origin"] = route.origin
                 values["destination"] = route.destination
+                values.update(
+                    airport_service.display_values_for_route(route.origin, route.destination)
+                )
             else:
                 values["route"] = "---"
                 values["origin"] = "---"
                 values["destination"] = "---"
+                values.update(airport_service.display_values_for_route(None, None))
 
-            # Build row string
+            # Build row string (city names need a bit more width than ICAO codes)
             row_parts = []
             for col in columns:
                 val = values.get(col, "---")
-                row_parts.append(str(val)[:10])
+                width = 12 if col.endswith("_city") or col in ("from_city", "to_city") else 10
+                row_parts.append(str(val)[:width])
             row_text = "  ".join(row_parts)
 
             self._draw_text(draw, x + 4, row_y, w - 8, row_text, color, None, font_size, align="left", height=row_height)
@@ -883,15 +890,25 @@ class DisplayEngine:
                 "weather_local_time": "---",
             })
 
-        # Route data
+        # Route data + friendly airport fields (IATA / city)
+        from app.services.airport_service import airport_service
+
         if ctx.route:
+            origin = getattr(ctx.route, "origin", None)
+            destination = getattr(ctx.route, "destination", None)
             values.update({
-                "route": f"{ctx.route.origin}-{ctx.route.destination}",
-                "origin": ctx.route.origin,
-                "destination": ctx.route.destination,
+                "route": f"{origin}-{destination}",
+                "origin": origin or "---",
+                "destination": destination or "---",
             })
+            values.update(airport_service.display_values_for_route(origin, destination))
         else:
-            values.update({"route": "---", "origin": "---", "destination": "---"})
+            values.update({
+                "route": "---",
+                "origin": "---",
+                "destination": "---",
+                **airport_service.display_values_for_route(None, None),
+            })
 
         if fmt:
             try:

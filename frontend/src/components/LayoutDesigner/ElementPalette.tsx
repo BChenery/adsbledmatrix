@@ -174,6 +174,30 @@ export const QUICK_ADD_PRESETS: PalettePreset[] = [
     template: { element_type: 'data_field', x: 10, y: 10, width: 60, height: 12, color: '#aaaaaa', font_size: 7, data_field: 'bearing', format_str: 'BRG: {bearing}' },
   },
   {
+    key: 'origin_iata',
+    label: 'From (IATA)',
+    icon: <MapPin size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 50, height: 16, color: '#00d4ff', font_size: 14, data_field: 'origin_iata', format_str: '{origin_iata}' },
+  },
+  {
+    key: 'destination_iata',
+    label: 'To (IATA)',
+    icon: <MapPinOff size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 50, height: 16, color: '#ffb347', font_size: 14, data_field: 'destination_iata', format_str: '{destination_iata}' },
+  },
+  {
+    key: 'origin_city',
+    label: 'From City',
+    icon: <MapPin size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 100, height: 16, color: '#00d4ff', font_size: 14, data_field: 'origin_city', format_str: '{origin_city}' },
+  },
+  {
+    key: 'destination_city',
+    label: 'To City',
+    icon: <MapPinOff size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 100, height: 16, color: '#ffb347', font_size: 14, data_field: 'destination_city', format_str: '{destination_city}' },
+  },
+  {
     key: 'aircraft_list',
     label: 'Flight List',
     icon: <List size={18} />,
