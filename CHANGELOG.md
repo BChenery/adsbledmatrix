@@ -5,6 +5,12 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.59] - 2026-07-31
+
+### Fixed
+- Aircraft type enrichment now prefers **aero_fleet** and **Australian civil registry** over stale ADS-B-seen types (e.g. VH-OYV / Jetstar no longer shows as Beech 1900 instead of **A321-251NX**)
+- Corrected VH-OYV (`7C4A55`) type in localadsb source data to `A21N`
+
 ## [0.1.57] - 2026-07-31
 
 ### Added
