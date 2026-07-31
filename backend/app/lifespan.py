@@ -89,6 +89,10 @@ async def lifespan(app: FastAPI):
     await receiver.start()
     await engine.start()
 
+    from app.services.weather_service import weather_service
+
+    await weather_service.start()
+
     # While onboarding is incomplete the matrix itself shows how to connect.
     if needs_onboarding:
         from app.services.onboarding_display import show_setup_screen
@@ -120,6 +124,7 @@ async def lifespan(app: FastAPI):
         pass
 
     await sighting_history.stop()
+    await weather_service.stop()
     await receiver.stop()
     await engine.stop()
     await updater.close()

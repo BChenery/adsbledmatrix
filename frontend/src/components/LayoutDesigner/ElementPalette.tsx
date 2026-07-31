@@ -23,6 +23,8 @@ import {
   Factory,
   Radio,
   Milestone,
+  Cloud,
+  CloudSun,
 } from 'lucide-react';
 
 export interface PalettePreset {
@@ -176,6 +178,24 @@ export const QUICK_ADD_PRESETS: PalettePreset[] = [
     label: 'Flight List',
     icon: <List size={18} />,
     template: { element_type: 'aircraft_list', x: 10, y: 10, width: 246, height: 100, color: '#ffffff', extra: { max_rows: 3, columns: ['callsign', 'origin', 'destination', 'distance'], row_height: 14, show_header: true } },
+  },
+  {
+    key: 'weather_city',
+    label: 'Weather City',
+    icon: <Cloud size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 150, height: 24, color: '#00d4ff', font_size: 16, data_field: 'weather_city', format_str: '{weather_city}' },
+  },
+  {
+    key: 'weather_temp',
+    label: 'Weather Temp',
+    icon: <Thermometer size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 80, height: 24, color: '#ffffff', font_size: 16, data_field: 'weather_temp', format_str: '{weather_temp}' },
+  },
+  {
+    key: 'weather_condition',
+    label: 'Weather',
+    icon: <CloudSun size={18} />,
+    template: { element_type: 'data_field', x: 10, y: 10, width: 120, height: 16, color: '#4ade80', font_size: 12, data_field: 'weather_condition', format_str: '{weather_condition}' },
   },
 ];
 

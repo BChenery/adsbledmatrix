@@ -255,6 +255,16 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
                   distance: '{distance} km',
                   vertical_rate: '{vertical_rate}',
                   bearing: 'BRG: {bearing}',
+                  weather_city: '{weather_city}',
+                  weather_country: '{weather_country}',
+                  weather_location: '{weather_location}',
+                  weather_temp: '{weather_temp}',
+                  weather_feels_like: 'Feels {weather_feels_like}',
+                  weather_condition: '{weather_condition}',
+                  weather_humidity: 'H {weather_humidity}',
+                  weather_wind: 'W {weather_wind}',
+                  weather_local_time: '{weather_local_time}',
+                  current_time: '{current_time}',
                 };
                 onChange({
                   ...element,
@@ -287,6 +297,16 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
                 <SelectItem value="route">Route</SelectItem>
                 <SelectItem value="origin">Origin</SelectItem>
                 <SelectItem value="destination">Destination</SelectItem>
+                <SelectItem value="current_time">Current Time</SelectItem>
+                <SelectItem value="weather_city">Weather City</SelectItem>
+                <SelectItem value="weather_country">Weather Country</SelectItem>
+                <SelectItem value="weather_location">Weather Location</SelectItem>
+                <SelectItem value="weather_temp">Weather Temp</SelectItem>
+                <SelectItem value="weather_feels_like">Weather Feels Like</SelectItem>
+                <SelectItem value="weather_condition">Weather Condition</SelectItem>
+                <SelectItem value="weather_humidity">Weather Humidity</SelectItem>
+                <SelectItem value="weather_wind">Weather Wind</SelectItem>
+                <SelectItem value="weather_local_time">Weather Local Time</SelectItem>
               </SelectContent>
             </Select>
           </div>

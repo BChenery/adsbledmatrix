@@ -117,6 +117,22 @@ async def migrate_db():
                     text("ALTER TABLE user_config ADD COLUMN layout_rotation_interval_sec INTEGER NOT NULL DEFAULT 30")
                 )
 
+            # Idle world-weather rotation
+            if "idle_weather_enabled" not in columns:
+                sync_conn.execute(
+                    text(
+                        "ALTER TABLE user_config ADD COLUMN idle_weather_enabled "
+                        "BOOLEAN NOT NULL DEFAULT 1"
+                    )
+                )
+            if "idle_rotation_interval_sec" not in columns:
+                sync_conn.execute(
+                    text(
+                        "ALTER TABLE user_config ADD COLUMN idle_rotation_interval_sec "
+                        "INTEGER NOT NULL DEFAULT 15"
+                    )
+                )
+
             # Interesting aircraft alerts
             interesting_cols = [
                 ("interesting_alerts_enabled", "BOOLEAN NOT NULL DEFAULT 1"),

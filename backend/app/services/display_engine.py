@@ -71,6 +71,9 @@ class DisplayEngine:
         self._interesting_hex: Optional[str] = None
         self._interesting_since: Optional[datetime] = None
         self._layout_rotation_enabled = False
+        self._weather_layout: Optional[Any] = None
+        self._idle_index = 0
+        self._idle_time = datetime.utcnow()
         self._preview_layout: Optional[Any] = None
         self._test_color: Optional[Tuple[int, int, int]] = None
         self._brightness = settings.led_matrix_brightness
@@ -108,11 +111,13 @@ class DisplayEngine:
         playlist: Optional[List[Any]] = None,
         rotation_enabled: bool = False,
         interesting_layout: Optional[Any] = None,
+        weather_layout: Optional[Any] = None,
     ):
         self._current_layout = layout
         self._idle_layout = idle_layout
         self._focus_layout = focus_layout
         self._interesting_layout = interesting_layout
+        self._weather_layout = weather_layout
         self._playlist_layouts = list(playlist or [])
         self._layout_rotation_enabled = bool(rotation_enabled)
         if self._layout_index and self._playlist_layouts:
@@ -201,6 +206,50 @@ class DisplayEngine:
 
         return self._current_layout
 
+    def _resolve_idle_layout(self, user_config: Any) -> Optional[Any]:
+        """Pick idle layout, optionally rotating scanning ↔ world weather."""
+        primary = self._idle_layout or self._current_layout
+        weather = self._weather_layout
+        weather_enabled = True
+        if user_config is not None:
+            weather_enabled = bool(getattr(user_config, "idle_weather_enabled", True))
+
+        if not weather_enabled or weather is None:
+            self._idle_time = datetime.utcnow()
+            return primary
+
+        # If the configured idle layout already is the weather layout, stay on it.
+        primary_id = getattr(primary, "id", None)
+        weather_id = getattr(weather, "id", None)
+        if primary is not None and weather is not None and primary_id is not None and primary_id == weather_id:
+            return weather
+        if primary is weather:
+            return weather
+
+        # Alternate between primary idle (e.g. Scanning) and World Weather.
+        candidates = [lay for lay in (primary, weather) if lay is not None]
+        # De-dupe by id when possible
+        seen = set()
+        unique: List[Any] = []
+        for lay in candidates:
+            key = getattr(lay, "id", id(lay))
+            if key in seen:
+                continue
+            seen.add(key)
+            unique.append(lay)
+        if len(unique) <= 1:
+            return unique[0] if unique else primary
+
+        interval = 15
+        if user_config is not None:
+            interval = int(getattr(user_config, "idle_rotation_interval_sec", 15) or 15)
+        interval = max(5, min(interval, 600))
+        now = datetime.utcnow()
+        if (now - self._idle_time).total_seconds() >= interval:
+            self._idle_index = (self._idle_index + 1) % len(unique)
+            self._idle_time = now
+        return unique[self._idle_index % len(unique)]
+
     async def _render_frame(self):
         from app.services.adsb_receiver import receiver
         from app.services.aircraft_db import db
@@ -231,7 +280,7 @@ class DisplayEngine:
             self._proximity_focused = False
             self._interesting_hex = None
             self._interesting_since = None
-            layout = self._preview_layout or self._idle_layout or self._current_layout
+            layout = self._preview_layout or self._resolve_idle_layout(user_config)
             ctx = RenderContext(
                 aircraft=None,
                 enriched=None,
@@ -815,6 +864,24 @@ class DisplayEngine:
             "is_interesting": "1" if ctx.is_interesting else "0",
             "interest_reason": ctx.interest_reason or "---",
         })
+
+        # Live world weather (used by idle World Weather layout)
+        try:
+            from app.services.weather_service import weather_service
+
+            values.update(weather_service.display_values())
+        except Exception:
+            values.update({
+                "weather_city": "---",
+                "weather_country": "---",
+                "weather_location": "---",
+                "weather_temp": "---",
+                "weather_feels_like": "---",
+                "weather_condition": "---",
+                "weather_humidity": "---",
+                "weather_wind": "---",
+                "weather_local_time": "---",
+            })
 
         # Route data
         if ctx.route:

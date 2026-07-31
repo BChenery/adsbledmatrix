@@ -11,15 +11,27 @@ from app.models import Layout, UserConfig
 from app.services.display_selection import resolve_playlist_ids
 
 
+WORLD_WEATHER_LAYOUT_NAME = "World Weather"
+
+
 async def load_layouts_for_config(
     session: AsyncSession,
     config: UserConfig,
-) -> tuple[Optional[Any], Optional[Any], Optional[Any], List[Any], bool, Optional[Any]]:
-    """Return (active, idle, focus, playlist, rotation_enabled, interesting) for a config row."""
+) -> tuple[
+    Optional[Any],
+    Optional[Any],
+    Optional[Any],
+    List[Any],
+    bool,
+    Optional[Any],
+    Optional[Any],
+]:
+    """Return (active, idle, focus, playlist, rotation_enabled, interesting, weather)."""
     active = None
     idle = None
     focus = None
     interesting = None
+    weather = None
     playlist: List[Any] = []
 
     if config.active_layout_id:
@@ -55,6 +67,13 @@ async def load_layouts_for_config(
         )
         interesting = result.scalar_one_or_none()
 
+    result = await session.execute(
+        select(Layout)
+        .where(Layout.name == WORLD_WEATHER_LAYOUT_NAME)
+        .options(selectinload(Layout.elements))
+    )
+    weather = result.scalar_one_or_none()
+
     playlist_ids = resolve_playlist_ids(config.layout_playlist_ids, config.active_layout_id)
     if playlist_ids:
         result = await session.execute(
@@ -65,7 +84,15 @@ async def load_layouts_for_config(
         by_id = {lay.id: lay for lay in result.scalars().all()}
         playlist = [by_id[i] for i in playlist_ids if i in by_id]
 
-    return active, idle, focus, playlist, bool(config.layout_rotation_enabled), interesting
+    return (
+        active,
+        idle,
+        focus,
+        playlist,
+        bool(config.layout_rotation_enabled),
+        interesting,
+        weather,
+    )
 
 
 async def apply_engine_layouts(config: UserConfig, session: Optional[AsyncSession] = None) -> None:
@@ -74,7 +101,7 @@ async def apply_engine_layouts(config: UserConfig, session: Optional[AsyncSessio
     from app.services.display_engine import engine
 
     if session is not None:
-        active, idle, focus, playlist, rotation, interesting = await load_layouts_for_config(
+        active, idle, focus, playlist, rotation, interesting, weather = await load_layouts_for_config(
             session, config
         )
         engine.set_layout(
@@ -84,11 +111,12 @@ async def apply_engine_layouts(config: UserConfig, session: Optional[AsyncSessio
             playlist=playlist,
             rotation_enabled=rotation,
             interesting_layout=interesting,
+            weather_layout=weather,
         )
         return
 
     async with AsyncSessionLocal() as refresh_session:
-        active, idle, focus, playlist, rotation, interesting = await load_layouts_for_config(
+        active, idle, focus, playlist, rotation, interesting, weather = await load_layouts_for_config(
             refresh_session, config
         )
         engine.set_layout(
@@ -98,4 +126,5 @@ async def apply_engine_layouts(config: UserConfig, session: Optional[AsyncSessio
             playlist=playlist,
             rotation_enabled=rotation,
             interesting_layout=interesting,
+            weather_layout=weather,
         )

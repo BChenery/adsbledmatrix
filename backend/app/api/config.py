@@ -38,6 +38,8 @@ class ConfigResponse(BaseModel):
     interesting_hold_sec: int = 8
     active_layout_id: Optional[int]
     idle_layout_id: Optional[int]
+    idle_weather_enabled: bool = True
+    idle_rotation_interval_sec: int = 15
     onboarding_complete: bool
     wifi_ssid: Optional[str]
     auto_update: bool
@@ -80,6 +82,8 @@ class ConfigUpdate(BaseModel):
     interesting_hold_sec: Optional[int] = None
     active_layout_id: Optional[int] = None
     idle_layout_id: Optional[int] = None
+    idle_weather_enabled: Optional[bool] = None
+    idle_rotation_interval_sec: Optional[int] = None
     onboarding_complete: Optional[bool] = None
     wifi_ssid: Optional[str] = None
     wifi_password: Optional[str] = None
@@ -150,6 +154,13 @@ class ConfigUpdate(BaseModel):
     def validate_layout_rotation_interval(cls, v):
         if v is not None and not (5 <= v <= 600):
             raise ValueError("layout_rotation_interval_sec must be between 5 and 600")
+        return v
+
+    @field_validator("idle_rotation_interval_sec")
+    @classmethod
+    def validate_idle_rotation_interval(cls, v):
+        if v is not None and not (5 <= v <= 600):
+            raise ValueError("idle_rotation_interval_sec must be between 5 and 600")
         return v
 
     @field_validator("layout_playlist_ids")

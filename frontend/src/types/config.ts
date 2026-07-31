@@ -22,6 +22,8 @@ export interface UserConfig {
   interesting_hold_sec: number;
   active_layout_id?: number;
   idle_layout_id?: number;
+  idle_weather_enabled: boolean;
+  idle_rotation_interval_sec: number;
   onboarding_complete: boolean;
   wifi_ssid?: string;
   auto_update: boolean;

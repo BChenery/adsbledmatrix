@@ -98,6 +98,8 @@ export default function Settings() {
         interesting_warmup_days: raw.interesting_warmup_days ?? 45,
         interesting_layout_id: raw.interesting_layout_id ?? null,
         interesting_hold_sec: raw.interesting_hold_sec ?? 8,
+        idle_weather_enabled: raw.idle_weather_enabled ?? true,
+        idle_rotation_interval_sec: raw.idle_rotation_interval_sec ?? 15,
       });
       setWifiSsid(raw.wifi_ssid ?? '');
     });
@@ -1085,6 +1087,38 @@ export default function Settings() {
             onSelect={(id) => update('idle_layout_id', id)}
             highlightMode="idle"
           />
+
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <div>
+              <Label>World weather when idle</Label>
+              <p className="text-xs text-white/40 mt-0.5">
+                Alternate with live weather from cities around the world (Brisbane, Tokyo, Paris…). Cities change about every 10 seconds.
+              </p>
+            </div>
+            <Switch
+              checked={!!config.idle_weather_enabled}
+              onCheckedChange={(v) => update('idle_weather_enabled', v)}
+            />
+          </div>
+          {config.idle_weather_enabled && (
+            <div className="space-y-2">
+              <Label>Switch idle layout every</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  min={5}
+                  max={600}
+                  value={config.idle_rotation_interval_sec}
+                  onChange={(e) => update('idle_rotation_interval_sec', parseInt(e.target.value) || 15)}
+                  className="w-24"
+                />
+                <span className="text-sm text-white/50">seconds</span>
+              </div>
+              <p className="text-xs text-white/40">
+                How long to show scanning vs weather before switching. Pick <strong className="text-white/60">World Weather</strong> as the idle layout to stay on weather only.
+              </p>
+            </div>
+          )}
         </div>
       </SettingsSection>
 

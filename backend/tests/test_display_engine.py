@@ -619,3 +619,76 @@ def test_preview_layout_used_when_rendering_idle(engine):
     assert img is not None
     # Draft text should produce non-black pixels.
     assert any(px != (0, 0, 0) for px in img.getdata())
+
+
+def test_resolve_weather_data_fields(engine):
+    from unittest.mock import MagicMock, patch
+    import time
+    from app.services.display_engine import RenderContext
+    from app.services.weather_service import WeatherSnapshot
+
+    snap = WeatherSnapshot(
+        city="Sydney",
+        country="Australia",
+        temperature_c=18.0,
+        feels_like_c=17.0,
+        condition="Partly cloudy",
+        humidity=60,
+        wind_kmh=20.0,
+        weather_code=2,
+        local_time="10:00",
+        fetched_at=time.monotonic(),
+    )
+    mock_svc = MagicMock()
+    mock_svc.display_values.return_value = snap.as_display_values()
+
+    with patch("app.services.weather_service.weather_service", mock_svc):
+        ctx = RenderContext(is_idle=True)
+        assert engine._resolve_data_field("weather_city", "{weather_city}", ctx) == "Sydney"
+        assert engine._resolve_data_field("weather_temp", "{weather_temp}", ctx) == "18°C"
+        assert engine._resolve_data_field(
+            "weather_condition", "{weather_condition}", ctx
+        ) == "Partly cloudy"
+
+
+def test_resolve_idle_layout_rotates_to_weather(engine):
+    from unittest.mock import MagicMock
+    from datetime import datetime, timedelta
+
+    scanning = MagicMock()
+    scanning.id = 1
+    scanning.name = "Idle / Scanning"
+    weather = MagicMock()
+    weather.id = 2
+    weather.name = "World Weather"
+
+    engine._idle_layout = scanning
+    engine._weather_layout = weather
+    engine._idle_index = 0
+    engine._idle_time = datetime.utcnow() - timedelta(seconds=30)
+
+    config = MagicMock()
+    config.idle_weather_enabled = True
+    config.idle_rotation_interval_sec = 15
+
+    layout = engine._resolve_idle_layout(config)
+    assert layout in (scanning, weather)
+
+    config.idle_weather_enabled = False
+    assert engine._resolve_idle_layout(config) is scanning
+
+
+def test_resolve_idle_layout_stays_on_weather_when_selected(engine):
+    from unittest.mock import MagicMock
+
+    weather = MagicMock()
+    weather.id = 5
+    weather.name = "World Weather"
+    engine._idle_layout = weather
+    engine._weather_layout = weather
+
+    config = MagicMock()
+    config.idle_weather_enabled = True
+    config.idle_rotation_interval_sec = 15
+
+    assert engine._resolve_idle_layout(config) is weather

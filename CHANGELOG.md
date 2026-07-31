@@ -5,6 +5,13 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.57] - 2026-07-31
+
+### Added
+- **World Weather idle layout** — when no aircraft are in range, the display can show live weather from cities around the world (Brisbane, Tokyo, Paris, London, New York, and more), rotating cities about every 10 seconds via Open-Meteo
+- Idle mode optionally **alternates** between your idle/scanning layout and World Weather (Settings → Display → “World weather when idle”)
+- New layout data fields: weather city, country, temperature, condition, humidity, wind, local time
+
 ## [0.1.56] - 2026-07-28
 
 ### Fixed

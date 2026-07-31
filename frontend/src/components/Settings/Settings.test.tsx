@@ -36,6 +36,8 @@ const mockConfig: UserConfig = {
   interesting_hold_sec: 8,
   active_layout_id: 1,
   idle_layout_id: 2,
+  idle_weather_enabled: true,
+  idle_rotation_interval_sec: 15,
   latitude: -33.8688,
   longitude: 151.2093,
   distance_unit: 'km',

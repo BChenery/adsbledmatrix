@@ -214,6 +214,27 @@ def idle_scanning() -> Dict[str, Any]:
     }
 
 
+def world_weather() -> Dict[str, Any]:
+    """Idle layout: live weather for a rotating set of world cities."""
+    return {
+        "name": "World Weather",
+        "description": "Live weather from random cities around the world when no aircraft are in range",
+        "width": W,
+        "height": H,
+        "is_default": False,
+        "elements": [
+            text(4, 4, 120, 14, "WORLD WEATHER", font_size=12, color=PALETTE["secondary"]),
+            data_field(140, 4, 112, 14, "weather_local_time", fmt="{weather_local_time}", font_size=12, color=PALETTE["secondary"]),
+            data_field(4, 28, 248, 28, "weather_city", fmt="{weather_city}", font_size=24, color=PALETTE["primary"]),
+            data_field(4, 58, 248, 16, "weather_country", fmt="{weather_country}", font_size=14, color=PALETTE["accent"]),
+            data_field(4, 84, 100, 28, "weather_temp", fmt="{weather_temp}", font_size=24, color=PALETTE["white"]),
+            data_field(110, 84, 142, 16, "weather_condition", fmt="{weather_condition}", font_size=14, color=PALETTE["positive"]),
+            data_field(110, 104, 70, 16, "weather_humidity", fmt="H {weather_humidity}", font_size=12, color=PALETTE["secondary"]),
+            data_field(184, 104, 68, 16, "weather_wind", fmt="W {weather_wind}", font_size=12, color=PALETTE["secondary"]),
+        ],
+    }
+
+
 def airport_board() -> Dict[str, Any]:
     return {
         "name": "Airport Board",
@@ -317,6 +338,7 @@ def build_layouts() -> List[Dict[str, Any]]:
         route_focus(),
         minimal(),
         idle_scanning(),
+        world_weather(),
         airport_board(),
         close_encounters(),
         split_detail_list(),
