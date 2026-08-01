@@ -471,6 +471,9 @@ class DisplayEngine:
         elif element_type == "image":
             self._draw_image(img, x, y, w, h, element, ctx)
 
+        elif element_type == "weather_icon":
+            self._draw_weather_icon(img, x, y, w, h, element, color)
+
         elif element_type == "shape":
             self._draw_shape(draw, x, y, w, h, element, color)
 
@@ -562,6 +565,50 @@ class DisplayEngine:
         output = Image.new("RGB", (width, render_h), (0, 0, 0))
         output.paste(solid, (0, 0), mask)
         draw._image.paste(output, (x, y), mask.crop((0, 0, width, render_h)))
+
+    def _draw_weather_icon(
+        self,
+        img: Image.Image,
+        x: int,
+        y: int,
+        w: int,
+        h: int,
+        element: Any,
+        color: Tuple[int, int, int],
+    ) -> None:
+        """Draw a condition icon for the current world-weather snapshot."""
+        from app.services.weather_icons import cached_weather_icon, weather_icon_key
+        from app.services.weather_service import weather_service
+
+        # Prefer live service icon; allow a fixed override via extra.icon for previews.
+        extra = getattr(element, "extra", None) or {}
+        icon_key = None
+        if isinstance(extra, dict):
+            icon_key = extra.get("icon") or extra.get("weather_icon")
+        if not icon_key:
+            try:
+                snap = weather_service.get_snapshot()
+                icon_key = weather_icon_key(getattr(snap, "weather_code", None))
+            except Exception:
+                icon_key = "unknown"
+
+        size = max(8, min(int(w or 32), int(h or 32)))
+        cache_key = f"weather_icon:{icon_key}:{size}"
+        try:
+            if cache_key not in self._image_cache:
+                self._image_cache[cache_key] = cached_weather_icon(str(icon_key), size)
+            icon = self._image_cache[cache_key].copy()
+            # Centre inside the element box if non-square.
+            px = x + max(0, (int(w) - size) // 2)
+            py = y + max(0, (int(h) - size) // 2)
+            img.paste(icon, (px, py), icon)
+        except Exception:
+            # Fallback: simple circle so the slot is never blank on failure.
+            try:
+                draw = ImageDraw.Draw(img)
+                draw.ellipse([x, y, x + w - 1, y + h - 1], outline=color, width=1)
+            except Exception:
+                pass
 
     def _draw_image(self, img: Image.Image, x: int, y: int, w: int, h: int, element: Any, ctx: RenderContext):
         path = element.image_path
@@ -988,6 +1035,7 @@ class DisplayEngine:
                 "weather_humidity": "---",
                 "weather_wind": "---",
                 "weather_local_time": "---",
+                "weather_icon": "unknown",
             })
 
         # Route data + friendly airport fields (IATA / city)

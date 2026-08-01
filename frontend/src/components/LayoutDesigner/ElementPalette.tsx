@@ -35,6 +35,7 @@ import {
   Milestone,
   Cloud,
   CloudSun,
+  CloudRain,
 } from 'lucide-react';
 
 export interface PalettePreset {
@@ -230,6 +231,21 @@ export const QUICK_ADD_PRESETS: PalettePreset[] = [
     label: 'Weather',
     icon: <CloudSun size={18} />,
     template: { element_type: 'data_field', x: 10, y: 10, width: 120, height: 16, color: '#4ade80', font_size: 12, data_field: 'weather_condition', format_str: '{weather_condition}' },
+  },
+  {
+    key: 'weather_icon',
+    label: 'Weather Icon',
+    icon: <CloudRain size={18} />,
+    template: {
+      element_type: 'weather_icon',
+      x: 10,
+      y: 10,
+      width: 48,
+      height: 48,
+      color: '#ffffff',
+      // Designer preview default; live matrix uses Open-Meteo condition.
+      extra: { icon: 'rain' },
+    },
   },
 ];
 

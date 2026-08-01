@@ -13,6 +13,7 @@ from app.services.weather_service import (
     WeatherSnapshot,
     _wmo_label,
 )
+from app.services.weather_icons import weather_icon_key, render_weather_icon
 
 
 def test_wmo_labels_cover_common_codes():
@@ -21,6 +22,38 @@ def test_wmo_labels_cover_common_codes():
     assert _wmo_label(95) == "Thunderstorm"
     assert _wmo_label(None) == "---"
     assert "999" in _wmo_label(999) or "Code" in _wmo_label(999)
+
+
+def test_weather_icon_key_maps_conditions():
+    assert weather_icon_key(0) == "clear"
+    assert weather_icon_key(2) == "partly_cloudy"
+    assert weather_icon_key(3) == "cloudy"
+    assert weather_icon_key(45) == "fog"
+    assert weather_icon_key(53) == "drizzle"
+    assert weather_icon_key(61) == "rain"
+    assert weather_icon_key(63) == "rain"
+    assert weather_icon_key(80) == "rain"
+    assert weather_icon_key(73) == "snow"
+    assert weather_icon_key(95) == "thunder"
+    assert weather_icon_key(None) == "unknown"
+
+
+def test_render_weather_icons_paint_pixels():
+    for key in (
+        "clear",
+        "partly_cloudy",
+        "cloudy",
+        "fog",
+        "drizzle",
+        "rain",
+        "snow",
+        "thunder",
+        "unknown",
+    ):
+        img = render_weather_icon(key, size=32)
+        assert img.size == (32, 32)
+        lit = sum(1 for px in img.getdata() if px[3] > 0)
+        assert lit > 0, f"{key} should draw visible pixels"
 
 
 def test_world_cities_include_user_requested():
@@ -66,6 +99,7 @@ def test_snapshot_display_values():
     assert values["weather_humidity"] == "55%"
     assert values["weather_wind"] == "12 km/h"
     assert values["weather_local_time"] == "14:30"
+    assert values["weather_icon"] == "clear"
 
 
 def test_city_rotates_after_interval():

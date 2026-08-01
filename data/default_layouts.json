@@ -651,7 +651,7 @@
         "element_type": "data_field",
         "x": 4,
         "y": 28,
-        "width": 248,
+        "width": 188,
         "height": 28,
         "z_index": 0,
         "data_field": "weather_city",
@@ -663,13 +663,22 @@
         "element_type": "data_field",
         "x": 4,
         "y": 58,
-        "width": 248,
+        "width": 188,
         "height": 16,
         "z_index": 0,
         "data_field": "weather_country",
         "format_str": "{weather_country}",
         "font_size": 14,
         "color": "#ffb347"
+      },
+      {
+        "element_type": "weather_icon",
+        "x": 200,
+        "y": 28,
+        "width": 48,
+        "height": 48,
+        "z_index": 1,
+        "color": "#ffffff"
       },
       {
         "element_type": "data_field",
@@ -687,12 +696,12 @@
         "element_type": "data_field",
         "x": 110,
         "y": 84,
-        "width": 142,
+        "width": 86,
         "height": 16,
         "z_index": 0,
         "data_field": "weather_condition",
         "format_str": "{weather_condition}",
-        "font_size": 14,
+        "font_size": 12,
         "color": "#4ade80"
       },
       {

@@ -81,6 +81,134 @@ function shapePolygon(
   }
 }
 
+/** Simple canvas preview for weather_icon elements (matches LED categories). */
+function drawWeatherIconPreview(
+  ctx: CanvasRenderingContext2D,
+  el: LayoutElement,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  const key = String(el.extra?.icon || el.extra?.weather_icon || 'partly_cloudy');
+  const size = Math.max(8, Math.min(w, h));
+  const px = x + Math.max(0, (w - size) / 2);
+  const py = y + Math.max(0, (h - size) / 2);
+  const s = size / 32;
+  const cx = px + size / 2;
+  const cy = py + size / 2;
+
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const sun = (ox: number, oy: number, r: number) => {
+    ctx.fillStyle = '#ffcc00';
+    ctx.beginPath();
+    ctx.arc(ox, oy, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ffa020';
+    ctx.lineWidth = Math.max(1, 1.5 * s);
+    for (const a of [0, 45, 90, 135, 180, 225, 270, 315]) {
+      const rad = (a * Math.PI) / 180;
+      ctx.beginPath();
+      ctx.moveTo(ox + Math.cos(rad) * r * 1.3, oy + Math.sin(rad) * r * 1.3);
+      ctx.lineTo(ox + Math.cos(rad) * r * 1.8, oy + Math.sin(rad) * r * 1.8);
+      ctx.stroke();
+    }
+  };
+
+  const cloud = (ox: number, oy: number, fill = '#b4bed0') => {
+    ctx.fillStyle = fill;
+    ctx.beginPath();
+    ctx.ellipse(ox - 4 * s, oy, 8 * s, 6 * s, 0, 0, Math.PI * 2);
+    ctx.ellipse(ox + 2 * s, oy - 3 * s, 9 * s, 7 * s, 0, 0, Math.PI * 2);
+    ctx.ellipse(ox + 8 * s, oy + 1 * s, 7 * s, 6 * s, 0, 0, Math.PI * 2);
+    ctx.fill();
+  };
+
+  const rain = () => {
+    ctx.strokeStyle = '#00c8ff';
+    ctx.lineWidth = Math.max(1, 1.5 * s);
+    for (let i = 0; i < 3; i++) {
+      const rx = cx - 6 * s + i * 6 * s;
+      ctx.beginPath();
+      ctx.moveTo(rx, cy + 4 * s);
+      ctx.lineTo(rx - 2 * s, cy + 12 * s);
+      ctx.stroke();
+    }
+  };
+
+  switch (key) {
+    case 'clear':
+      sun(cx, cy, 7 * s);
+      break;
+    case 'partly_cloudy':
+      sun(cx - 5 * s, cy - 5 * s, 5 * s);
+      cloud(cx, cy + 2 * s);
+      break;
+    case 'cloudy':
+      cloud(cx, cy, '#788296');
+      cloud(cx + 2 * s, cy + 2 * s);
+      break;
+    case 'fog':
+      ctx.strokeStyle = '#a0aab4';
+      ctx.lineWidth = Math.max(1, 2 * s);
+      for (let i = 0; i < 4; i++) {
+        const y0 = cy - 8 * s + i * 5 * s;
+        const w0 = i % 2 === 0 ? 18 * s : 14 * s;
+        ctx.beginPath();
+        ctx.moveTo(cx - w0 / 2, y0);
+        ctx.lineTo(cx + w0 / 2, y0);
+        ctx.stroke();
+      }
+      break;
+    case 'drizzle':
+      cloud(cx, cy - 3 * s);
+      rain();
+      break;
+    case 'rain':
+      cloud(cx, cy - 4 * s, '#788296');
+      rain();
+      break;
+    case 'snow':
+      cloud(cx, cy - 4 * s);
+      ctx.fillStyle = '#f0f0f5';
+      for (const [ox, oy] of [[-6, 6], [0, 9], [6, 6]] as const) {
+        ctx.beginPath();
+        ctx.arc(cx + ox * s, cy + oy * s, 1.8 * s, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      break;
+    case 'thunder':
+      cloud(cx, cy - 5 * s, '#a064ff');
+      ctx.fillStyle = '#ffe650';
+      ctx.beginPath();
+      ctx.moveTo(cx - 1 * s, cy);
+      ctx.lineTo(cx + 4 * s, cy);
+      ctx.lineTo(cx - 1 * s, cy + 7 * s);
+      ctx.lineTo(cx + 5 * s, cy + 7 * s);
+      ctx.lineTo(cx - 3 * s, cy + 16 * s);
+      ctx.lineTo(cx + 1 * s, cy + 8 * s);
+      ctx.lineTo(cx - 4 * s, cy + 8 * s);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    default:
+      ctx.strokeStyle = el.color || '#ffffff';
+      ctx.lineWidth = Math.max(1, 2 * s);
+      ctx.beginPath();
+      ctx.arc(cx, cy - 2 * s, 7 * s, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx, cy + 8 * s);
+      ctx.lineTo(cx, cy + 12 * s);
+      ctx.stroke();
+      break;
+  }
+  ctx.restore();
+}
+
 function drawShapePreview(
   ctx: CanvasRenderingContext2D,
   el: LayoutElement,
@@ -285,6 +413,7 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         }
       }
       else if (el.element_type === 'shape') text = '';
+      else if (el.element_type === 'weather_icon') text = '';
       else if (el.element_type === 'aircraft_list') {
         // Handled separately below
       }
@@ -313,6 +442,11 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
       // Shape preview (matches LED display_engine._draw_shape)
       if (el.element_type === 'shape') {
         drawShapePreview(ctx, el, x, y, w, h);
+      }
+
+      // Weather condition icon (sun / rain / snow / thunder…)
+      if (el.element_type === 'weather_icon') {
+        drawWeatherIconPreview(ctx, el, x, y, w, h);
       }
 
       // Heading arrow: match LED engine — filled triangle rotated by aircraft

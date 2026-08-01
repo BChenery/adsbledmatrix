@@ -96,10 +96,13 @@ class WeatherSnapshot:
     stale: bool = False
 
     def as_display_values(self) -> Dict[str, str]:
+        from app.services.weather_icons import weather_icon_key
+
         temp = f"{self.temperature_c:.0f}°C" if self.temperature_c is not None else "---"
         feels = f"{self.feels_like_c:.0f}°C" if self.feels_like_c is not None else "---"
         humidity = f"{self.humidity}%" if self.humidity is not None else "---"
         wind = f"{self.wind_kmh:.0f} km/h" if self.wind_kmh is not None else "---"
+        icon = weather_icon_key(self.weather_code)
         return {
             "weather_city": self.city,
             "weather_country": self.country,
@@ -110,6 +113,7 @@ class WeatherSnapshot:
             "weather_humidity": humidity,
             "weather_wind": wind,
             "weather_local_time": self.local_time or "---",
+            "weather_icon": icon,
         }
 
 

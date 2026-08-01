@@ -158,3 +158,62 @@ def test_default_layouts_json_has_no_pilot_view():
     assert "Pilot View" not in names
     assert "Aviation Enthusiast" in names
     assert len(names) == len(set(names)), "duplicate layout names in defaults"
+
+
+def test_default_world_weather_includes_weather_icon():
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[2] / "data" / "default_layouts.json"
+    layouts = {l["name"]: l for l in json.loads(path.read_text())}
+    weather = layouts["World Weather"]
+    types = [e["element_type"] for e in weather["elements"]]
+    assert "weather_icon" in types
+
+
+@pytest.mark.asyncio
+async def test_merge_appends_weather_icon_to_existing_world_weather(db_session):
+    layout = Layout(
+        name="World Weather",
+        description="existing",
+        width=256,
+        height=128,
+        is_default=False,
+    )
+    db_session.add(layout)
+    await db_session.flush()
+    db_session.add(
+        LayoutElement(
+            layout_id=layout.id,
+            element_type="text",
+            x=0,
+            y=0,
+            z_index=0,
+            format_str="WORLD WEATHER",
+        )
+    )
+    await db_session.commit()
+
+    await merge_default_layouts(db_session, [])
+    await db_session.commit()
+
+    result = await db_session.execute(
+        select(Layout)
+        .where(Layout.name == "World Weather")
+        .options(selectinload(Layout.elements))
+    )
+    loaded = result.scalar_one()
+    types = [e.element_type for e in loaded.elements]
+    assert "weather_icon" in types
+    assert types.count("weather_icon") == 1
+
+    # Idempotent — second merge does not duplicate.
+    await merge_default_layouts(db_session, [])
+    await db_session.commit()
+    result = await db_session.execute(
+        select(Layout)
+        .where(Layout.name == "World Weather")
+        .options(selectinload(Layout.elements))
+    )
+    loaded = result.scalar_one()
+    assert [e.element_type for e in loaded.elements].count("weather_icon") == 1

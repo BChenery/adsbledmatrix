@@ -8,7 +8,8 @@ export type ElementType =
   | 'distance_bar'
   | 'radar'
   | 'radar_blip'
-  | 'aircraft_list';
+  | 'aircraft_list'
+  | 'weather_icon';
 
 export interface LayoutElement {
   id?: number;

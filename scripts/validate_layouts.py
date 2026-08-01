@@ -35,6 +35,7 @@ REQUIRED_FIELDS = {
     "radar": [],
     "radar_blip": [],
     "aircraft_list": ["extra"],
+    "weather_icon": [],
 }
 
 
@@ -103,7 +104,7 @@ def validate_layout(layout: Dict[str, Any]) -> List[str]:
         for j in range(i + 1, len(elements)):
             a, b = elements[i], elements[j]
             # Images and solid backgrounds are opaque; text/data over images is allowed.
-            opaque = {"image", "shape", "radar", "radar_blip", "distance_bar", "heading_arrow"}
+            opaque = {"image", "shape", "radar", "radar_blip", "distance_bar", "heading_arrow", "weather_icon"}
             a_opaque = a.get("element_type") in opaque
             b_opaque = b.get("element_type") in opaque
             if a_opaque and b_opaque and overlaps(a, b):

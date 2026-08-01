@@ -250,6 +250,34 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
           </div>
         )}
 
+        {element.element_type === 'weather_icon' && (
+          <div className="space-y-1">
+            <Label htmlFor="weather-icon-preview">Preview icon</Label>
+            <Select
+              value={String(element.extra?.icon || element.extra?.weather_icon || 'partly_cloudy')}
+              onValueChange={(v) => updateExtra('icon', v)}
+            >
+              <SelectTrigger id="weather-icon-preview">
+                <SelectValue placeholder="Condition" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="clear">Clear / sun</SelectItem>
+                <SelectItem value="partly_cloudy">Partly cloudy</SelectItem>
+                <SelectItem value="cloudy">Cloudy</SelectItem>
+                <SelectItem value="fog">Fog</SelectItem>
+                <SelectItem value="drizzle">Drizzle</SelectItem>
+                <SelectItem value="rain">Rain</SelectItem>
+                <SelectItem value="snow">Snow</SelectItem>
+                <SelectItem value="thunder">Thunderstorm</SelectItem>
+                <SelectItem value="unknown">Unknown</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-[11px] text-led-faint">
+              Designer preview only. On the matrix the icon follows live weather (rain, snow, clear…).
+            </p>
+          </div>
+        )}
+
         <div className="space-y-1">
           <Label>Color</Label>
           <div className="flex gap-2">
