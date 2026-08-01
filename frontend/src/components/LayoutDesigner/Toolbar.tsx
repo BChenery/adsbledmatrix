@@ -25,6 +25,8 @@ import {
   Play,
   CopyPlus,
   Pencil,
+  Undo2,
+  Redo2,
 } from 'lucide-react';
 
 interface ToolbarProps {
@@ -44,6 +46,10 @@ interface ToolbarProps {
   isSaving?: boolean;
   onDelete?: () => void;
   canDelete?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
   useMockData: boolean;
   onToggleMockData: () => void;
   zoom: number;
@@ -78,6 +84,10 @@ export default function Toolbar({
   isSaving = false,
   onDelete,
   canDelete = false,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
   useMockData,
   onToggleMockData,
   zoom,
@@ -239,6 +249,34 @@ export default function Toolbar({
             aria-label="Duplicate layout"
           >
             <CopyPlus size={16} />
+          </Button>
+        )}
+
+        {activeLayout && onUndo && (
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={onUndo}
+            disabled={!canUndo}
+            className="h-9 w-9 shrink-0"
+            title="Undo (Ctrl+Z)"
+            aria-label="Undo"
+          >
+            <Undo2 size={16} />
+          </Button>
+        )}
+
+        {activeLayout && onRedo && (
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={onRedo}
+            disabled={!canRedo}
+            className="h-9 w-9 shrink-0"
+            title="Redo (Ctrl+Shift+Z)"
+            aria-label="Redo"
+          >
+            <Redo2 size={16} />
           </Button>
         )}
 

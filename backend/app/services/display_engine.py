@@ -608,13 +608,113 @@ class DisplayEngine:
             pass
 
     def _draw_shape(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, element: Any, color: Tuple[int, int, int]):
-        shape = element.extra.get("shape_type", "rectangle") if element.extra else "rectangle"
-        if shape == "rectangle":
-            draw.rectangle([x, y, x + w, y + h], outline=color)
+        extra = element.extra or {}
+        shape = extra.get("shape_type", "rectangle") if isinstance(extra, dict) else "rectangle"
+        stroke = 2
+        if isinstance(extra, dict):
+            try:
+                stroke = max(1, int(extra.get("stroke_width") or extra.get("width") or 2))
+            except (TypeError, ValueError):
+                stroke = 2
+
+        # Clamp box so degenerate sizes still draw something.
+        w = max(1, int(w or 1))
+        h = max(1, int(h or 1))
+        x2, y2 = x + w - 1, y + h - 1
+        cx, cy = x + w / 2.0, y + h / 2.0
+
+        if shape in ("rectangle", "rect"):
+            draw.rectangle([x, y, x2, y2], outline=color, width=stroke)
+        elif shape in ("filled_rectangle", "filled_rect", "box"):
+            draw.rectangle([x, y, x2, y2], fill=color)
         elif shape == "circle":
-            draw.ellipse([x, y, x + w, y + h], outline=color)
+            draw.ellipse([x, y, x2, y2], outline=color, width=stroke)
+        elif shape in ("filled_circle", "ellipse"):
+            draw.ellipse([x, y, x2, y2], fill=color)
         elif shape == "line":
-            draw.line([x, y, x + w, y + h], fill=color, width=2)
+            draw.line([x, y, x2, y2], fill=color, width=stroke)
+        elif shape in ("hline", "horizontal_line"):
+            mid = int(round(cy))
+            draw.line([x, mid, x2, mid], fill=color, width=stroke)
+        elif shape in ("vline", "vertical_line"):
+            mid = int(round(cx))
+            draw.line([mid, y, mid, y2], fill=color, width=stroke)
+        elif shape in (
+            "arrow_right",
+            "arrow_left",
+            "arrow_up",
+            "arrow_down",
+            "triangle",
+            "diamond",
+            "chevron_right",
+            "chevron_left",
+        ):
+            points = self._shape_polygon(shape, x, y, w, h)
+            if points:
+                draw.polygon(points, fill=color)
+        else:
+            # Unknown shape_type — fall back to outline rectangle so layouts never blank out.
+            draw.rectangle([x, y, x2, y2], outline=color, width=stroke)
+
+    @staticmethod
+    def _shape_polygon(
+        shape: str, x: int, y: int, w: int, h: int
+    ) -> List[Tuple[float, float]]:
+        """Return polygon points for filled directional shapes, in element box coords."""
+        x2, y2 = x + w, y + h
+        cx, cy = x + w / 2.0, y + h / 2.0
+
+        if shape == "arrow_right":
+            # Shaft on the left, chevron head on the right.
+            return [
+                (x, y + h * 0.30),
+                (x + w * 0.55, y + h * 0.30),
+                (x + w * 0.55, y),
+                (x2, cy),
+                (x + w * 0.55, y2),
+                (x + w * 0.55, y + h * 0.70),
+                (x, y + h * 0.70),
+            ]
+        if shape == "arrow_left":
+            return [
+                (x2, y + h * 0.30),
+                (x + w * 0.45, y + h * 0.30),
+                (x + w * 0.45, y),
+                (x, cy),
+                (x + w * 0.45, y2),
+                (x + w * 0.45, y + h * 0.70),
+                (x2, y + h * 0.70),
+            ]
+        if shape == "arrow_up":
+            return [
+                (x + w * 0.30, y2),
+                (x + w * 0.30, y + h * 0.45),
+                (x, y + h * 0.45),
+                (cx, y),
+                (x2, y + h * 0.45),
+                (x + w * 0.70, y + h * 0.45),
+                (x + w * 0.70, y2),
+            ]
+        if shape == "arrow_down":
+            return [
+                (x + w * 0.30, y),
+                (x + w * 0.30, y + h * 0.55),
+                (x, y + h * 0.55),
+                (cx, y2),
+                (x2, y + h * 0.55),
+                (x + w * 0.70, y + h * 0.55),
+                (x + w * 0.70, y),
+            ]
+        if shape == "triangle":
+            return [(cx, y), (x2, y2), (x, y2)]
+        if shape == "diamond":
+            return [(cx, y), (x2, cy), (cx, y2), (x, cy)]
+        if shape == "chevron_right":
+            # Open chevron / play-style triangle pointing right.
+            return [(x, y), (x2, cy), (x, y2), (x + w * 0.35, cy)]
+        if shape == "chevron_left":
+            return [(x2, y), (x, cy), (x2, y2), (x + w * 0.65, cy)]
+        return []
 
     def _draw_heading_arrow(self, draw: ImageDraw.Draw, x: int, y: int, w: int, h: int, ctx: RenderContext, color: Tuple[int, int, int]):
         heading = ctx.aircraft.heading if ctx.aircraft else None

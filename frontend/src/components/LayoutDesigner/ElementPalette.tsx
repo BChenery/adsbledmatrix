@@ -5,6 +5,16 @@ import {
   Database,
   Image as ImageIcon,
   Square,
+  Circle,
+  Minus,
+  ArrowRight,
+  ArrowLeft,
+  ArrowUp,
+  ArrowDown,
+  Triangle,
+  Diamond,
+  ChevronRight,
+  ChevronLeft,
   Navigation,
   ArrowUpDown,
   BarChart3,
@@ -227,8 +237,101 @@ export const ADVANCED_ELEMENTS: PalettePreset[] = [
   { key: 'text', label: 'Text', icon: <Type size={18} />, template: { element_type: 'text', x: 10, y: 10, width: 100, height: 15, color: '#ffffff', font_size: 8, format_str: 'Hello LED' } },
   { key: 'data_field', label: 'Data Field', icon: <Database size={18} />, template: { element_type: 'data_field', x: 10, y: 10, width: 100, height: 15, color: '#00d4ff', font_size: 8, data_field: 'callsign', format_str: '{callsign}' } },
   { key: 'image', label: 'Image', icon: <ImageIcon size={18} />, template: { element_type: 'image', x: 10, y: 10, width: 32, height: 32 } },
-  { key: 'shape', label: 'Shape', icon: <Square size={18} />, template: { element_type: 'shape', x: 10, y: 10, width: 50, height: 2, color: '#ffffff', extra: { shape_type: 'rectangle' } } },
-  { key: 'radar_blip', label: 'Radar', icon: <Radar size={18} />, template: { element_type: 'radar_blip', x: 10, y: 10, width: 40, height: 40, color: '#00d4ff' } },
+  { key: 'radar_blip', label: 'Radar Blip', icon: <Radar size={18} />, template: { element_type: 'radar_blip', x: 10, y: 10, width: 40, height: 40, color: '#00d4ff' } },
+];
+
+/** Decorative geometry — all use element_type "shape" with extra.shape_type. */
+export const SHAPE_PRESETS: PalettePreset[] = [
+  {
+    key: 'shape_rect',
+    label: 'Rectangle',
+    icon: <Square size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 60, height: 24, color: '#ffffff', extra: { shape_type: 'rectangle', stroke_width: 1 } },
+  },
+  {
+    key: 'shape_box',
+    label: 'Filled Box',
+    icon: <Square size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 40, height: 16, color: '#334155', extra: { shape_type: 'filled_rectangle' } },
+  },
+  {
+    key: 'shape_circle',
+    label: 'Circle',
+    icon: <Circle size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 24, height: 24, color: '#ffffff', extra: { shape_type: 'circle', stroke_width: 1 } },
+  },
+  {
+    key: 'shape_filled_circle',
+    label: 'Filled Circle',
+    icon: <Circle size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 16, height: 16, color: '#00d4ff', extra: { shape_type: 'filled_circle' } },
+  },
+  {
+    key: 'shape_hline',
+    label: 'H. Line',
+    icon: <Minus size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 80, height: 4, color: '#a0aec0', extra: { shape_type: 'hline', stroke_width: 2 } },
+  },
+  {
+    key: 'shape_vline',
+    label: 'V. Line',
+    icon: <Minus size={18} className="rotate-90" />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 4, height: 48, color: '#a0aec0', extra: { shape_type: 'vline', stroke_width: 2 } },
+  },
+  {
+    key: 'shape_line',
+    label: 'Diagonal',
+    icon: <Minus size={18} className="-rotate-45" />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 40, height: 40, color: '#ffffff', extra: { shape_type: 'line', stroke_width: 2 } },
+  },
+  {
+    key: 'shape_arrow_right',
+    label: 'Arrow →',
+    icon: <ArrowRight size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 40, height: 20, color: '#00d4ff', extra: { shape_type: 'arrow_right' } },
+  },
+  {
+    key: 'shape_arrow_left',
+    label: 'Arrow ←',
+    icon: <ArrowLeft size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 40, height: 20, color: '#00d4ff', extra: { shape_type: 'arrow_left' } },
+  },
+  {
+    key: 'shape_arrow_up',
+    label: 'Arrow ↑',
+    icon: <ArrowUp size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 20, height: 40, color: '#4ade80', extra: { shape_type: 'arrow_up' } },
+  },
+  {
+    key: 'shape_arrow_down',
+    label: 'Arrow ↓',
+    icon: <ArrowDown size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 20, height: 40, color: '#f87171', extra: { shape_type: 'arrow_down' } },
+  },
+  {
+    key: 'shape_chevron_right',
+    label: 'Chevron ›',
+    icon: <ChevronRight size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 20, height: 28, color: '#ffb347', extra: { shape_type: 'chevron_right' } },
+  },
+  {
+    key: 'shape_chevron_left',
+    label: 'Chevron ‹',
+    icon: <ChevronLeft size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 20, height: 28, color: '#ffb347', extra: { shape_type: 'chevron_left' } },
+  },
+  {
+    key: 'shape_triangle',
+    label: 'Triangle',
+    icon: <Triangle size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 24, height: 24, color: '#ffffff', extra: { shape_type: 'triangle' } },
+  },
+  {
+    key: 'shape_diamond',
+    label: 'Diamond',
+    icon: <Diamond size={18} />,
+    template: { element_type: 'shape', x: 10, y: 10, width: 24, height: 24, color: '#00d4ff', extra: { shape_type: 'diamond' } },
+  },
 ];
 
 interface ElementPaletteProps {
@@ -251,6 +354,23 @@ export default function ElementPalette({ onAddElement, className, compact = fals
       </div>
       <div className="flex-1 space-y-1 overflow-y-auto p-2">
         {QUICK_ADD_PRESETS.map((el) => (
+          <Button
+            key={el.key}
+            variant="ghost"
+            onClick={() => onAddElement(el.key)}
+            className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm text-led-dim hover:text-[#f5f5f5]"
+          >
+            <span className="text-led-faint">{el.icon}</span>
+            {el.label}
+          </Button>
+        ))}
+      </div>
+
+      <div className="border-y border-led-line p-3">
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">Shapes</h3>
+      </div>
+      <div className="space-y-1 p-2">
+        {SHAPE_PRESETS.map((el) => (
           <Button
             key={el.key}
             variant="ghost"

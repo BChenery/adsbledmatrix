@@ -20,11 +20,23 @@ import { applyPayload } from '@/lib/applyPayload';
 import { MOCK_AIRCRAFT_FLEET } from '@/lib/mockAircraft';
 import { toast } from 'sonner';
 import { normalizeLayoutName, uniqueCopyName } from '@/lib/layoutName';
+import {
+  emptyLayoutHistory,
+  pushLayoutHistory,
+  undoLayout,
+  redoLayout,
+  reselectElement,
+  isEditableKeyboardTarget,
+  type LayoutHistory,
+} from '@/lib/layoutHistory';
 import Canvas from './Canvas';
-import ElementPalette, { QUICK_ADD_PRESETS, ADVANCED_ELEMENTS } from './ElementPalette';
+import ElementPalette, { QUICK_ADD_PRESETS, ADVANCED_ELEMENTS, SHAPE_PRESETS } from './ElementPalette';
 import PropertyPanel from './PropertyPanel';
 import Toolbar from './Toolbar';
 import { Save, Plus, Layers, SlidersHorizontal, X } from 'lucide-react';
+
+/** Coalesce rapid property edits (typing) into a single undo step. */
+const HISTORY_COALESCE_MS = 400;
 
 const DEFAULT_LAYOUT: Layout = {
   name: 'New Layout',
@@ -34,7 +46,7 @@ const DEFAULT_LAYOUT: Layout = {
   elements: [],
 };
 
-const ALL_PRESETS = [...QUICK_ADD_PRESETS, ...ADVANCED_ELEMENTS];
+const ALL_PRESETS = [...QUICK_ADD_PRESETS, ...SHAPE_PRESETS, ...ADVANCED_ELEMENTS];
 const ELEMENT_TEMPLATES: Record<string, Partial<LayoutElement>> = Object.fromEntries(
   ALL_PRESETS.map((p) => [p.key, p.template])
 );
@@ -75,11 +87,95 @@ export default function LayoutDesigner() {
   /** Bumps after duplicate so the toolbar can focus the name field for rename. */
   const [nameFocusToken, setNameFocusToken] = useState(0);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const historyRef = useRef<LayoutHistory>(emptyLayoutHistory());
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  const coalesceTimerRef = useRef<number | null>(null);
+  const didCoalescePushRef = useRef(false);
+  const activeLayoutRef = useRef<Layout | null>(null);
+  const selectedElementRef = useRef<LayoutElement | null>(null);
+
+  activeLayoutRef.current = activeLayout;
+  selectedElementRef.current = selectedElement;
 
   const isDirty = useMemo(
     () => !!activeLayout && layoutSnapshot(activeLayout) !== savedSnapshot,
     [activeLayout, savedSnapshot],
   );
+
+  const syncHistoryFlags = useCallback((history: LayoutHistory) => {
+    setCanUndo(history.past.length > 0);
+    setCanRedo(history.future.length > 0);
+  }, []);
+
+  const clearHistory = useCallback(() => {
+    historyRef.current = emptyLayoutHistory();
+    didCoalescePushRef.current = false;
+    if (coalesceTimerRef.current !== null) {
+      window.clearTimeout(coalesceTimerRef.current);
+      coalesceTimerRef.current = null;
+    }
+    syncHistoryFlags(historyRef.current);
+  }, [syncHistoryFlags]);
+
+  /** Snapshot current layout for undo (discrete actions, drag start). */
+  const recordHistory = useCallback(() => {
+    const current = activeLayoutRef.current;
+    if (!current) return;
+    historyRef.current = pushLayoutHistory(historyRef.current, current);
+    didCoalescePushRef.current = false;
+    if (coalesceTimerRef.current !== null) {
+      window.clearTimeout(coalesceTimerRef.current);
+      coalesceTimerRef.current = null;
+    }
+    syncHistoryFlags(historyRef.current);
+  }, [syncHistoryFlags]);
+
+  /** One undo step for a burst of property-panel edits. */
+  const recordHistoryCoalesced = useCallback(() => {
+    if (!didCoalescePushRef.current) {
+      recordHistory();
+      didCoalescePushRef.current = true;
+    }
+    if (coalesceTimerRef.current !== null) {
+      window.clearTimeout(coalesceTimerRef.current);
+    }
+    coalesceTimerRef.current = window.setTimeout(() => {
+      didCoalescePushRef.current = false;
+      coalesceTimerRef.current = null;
+    }, HISTORY_COALESCE_MS);
+  }, [recordHistory]);
+
+  const applyRestoredLayout = useCallback((layout: Layout, previous: Layout | null) => {
+    const prevSelected = selectedElementRef.current;
+    setActiveLayout(layout);
+    setSelectedElement(reselectElement(layout, prevSelected, previous));
+    didCoalescePushRef.current = false;
+    if (coalesceTimerRef.current !== null) {
+      window.clearTimeout(coalesceTimerRef.current);
+      coalesceTimerRef.current = null;
+    }
+  }, []);
+
+  const handleUndo = useCallback(() => {
+    const current = activeLayoutRef.current;
+    if (!current) return;
+    const result = undoLayout(historyRef.current, current);
+    if (!result) return;
+    historyRef.current = result.history;
+    syncHistoryFlags(result.history);
+    applyRestoredLayout(result.layout, current);
+  }, [applyRestoredLayout, syncHistoryFlags]);
+
+  const handleRedo = useCallback(() => {
+    const current = activeLayoutRef.current;
+    if (!current) return;
+    const result = redoLayout(historyRef.current, current);
+    if (!result) return;
+    historyRef.current = result.history;
+    syncHistoryFlags(result.history);
+    applyRestoredLayout(result.layout, current);
+  }, [applyRestoredLayout, syncHistoryFlags]);
 
   const clearPreviewOverride = useCallback(async () => {
     try {
@@ -105,6 +201,34 @@ export default function LayoutDesigner() {
     };
   }, []);
 
+  // Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo (skip when typing in fields).
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      if (isEditableKeyboardTarget(e.target)) return;
+      const key = e.key.toLowerCase();
+      if (key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+        return;
+      }
+      if ((key === 'z' && e.shiftKey) || key === 'y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [handleUndo, handleRedo]);
+
+  useEffect(() => {
+    return () => {
+      if (coalesceTimerRef.current !== null) {
+        window.clearTimeout(coalesceTimerRef.current);
+      }
+    };
+  }, []);
+
   const refreshConfig = async () => {
     const fresh = await api.get<UserConfig>('/api/config');
     setConfig(fresh);
@@ -126,6 +250,7 @@ export default function LayoutDesigner() {
     if (!activeLayout) return;
     const template = ELEMENT_TEMPLATES[key];
     if (!template) return;
+    recordHistory();
     const newElement: LayoutElement = {
       ...template,
       z_index: activeLayout.elements.length,
@@ -137,8 +262,10 @@ export default function LayoutDesigner() {
     setSelectedElement(newElement);
   };
 
-  const handleUpdateElement = (updated: LayoutElement) => {
+  const handleUpdateElement = (updated: LayoutElement, opts?: { history?: 'none' | 'coalesce' }) => {
     if (!activeLayout) return;
+    const mode = opts?.history ?? 'coalesce';
+    if (mode === 'coalesce') recordHistoryCoalesced();
     setActiveLayout({
       ...activeLayout,
       elements: activeLayout.elements.map((e) =>
@@ -148,8 +275,14 @@ export default function LayoutDesigner() {
     setSelectedElement(updated);
   };
 
+  const handleLayoutChange = (layout: Layout) => {
+    recordHistoryCoalesced();
+    setActiveLayout(layout);
+  };
+
   const handleDeleteElement = () => {
     if (!activeLayout || !selectedElement) return;
+    recordHistory();
     setActiveLayout({
       ...activeLayout,
       elements: activeLayout.elements.filter((e) => e !== selectedElement),
@@ -215,6 +348,7 @@ export default function LayoutDesigner() {
       });
       setActiveLayout(created);
       markSaved(created);
+      clearHistory();
       setSelectedElement(null);
       setShowNewModal(false);
       setNewLayoutName('');
@@ -291,6 +425,7 @@ export default function LayoutDesigner() {
       });
       setActiveLayout(created);
       markSaved(created);
+      clearHistory();
       setSelectedElement(null);
       setNameFocusToken((t) => t + 1);
       toast.success(`Duplicated as “${created.name}” — rename anytime`);
@@ -323,6 +458,7 @@ export default function LayoutDesigner() {
         setActiveLayout(null);
         setSavedSnapshot('');
       }
+      clearHistory();
       setSelectedElement(null);
       setShowDeleteModal(false);
       await refreshConfig();
@@ -336,6 +472,7 @@ export default function LayoutDesigner() {
 
   const handleSelectLayout = async (layout: Layout | null) => {
     await clearPreviewOverride();
+    clearHistory();
     if (!layout || !layout.id) {
       setActiveLayout(layout);
       setSavedSnapshot(layoutSnapshot(layout));
@@ -375,6 +512,10 @@ export default function LayoutDesigner() {
         isSaving={isSaving}
         onDelete={() => setShowDeleteModal(true)}
         canDelete={canDeleteLayout}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        canUndo={canUndo}
+        canRedo={canRedo}
         useMockData={useMockData}
         onToggleMockData={() => setUseMockData((v) => !v)}
         zoom={zoom}
@@ -473,7 +614,8 @@ export default function LayoutDesigner() {
                     setSelectedElement(el);
                     if (el) setMobilePanel('props');
                   }}
-                  onUpdateElement={handleUpdateElement}
+                  onUpdateElement={(el) => handleUpdateElement(el, { history: 'none' })}
+                  onEditStart={recordHistory}
                   aircraft={useMockData ? MOCK_AIRCRAFT_FLEET : aircraft}
                   zoom={zoom}
                   flipVertical={panelPreview && (diagnostics?.flip_vertical ?? false)}
@@ -509,10 +651,10 @@ export default function LayoutDesigner() {
           <div className="hidden lg:flex">
             <PropertyPanel
               layout={activeLayout}
-              onLayoutChange={setActiveLayout}
+              onLayoutChange={handleLayoutChange}
               onNameBlur={() => activeLayout?.id && handleRename(activeLayout.name)}
               element={selectedElement}
-              onChange={handleUpdateElement}
+              onChange={(el) => handleUpdateElement(el)}
               onDelete={handleDeleteElement}
             />
           </div>
@@ -544,10 +686,10 @@ export default function LayoutDesigner() {
                   ) : (
                     <PropertyPanel
                       layout={activeLayout}
-                      onLayoutChange={setActiveLayout}
+                      onLayoutChange={handleLayoutChange}
                       onNameBlur={() => activeLayout?.id && handleRename(activeLayout.name)}
                       element={selectedElement}
-                      onChange={handleUpdateElement}
+                      onChange={(el) => handleUpdateElement(el)}
                       onDelete={() => {
                         handleDeleteElement();
                         setMobilePanel(null);

@@ -124,15 +124,6 @@ def flight_card(name: str, description: str, variant: str = "full") -> Dict[str,
             data_field(60, 42, 130, 16, "registration", fmt="{registration} · {type_code}", font_size=12, color=PALETTE["secondary"]),
             heading_arrow(204, 42, 48, 48),
         ])
-    elif variant == "pilot":
-        elements.extend([
-            heading_arrow(180, 4, 72, 72),
-            data_field(4, 44, 78, 20, "altitude", fmt="ALT: {altitude}", font_size=16),
-            data_field(90, 44, 78, 20, "ground_speed", fmt="SPD: {ground_speed}", font_size=16),
-            data_field(176, 44, 76, 20, "heading", fmt="HDG: {heading}", font_size=16),
-            data_field(4, 70, 120, 28, "distance", fmt="{distance}", font_size=24, color=PALETTE["accent"]),
-            vertical_rate(130, 74, 100, 16),
-        ])
     elif variant == "type_speed":
         elements.extend([
             data_field(4, 44, 120, 36, "type_code", fmt="{type_code}", font_size=32, color=PALETTE["accent"]),
@@ -331,7 +322,7 @@ def build_layouts() -> List[Dict[str, Any]]:
     return [
         {**flight_card("Aviation Enthusiast", "Full aircraft details with callsign, altitude, speed, heading, and distance", "full"), "is_default": True},
         flight_card("Flight Tracker", "Brand-focused layout with airline logo, route, and key flight stats", "tracker"),
-        flight_card("Pilot View", "Giant callsign and heading arrow with key stats stacked", "pilot"),
+        # "Pilot View" intentionally omitted from shipped defaults.
         flight_card("Type & Speed", "Aircraft type code hero with speed and altitude side-by-side", "type_speed"),
         brand_hero("Airline Brand", "Large airline logo with minimal flight info"),
         brand_hero("Logo & Distance", "Giant logo and massive distance number for quick scanning", large_distance=True),

@@ -22,8 +22,6 @@ async def lifespan(app: FastAPI):
 
     # Load user config and set receiver location
     from app.database import AsyncSessionLocal
-    from sqlalchemy import select
-    from app.models import Layout, LayoutElement, UserConfig
     import json
 
     async with AsyncSessionLocal() as session:
@@ -40,45 +38,27 @@ async def lifespan(app: FastAPI):
         receiver.set_user_location(config.latitude, config.longitude)
         await apply_receiver_source(config)
 
-        # Seed / merge default layouts
+        # Additive merge: insert any new shipped defaults by name.
+        # Never overwrite or delete layouts users already have.
+        from app.services.layout_seed import merge_default_layouts
+
         with open(settings.default_layouts_path) as f:
             layouts_data = json.load(f)
 
-        existing_result = await session.execute(select(Layout))
-        existing_layouts = {l.name: l for l in existing_result.scalars().all()}
-        active_layout = None
-        idle_layout = None
-
-        for layout_data in layouts_data:
-            elements = layout_data.pop("elements", [])
-            name = layout_data.get("name")
-
-            if name in existing_layouts:
-                # Never overwrite user-edited layouts on restart. Only seed
-                # layouts that are missing by name.
-                layout = existing_layouts[name]
-            else:
-                logger.info(f"Seeding new default layout: {name}")
-                layout = Layout(**layout_data)
-                session.add(layout)
-                await session.flush()
-                for elem_data in elements:
-                    elem = LayoutElement(layout_id=layout.id, **elem_data)
-                    session.add(elem)
-
-            if layout.name == "Idle / Scanning":
-                idle_layout = layout
-            elif layout_data.get("is_default"):
-                active_layout = layout
-            elif active_layout is None:
-                active_layout = layout
+        added, total, active_layout, idle_layout = await merge_default_layouts(
+            session, layouts_data
+        )
 
         if not config.active_layout_id and active_layout:
             config.active_layout_id = active_layout.id
         if not config.idle_layout_id and idle_layout:
             config.idle_layout_id = idle_layout.id
         await session.commit()
-        logger.info(f"Merged {len(layouts_data)} default layouts")
+        logger.info(
+            "Default layouts: %d shipped, %d newly added (existing user layouts kept)",
+            total,
+            added,
+        )
 
         from app.services.layout_loader import apply_engine_layouts
 

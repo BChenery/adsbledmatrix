@@ -692,3 +692,37 @@ def test_resolve_idle_layout_stays_on_weather_when_selected(engine):
     config.idle_rotation_interval_sec = 15
 
     assert engine._resolve_idle_layout(config) is weather
+
+
+def test_draw_shape_arrows_and_geometry(engine):
+    """Directional and basic shapes should paint non-black pixels on the LED canvas."""
+    from unittest.mock import MagicMock
+    from PIL import Image, ImageDraw
+
+    shapes = [
+        "rectangle",
+        "filled_rectangle",
+        "circle",
+        "filled_circle",
+        "line",
+        "hline",
+        "vline",
+        "arrow_right",
+        "arrow_left",
+        "arrow_up",
+        "arrow_down",
+        "triangle",
+        "diamond",
+        "chevron_right",
+        "chevron_left",
+    ]
+    color = (0, 212, 255)
+
+    for shape in shapes:
+        element = MagicMock()
+        element.extra = {"shape_type": shape, "stroke_width": 2}
+        img = Image.new("RGB", (48, 32), (0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        engine._draw_shape(draw, 4, 4, 40, 24, element, color)
+        lit = sum(1 for px in img.get_flattened_data() if px != (0, 0, 0))
+        assert lit > 0, f"Expected {shape} to draw pixels"

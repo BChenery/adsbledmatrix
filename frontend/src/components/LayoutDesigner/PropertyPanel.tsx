@@ -93,6 +93,35 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
     onChange({ ...element, [field]: value });
   };
 
+  const updateExtra = (key: string, value: unknown) => {
+    onChange({
+      ...element,
+      extra: { ...(element.extra || {}), [key]: value },
+    });
+  };
+
+  const SHAPE_TYPES = [
+    { value: 'rectangle', label: 'Rectangle (outline)' },
+    { value: 'filled_rectangle', label: 'Filled box' },
+    { value: 'circle', label: 'Circle (outline)' },
+    { value: 'filled_circle', label: 'Filled circle' },
+    { value: 'hline', label: 'Horizontal line' },
+    { value: 'vline', label: 'Vertical line' },
+    { value: 'line', label: 'Diagonal line' },
+    { value: 'arrow_right', label: 'Arrow →' },
+    { value: 'arrow_left', label: 'Arrow ←' },
+    { value: 'arrow_up', label: 'Arrow ↑' },
+    { value: 'arrow_down', label: 'Arrow ↓' },
+    { value: 'chevron_right', label: 'Chevron ›' },
+    { value: 'chevron_left', label: 'Chevron ‹' },
+    { value: 'triangle', label: 'Triangle' },
+    { value: 'diamond', label: 'Diamond' },
+  ] as const;
+
+  const outlineShapes = new Set(['rectangle', 'rect', 'circle', 'line', 'hline', 'horizontal_line', 'vline', 'vertical_line']);
+  const shapeType = String(element.extra?.shape_type || 'rectangle');
+  const showStrokeWidth = element.element_type === 'shape' && outlineShapes.has(shapeType);
+
   return (
     <div className="flex h-full w-full flex-col border-led-line bg-led-dark lg:w-72 lg:border-l">
       <div className="flex items-center justify-between border-b border-led-line p-3">
@@ -107,6 +136,44 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
           <Label>Type</Label>
           <div className="text-sm font-medium">{element.element_type}</div>
         </div>
+
+        {element.element_type === 'shape' && (
+          <>
+            <div className="space-y-1">
+              <Label htmlFor="shape-type">Shape</Label>
+              <Select
+                value={shapeType}
+                onValueChange={(v) => updateExtra('shape_type', v)}
+              >
+                <SelectTrigger id="shape-type">
+                  <SelectValue placeholder="Shape type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SHAPE_TYPES.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {showStrokeWidth && (
+              <div className="space-y-1">
+                <Label htmlFor="shape-stroke">Stroke width</Label>
+                <Input
+                  id="shape-stroke"
+                  type="number"
+                  min={1}
+                  max={16}
+                  value={Number(element.extra?.stroke_width ?? element.extra?.width ?? 2) || 2}
+                  onChange={(e) =>
+                    updateExtra('stroke_width', Math.max(1, parseInt(e.target.value) || 1))
+                  }
+                />
+              </div>
+            )}
+          </>
+        )}
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">

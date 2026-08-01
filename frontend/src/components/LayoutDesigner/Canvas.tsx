@@ -14,22 +14,185 @@ function rotatePoint(px: number, py: number, cx: number, cy: number, angleDeg: n
   ];
 }
 
+/** Polygon points for filled shape types — mirrors display_engine._shape_polygon. */
+function shapePolygon(
+  shape: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): Array<[number, number]> {
+  const x2 = x + w;
+  const y2 = y + h;
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+
+  switch (shape) {
+    case 'arrow_right':
+      return [
+        [x, y + h * 0.3],
+        [x + w * 0.55, y + h * 0.3],
+        [x + w * 0.55, y],
+        [x2, cy],
+        [x + w * 0.55, y2],
+        [x + w * 0.55, y + h * 0.7],
+        [x, y + h * 0.7],
+      ];
+    case 'arrow_left':
+      return [
+        [x2, y + h * 0.3],
+        [x + w * 0.45, y + h * 0.3],
+        [x + w * 0.45, y],
+        [x, cy],
+        [x + w * 0.45, y2],
+        [x + w * 0.45, y + h * 0.7],
+        [x2, y + h * 0.7],
+      ];
+    case 'arrow_up':
+      return [
+        [x + w * 0.3, y2],
+        [x + w * 0.3, y + h * 0.45],
+        [x, y + h * 0.45],
+        [cx, y],
+        [x2, y + h * 0.45],
+        [x + w * 0.7, y + h * 0.45],
+        [x + w * 0.7, y2],
+      ];
+    case 'arrow_down':
+      return [
+        [x + w * 0.3, y],
+        [x + w * 0.3, y + h * 0.55],
+        [x, y + h * 0.55],
+        [cx, y2],
+        [x2, y + h * 0.55],
+        [x + w * 0.7, y + h * 0.55],
+        [x + w * 0.7, y],
+      ];
+    case 'triangle':
+      return [[cx, y], [x2, y2], [x, y2]];
+    case 'diamond':
+      return [[cx, y], [x2, cy], [cx, y2], [x, cy]];
+    case 'chevron_right':
+      return [[x, y], [x2, cy], [x, y2], [x + w * 0.35, cy]];
+    case 'chevron_left':
+      return [[x2, y], [x, cy], [x2, y2], [x + w * 0.65, cy]];
+    default:
+      return [];
+  }
+}
+
+function drawShapePreview(
+  ctx: CanvasRenderingContext2D,
+  el: LayoutElement,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+) {
+  const color = el.color || '#ffffff';
+  const extra = el.extra || {};
+  const shape = String(extra.shape_type || 'rectangle');
+  const stroke = Math.max(1, Number(extra.stroke_width ?? extra.width ?? 2) || 2);
+  const boxW = Math.max(1, w);
+  const boxH = Math.max(1, h);
+  const x2 = x + boxW;
+  const y2 = y + boxH;
+  const cx = x + boxW / 2;
+  const cy = y + boxH / 2;
+
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = stroke;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+
+  const fillPoly = (points: Array<[number, number]>) => {
+    if (points.length < 3) return;
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+    ctx.closePath();
+    ctx.fill();
+  };
+
+  switch (shape) {
+    case 'filled_rectangle':
+    case 'filled_rect':
+    case 'box':
+      ctx.fillRect(x, y, boxW, boxH);
+      break;
+    case 'circle':
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, boxW / 2, boxH / 2, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      break;
+    case 'filled_circle':
+    case 'ellipse':
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, boxW / 2, boxH / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    case 'line':
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x2 - 1, y2 - 1);
+      ctx.stroke();
+      break;
+    case 'hline':
+    case 'horizontal_line':
+      ctx.beginPath();
+      ctx.moveTo(x, cy);
+      ctx.lineTo(x2 - 1, cy);
+      ctx.stroke();
+      break;
+    case 'vline':
+    case 'vertical_line':
+      ctx.beginPath();
+      ctx.moveTo(cx, y);
+      ctx.lineTo(cx, y2 - 1);
+      ctx.stroke();
+      break;
+    case 'arrow_right':
+    case 'arrow_left':
+    case 'arrow_up':
+    case 'arrow_down':
+    case 'triangle':
+    case 'diamond':
+    case 'chevron_right':
+    case 'chevron_left':
+      fillPoly(shapePolygon(shape, x, y, boxW, boxH));
+      break;
+    case 'rectangle':
+    case 'rect':
+    default:
+      ctx.strokeRect(x + 0.5, y + 0.5, Math.max(0, boxW - 1), Math.max(0, boxH - 1));
+      break;
+  }
+
+  ctx.restore();
+}
+
 interface CanvasProps {
   layout: Layout;
   selectedElement: LayoutElement | null;
   onSelectElement: (el: LayoutElement | null) => void;
   onUpdateElement: (el: LayoutElement) => void;
+  /** Fired once when a drag or resize gesture begins (for undo checkpoints). */
+  onEditStart?: () => void;
   aircraft?: Aircraft[];
   zoom?: number;
   flipVertical?: boolean;
 }
 
 
-export default function Canvas({ layout, selectedElement, onSelectElement, onUpdateElement, aircraft = [], zoom = 1, flipVertical = false }: CanvasProps) {
+export default function Canvas({ layout, selectedElement, onSelectElement, onUpdateElement, onEditStart, aircraft = [], zoom = 1, flipVertical = false }: CanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const logoCacheRef = useRef<Record<string, HTMLImageElement>>({});
   const [dragging, setDragging] = useState<{ el: LayoutElement; offsetX: number; offsetY: number } | null>(null);
   const [resizing, setResizing] = useState<{ el: LayoutElement; corner: string } | null>(null);
+  /** Only record one undo checkpoint per drag/resize gesture, on first move. */
+  const editStartFiredRef = useRef(false);
 
   const getDisplayValue = useCallback((el: LayoutElement): string => {
     return getAircraftDisplayValue(aircraft[0], el);
@@ -147,10 +310,9 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         ctx.restore();
       }
 
-      // Shape preview
+      // Shape preview (matches LED display_engine._draw_shape)
       if (el.element_type === 'shape') {
-        ctx.strokeStyle = el.color || '#ffffff';
-        ctx.strokeRect(x, y, w, h);
+        drawShapePreview(ctx, el, x, y, w, h);
       }
 
       // Heading arrow: match LED engine — filled triangle rotated by aircraft
@@ -404,6 +566,7 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
 
   const handleMouseDown = (e: React.MouseEvent) => {
     const { x: mx, y: my } = getMousePos(e);
+    editStartFiredRef.current = false;
 
     // Check handles first (resize)
     if (selectedElement) {
@@ -429,12 +592,21 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
     onSelectElement(null);
   };
 
+  const fireEditStartOnce = () => {
+    if (editStartFiredRef.current) return;
+    editStartFiredRef.current = true;
+    onEditStart?.();
+  };
+
   const handleMouseMove = (e: React.MouseEvent) => {
     const { x: mx, y: my } = getMousePos(e);
 
     if (dragging) {
       const newX = Math.round(Math.max(0, Math.min(mx - dragging.offsetX, layout.width - (dragging.el.width || 50))));
       const newY = Math.round(Math.max(0, Math.min(my - dragging.offsetY, layout.height - (dragging.el.height || 20))));
+      if (newX !== dragging.el.x || newY !== dragging.el.y) {
+        fireEditStartOnce();
+      }
       onUpdateElement({ ...dragging.el, x: newX, y: newY });
     } else if (resizing) {
       const { el, corner } = resizing;
@@ -456,19 +628,29 @@ export default function Canvas({ layout, selectedElement, onSelectElement, onUpd
         newH = bottom - newY;
       }
 
-      onUpdateElement({
+      const next = {
         ...el,
         x: Math.round(newX),
         y: Math.round(newY),
         width: Math.round(newW),
         height: Math.round(newH),
-      });
+      };
+      if (
+        next.x !== el.x ||
+        next.y !== el.y ||
+        next.width !== (el.width || 50) ||
+        next.height !== (el.height || 20)
+      ) {
+        fireEditStartOnce();
+      }
+      onUpdateElement(next);
     }
   };
 
   const handleMouseUp = () => {
     setDragging(null);
     setResizing(null);
+    editStartFiredRef.current = false;
   };
 
   return (
