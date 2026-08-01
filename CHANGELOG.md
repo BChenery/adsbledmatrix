@@ -5,6 +5,22 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.63] - 2026-08-01
+
+### Added
+- **Weather condition icons** on the World Weather idle layout (sun, clouds, rain, snow, thunder, fog, drizzle) driven by live Open-Meteo WMO codes
+- New layout element type **weather_icon** (designer palette + LED renderer); existing World Weather layouts get the icon appended on upgrade without replacing other elements
+
+## [0.1.62] - 2026-08-01
+
+### Added
+- Layout designer **undo/redo** (toolbar buttons + Ctrl/Cmd+Z / Ctrl/Cmd+Shift+Z)
+- Extra **shapes** for layouts: arrows, chevrons, triangle, diamond, filled box/circle, H/V/diagonal lines
+- Additive default-layout merge so new shipped layouts are added by name without overwriting or deleting user layouts
+
+### Removed
+- **Pilot View** removed from shipped default layouts (existing installs keep their copy)
+
 ## [0.1.61] - 2026-08-01
 
 ### Added
