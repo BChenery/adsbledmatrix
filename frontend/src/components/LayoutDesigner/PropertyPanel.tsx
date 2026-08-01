@@ -33,14 +33,25 @@ export default function PropertyPanel({ layout, onLayoutChange, onNameBlur, elem
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div className="space-y-1">
-            <Label>Name</Label>
+            <Label htmlFor="layout-props-name">Name</Label>
             <Input
+              id="layout-props-name"
               type="text"
               value={layout.name}
               onChange={(e) => updateLayout('name', e.target.value)}
+              onFocus={(e) => e.currentTarget.select()}
               onBlur={onNameBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                }
+              }}
               placeholder="Layout name"
+              title="Edit name — saves when you leave the field"
             />
+            <p className="text-[11px] leading-snug text-led-faint">
+              Saves on blur. You can also rename from the toolbar title.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-2">

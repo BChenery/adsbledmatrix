@@ -19,7 +19,7 @@ import { api } from '@/api/client';
 import { applyPayload } from '@/lib/applyPayload';
 import { MOCK_AIRCRAFT_FLEET } from '@/lib/mockAircraft';
 import { toast } from 'sonner';
-import { normalizeLayoutName } from '@/lib/layoutName';
+import { normalizeLayoutName, uniqueCopyName } from '@/lib/layoutName';
 import Canvas from './Canvas';
 import ElementPalette, { QUICK_ADD_PRESETS, ADVANCED_ELEMENTS } from './ElementPalette';
 import PropertyPanel from './PropertyPanel';
@@ -65,12 +65,15 @@ export default function LayoutDesigner() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newLayoutName, setNewLayoutName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [isDuplicating, setIsDuplicating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [useMockData, setUseMockData] = useState(false);
   const [panelPreview, setPanelPreview] = useState(false);
   const [zoom, setZoom] = useState(3);
   const [config, setConfig] = useState<UserConfig | null>(null);
   const [mobilePanel, setMobilePanel] = useState<'palette' | 'props' | null>(null);
+  /** Bumps after duplicate so the toolbar can focus the name field for rename. */
+  const [nameFocusToken, setNameFocusToken] = useState(0);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const isDirty = useMemo(
@@ -223,9 +226,27 @@ export default function LayoutDesigner() {
     }
   };
 
+  /** Last name that was confirmed saved (not the live draft in the canvas). */
+  const savedName = useMemo(() => {
+    if (!savedSnapshot) return activeLayout?.name ?? '';
+    try {
+      return (JSON.parse(savedSnapshot) as { name?: string }).name ?? activeLayout?.name ?? '';
+    } catch {
+      return activeLayout?.name ?? '';
+    }
+  }, [savedSnapshot, activeLayout?.name]);
+
   const handleRename = async (name: string) => {
-    if (!activeLayout?.id || name === activeLayout.name) return;
-    const normalized = normalizeLayoutName(name, activeLayout.name);
+    if (!activeLayout?.id) return;
+    const normalized = normalizeLayoutName(name, savedName || activeLayout.name);
+    // Compare against the last-saved name so the property panel (which already
+    // wrote into activeLayout) can still persist renames on blur.
+    if (normalized === savedName) {
+      if (activeLayout.name !== normalized) {
+        setActiveLayout((prev) => (prev ? { ...prev, name: normalized } : prev));
+      }
+      return;
+    }
     try {
       const updated = await update(activeLayout.id, { name: normalized });
       // Keep unsaved local edits; only apply the renamed name from the server.
@@ -243,10 +264,40 @@ export default function LayoutDesigner() {
           return prev;
         }
       });
-      toast.success('Layout renamed');
+      toast.success(`Renamed to “${updated.name}”`);
     } catch (err: unknown) {
       toast.error(`Rename failed: ${errorMessage(err, 'Rename failed')}`);
       throw err;
+    }
+  };
+
+  const handleDuplicate = async () => {
+    if (!activeLayout) return;
+    setIsDuplicating(true);
+    try {
+      await clearPreviewOverride();
+      const copyName = uniqueCopyName(
+        activeLayout.name,
+        layouts.map((l) => l.name),
+      );
+      // Clone the current canvas (including unsaved edits) as a brand-new layout.
+      const created = await create({
+        name: copyName,
+        description: activeLayout.description,
+        width: activeLayout.width,
+        height: activeLayout.height,
+        is_default: false,
+        elements: activeLayout.elements.map(({ id: _id, ...rest }) => rest),
+      });
+      setActiveLayout(created);
+      markSaved(created);
+      setSelectedElement(null);
+      setNameFocusToken((t) => t + 1);
+      toast.success(`Duplicated as “${created.name}” — rename anytime`);
+    } catch (err: unknown) {
+      toast.error(`Duplicate failed: ${errorMessage(err, 'Duplicate failed')}`);
+    } finally {
+      setIsDuplicating(false);
     }
   };
 
@@ -313,6 +364,9 @@ export default function LayoutDesigner() {
         config={config}
         onSelectLayout={handleSelectLayout}
         onNew={() => setShowNewModal(true)}
+        onDuplicate={handleDuplicate}
+        canDuplicate={!!activeLayout}
+        isDuplicating={isDuplicating}
         onApply={handleApply}
         onSave={handleSave}
         isDirty={isDirty}
@@ -332,6 +386,7 @@ export default function LayoutDesigner() {
         layoutName={activeLayout?.name || ''}
         onRename={handleRename}
         canRename={!!activeLayout?.id}
+        nameFocusToken={nameFocusToken}
       />
 
       <Dialog open={showNewModal} onOpenChange={setShowNewModal}>

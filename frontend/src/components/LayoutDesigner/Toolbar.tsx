@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Layout } from '@/types/layout';
 import { UserConfig } from '@/types/config';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Save, Plus, ChevronDown, Radio, FlaskConical, ZoomIn, ZoomOut, Monitor, Moon, Eye, Trash2, Play } from 'lucide-react';
+import {
+  Save,
+  Plus,
+  ChevronDown,
+  Radio,
+  FlaskConical,
+  ZoomIn,
+  ZoomOut,
+  Monitor,
+  Moon,
+  Eye,
+  Trash2,
+  Play,
+  CopyPlus,
+  Pencil,
+} from 'lucide-react';
 
 interface ToolbarProps {
   layouts: Layout[];
@@ -18,6 +33,9 @@ interface ToolbarProps {
   config: UserConfig | null;
   onSelectLayout: (layout: Layout | null) => void;
   onNew: () => void;
+  onDuplicate?: () => void;
+  canDuplicate?: boolean;
+  isDuplicating?: boolean;
   onApply: () => void;
   onSave: () => void;
   isDirty?: boolean;
@@ -37,6 +55,8 @@ interface ToolbarProps {
   layoutName: string;
   onRename: (name: string) => Promise<void>;
   canRename: boolean;
+  /** Increment to focus + select the name field (e.g. after duplicate). */
+  nameFocusToken?: number;
 }
 
 const ZOOM_OPTIONS = [1, 2, 3, 4, 5, 6];
@@ -47,6 +67,9 @@ export default function Toolbar({
   config,
   onSelectLayout,
   onNew,
+  onDuplicate,
+  canDuplicate = false,
+  isDuplicating = false,
   onApply,
   onSave,
   isDirty = false,
@@ -66,52 +89,124 @@ export default function Toolbar({
   layoutName,
   onRename,
   canRename,
+  nameFocusToken = 0,
 }: ToolbarProps) {
   const [draftName, setDraftName] = useState(layoutName);
+  const [nameFocused, setNameFocused] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setDraftName(layoutName);
   }, [layoutName]);
 
+  useEffect(() => {
+    if (nameFocusToken <= 0) return;
+    const input = nameInputRef.current;
+    if (!input || input.disabled) return;
+    // Wait a tick so the new layout name has rendered.
+    const id = window.requestAnimationFrame(() => {
+      input.focus();
+      input.select();
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [nameFocusToken]);
+
+  const commitRename = async () => {
+    if (!canRename || draftName === layoutName) return;
+    try {
+      await onRename(draftName);
+    } catch {
+      setDraftName(layoutName);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2 border-b border-led-line bg-led-dark/95 px-3 py-2.5 backdrop-blur-xl sm:px-4">
       <div className="flex items-center gap-2">
         <div className="flex min-w-0 flex-1 items-center gap-1">
-          <Input
-            type="text"
-            value={draftName}
-            onChange={(e) => setDraftName(e.target.value)}
-            onBlur={async () => {
-              if (!canRename || draftName === layoutName) return;
-              try {
-                await onRename(draftName);
-              } catch {
-                setDraftName(layoutName);
+          {/* Document-title style name: looks plain until hover/focus, then clearly editable */}
+          <div
+            className={`group relative min-w-0 flex-1 sm:max-w-[240px] ${
+              canRename ? '' : 'opacity-70'
+            }`}
+          >
+            <Input
+              ref={nameInputRef}
+              type="text"
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              onFocus={(e) => {
+                setNameFocused(true);
+                e.currentTarget.select();
+              }}
+              onBlur={async () => {
+                setNameFocused(false);
+                await commitRename();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                }
+                if (e.key === 'Escape') {
+                  setDraftName(layoutName);
+                  e.currentTarget.blur();
+                }
+              }}
+              disabled={!canRename}
+              placeholder={canRename ? 'Layout name' : 'Select a layout'}
+              title={
+                canRename
+                  ? 'Click to rename — Enter to save, Esc to cancel'
+                  : undefined
               }
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.currentTarget.blur();
-              }
-            }}
-            disabled={!canRename}
-            placeholder="Layout name"
-            title={canRename ? 'Edit name, then press Enter or click away to rename' : undefined}
-            aria-label="Layout name"
-            className="h-9 min-w-0 flex-1 bg-led-black text-sm sm:max-w-[220px]"
-          />
+              aria-label="Layout name — click to rename"
+              className={`h-9 min-w-0 bg-led-black pr-8 text-sm font-medium transition-colors ${
+                nameFocused
+                  ? 'border-led-accent/50'
+                  : 'border-transparent hover:border-led-line'
+              }`}
+            />
+            {canRename && (
+              <Pencil
+                size={13}
+                className={`pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-led-faint transition-opacity ${
+                  nameFocused ? 'opacity-70' : 'opacity-0 group-hover:opacity-50'
+                }`}
+                aria-hidden
+              />
+            )}
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="h-9 w-9 shrink-0">
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-9 w-9 shrink-0"
+                title="Switch layout"
+                aria-label="Switch layout"
+              >
                 <ChevronDown size={14} />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-56">
               {layouts.map((l) => (
-                <DropdownMenuItem key={l.id} onClick={() => onSelectLayout(l)}>
-                  <div>
-                    <div className="font-medium">{l.name}</div>
-                    <div className="font-mono text-xs text-led-faint">{l.width}×{l.height}</div>
+                <DropdownMenuItem
+                  key={l.id}
+                  onClick={() => onSelectLayout(l)}
+                  className={l.id === activeLayout?.id ? 'bg-white/10' : undefined}
+                >
+                  <div className="min-w-0">
+                    <div className="truncate font-medium">
+                      {l.name}
+                      {l.id === activeLayout?.id ? (
+                        <span className="ml-1.5 font-mono text-[10px] uppercase tracking-wide text-led-accent">
+                          open
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="font-mono text-xs text-led-faint">
+                      {l.width}×{l.height}
+                    </div>
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -122,9 +217,30 @@ export default function Toolbar({
           </DropdownMenu>
         </div>
 
-        <Button variant="secondary" size="icon" onClick={onNew} className="h-9 w-9 shrink-0">
+        <Button
+          variant="secondary"
+          size="icon"
+          onClick={onNew}
+          className="h-9 w-9 shrink-0"
+          title="New blank layout"
+          aria-label="New blank layout"
+        >
           <Plus size={16} />
         </Button>
+
+        {onDuplicate && (
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={onDuplicate}
+            disabled={!canDuplicate || isDuplicating}
+            className="h-9 w-9 shrink-0"
+            title="Duplicate this layout — copy everything, then rename"
+            aria-label="Duplicate layout"
+          >
+            <CopyPlus size={16} />
+          </Button>
+        )}
 
         {activeLayout && (
           <>
