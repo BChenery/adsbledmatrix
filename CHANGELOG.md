@@ -5,6 +5,11 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.65] - 2026-08-02
+
+### Added
+- **Destination** layout — airline logo, callsign, destination city, altitude, and type code (shipped to all installs via additive default-layout merge)
+
 ## [0.1.63] - 2026-08-01
 
 ### Added
