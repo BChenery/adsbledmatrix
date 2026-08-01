@@ -43,8 +43,11 @@ export interface PalettePreset {
   label: string;
   icon: React.ReactNode;
   template: Partial<LayoutElement>;
+  /** Short label for compact icon grids (defaults to label). */
+  shortLabel?: string;
 }
 
+/** Primary palette: aviation / flight data — this is the product. */
 export const QUICK_ADD_PRESETS: PalettePreset[] = [
   {
     key: 'logo',
@@ -256,96 +259,114 @@ export const ADVANCED_ELEMENTS: PalettePreset[] = [
   { key: 'radar_blip', label: 'Radar Blip', icon: <Radar size={18} />, template: { element_type: 'radar_blip', x: 10, y: 10, width: 40, height: 40, color: '#00d4ff' } },
 ];
 
-/** Decorative geometry — all use element_type "shape" with extra.shape_type. */
+/**
+ * Decorative geometry only — kept compact in the palette footer.
+ * All use element_type "shape" with extra.shape_type.
+ */
 export const SHAPE_PRESETS: PalettePreset[] = [
   {
     key: 'shape_rect',
     label: 'Rectangle',
-    icon: <Square size={18} />,
+    shortLabel: 'Rect',
+    icon: <Square size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 60, height: 24, color: '#ffffff', extra: { shape_type: 'rectangle', stroke_width: 1 } },
   },
   {
     key: 'shape_box',
-    label: 'Filled Box',
-    icon: <Square size={18} />,
+    label: 'Filled box',
+    shortLabel: 'Box',
+    icon: <Square size={14} className="fill-current" />,
     template: { element_type: 'shape', x: 10, y: 10, width: 40, height: 16, color: '#334155', extra: { shape_type: 'filled_rectangle' } },
   },
   {
     key: 'shape_circle',
     label: 'Circle',
-    icon: <Circle size={18} />,
+    shortLabel: 'Circle',
+    icon: <Circle size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 24, height: 24, color: '#ffffff', extra: { shape_type: 'circle', stroke_width: 1 } },
   },
   {
     key: 'shape_filled_circle',
-    label: 'Filled Circle',
-    icon: <Circle size={18} />,
+    label: 'Filled circle',
+    shortLabel: 'Dot',
+    icon: <Circle size={14} className="fill-current" />,
     template: { element_type: 'shape', x: 10, y: 10, width: 16, height: 16, color: '#00d4ff', extra: { shape_type: 'filled_circle' } },
   },
   {
     key: 'shape_hline',
-    label: 'H. Line',
-    icon: <Minus size={18} />,
+    label: 'Horizontal line',
+    shortLabel: 'H-line',
+    icon: <Minus size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 80, height: 4, color: '#a0aec0', extra: { shape_type: 'hline', stroke_width: 2 } },
   },
   {
     key: 'shape_vline',
-    label: 'V. Line',
-    icon: <Minus size={18} className="rotate-90" />,
+    label: 'Vertical line',
+    shortLabel: 'V-line',
+    icon: <Minus size={14} className="rotate-90" />,
     template: { element_type: 'shape', x: 10, y: 10, width: 4, height: 48, color: '#a0aec0', extra: { shape_type: 'vline', stroke_width: 2 } },
   },
   {
     key: 'shape_line',
-    label: 'Diagonal',
-    icon: <Minus size={18} className="-rotate-45" />,
+    label: 'Diagonal line',
+    shortLabel: 'Diag',
+    icon: <Minus size={14} className="-rotate-45" />,
     template: { element_type: 'shape', x: 10, y: 10, width: 40, height: 40, color: '#ffffff', extra: { shape_type: 'line', stroke_width: 2 } },
   },
   {
     key: 'shape_arrow_right',
-    label: 'Arrow →',
-    icon: <ArrowRight size={18} />,
+    label: 'Arrow right',
+    shortLabel: '→',
+    icon: <ArrowRight size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 40, height: 20, color: '#00d4ff', extra: { shape_type: 'arrow_right' } },
   },
   {
     key: 'shape_arrow_left',
-    label: 'Arrow ←',
-    icon: <ArrowLeft size={18} />,
+    label: 'Arrow left',
+    shortLabel: '←',
+    icon: <ArrowLeft size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 40, height: 20, color: '#00d4ff', extra: { shape_type: 'arrow_left' } },
   },
   {
     key: 'shape_arrow_up',
-    label: 'Arrow ↑',
-    icon: <ArrowUp size={18} />,
+    label: 'Arrow up',
+    shortLabel: '↑',
+    icon: <ArrowUp size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 20, height: 40, color: '#4ade80', extra: { shape_type: 'arrow_up' } },
   },
   {
     key: 'shape_arrow_down',
-    label: 'Arrow ↓',
-    icon: <ArrowDown size={18} />,
+    label: 'Arrow down',
+    shortLabel: '↓',
+    icon: <ArrowDown size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 20, height: 40, color: '#f87171', extra: { shape_type: 'arrow_down' } },
   },
   {
     key: 'shape_chevron_right',
-    label: 'Chevron ›',
-    icon: <ChevronRight size={18} />,
+    label: 'Chevron right',
+    shortLabel: '›',
+    icon: <ChevronRight size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 20, height: 28, color: '#ffb347', extra: { shape_type: 'chevron_right' } },
   },
   {
     key: 'shape_chevron_left',
-    label: 'Chevron ‹',
-    icon: <ChevronLeft size={18} />,
+    label: 'Chevron left',
+    shortLabel: '‹',
+    icon: <ChevronLeft size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 20, height: 28, color: '#ffb347', extra: { shape_type: 'chevron_left' } },
   },
   {
     key: 'shape_triangle',
     label: 'Triangle',
-    icon: <Triangle size={18} />,
+    shortLabel: '△',
+    icon: <Triangle size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 24, height: 24, color: '#ffffff', extra: { shape_type: 'triangle' } },
   },
   {
     key: 'shape_diamond',
     label: 'Diamond',
-    icon: <Diamond size={18} />,
+    shortLabel: '◇',
+    icon: <Diamond size={14} />,
     template: { element_type: 'shape', x: 10, y: 10, width: 24, height: 24, color: '#00d4ff', extra: { shape_type: 'diamond' } },
   },
 ];
@@ -354,6 +375,25 @@ interface ElementPaletteProps {
   onAddElement: (key: string) => void;
   className?: string;
   compact?: boolean;
+}
+
+function PaletteRow({
+  preset,
+  onAdd,
+}: {
+  preset: PalettePreset;
+  onAdd: (key: string) => void;
+}) {
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => onAdd(preset.key)}
+      className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm text-led-dim hover:text-[#f5f5f5]"
+    >
+      <span className="text-led-faint">{preset.icon}</span>
+      {preset.label}
+    </Button>
+  );
 }
 
 export default function ElementPalette({ onAddElement, className, compact = false }: ElementPaletteProps) {
@@ -365,55 +405,53 @@ export default function ElementPalette({ onAddElement, className, compact = fals
         className || '',
       ].join(' ')}
     >
+      {/* ── Primary: aviation data (scrolls) ─────────────────────────── */}
       <div className="border-b border-led-line p-3">
-        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">Quick add</h3>
+        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">
+          Flight data
+        </h3>
+        <p className="mt-0.5 text-[10px] leading-snug text-led-faint/80">
+          Callsign, route, altitude, radar…
+        </p>
       </div>
-      <div className="flex-1 space-y-1 overflow-y-auto p-2">
+      <div className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
         {QUICK_ADD_PRESETS.map((el) => (
-          <Button
-            key={el.key}
-            variant="ghost"
-            onClick={() => onAddElement(el.key)}
-            className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm text-led-dim hover:text-[#f5f5f5]"
-          >
-            <span className="text-led-faint">{el.icon}</span>
-            {el.label}
-          </Button>
+          <PaletteRow key={el.key} preset={el} onAdd={onAddElement} />
         ))}
+
+        <div className="my-2 border-t border-led-line/60 pt-2">
+          <p className="mb-1 px-1 font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-led-faint/70">
+            Advanced
+          </p>
+          {ADVANCED_ELEMENTS.map((el) => (
+            <PaletteRow key={el.key} preset={el} onAdd={onAddElement} />
+          ))}
+        </div>
       </div>
 
-      <div className="border-y border-led-line p-3">
-        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">Shapes</h3>
-      </div>
-      <div className="space-y-1 p-2">
-        {SHAPE_PRESETS.map((el) => (
-          <Button
-            key={el.key}
-            variant="ghost"
-            onClick={() => onAddElement(el.key)}
-            className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm text-led-dim hover:text-[#f5f5f5]"
-          >
-            <span className="text-led-faint">{el.icon}</span>
-            {el.label}
-          </Button>
-        ))}
-      </div>
-
-      <div className="border-y border-led-line p-3">
-        <h3 className="font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-led-faint">Advanced</h3>
-      </div>
-      <div className="space-y-1 p-2">
-        {ADVANCED_ELEMENTS.map((el) => (
-          <Button
-            key={el.key}
-            variant="ghost"
-            onClick={() => onAddElement(el.key)}
-            className="h-auto w-full justify-start gap-3 rounded-lg px-3 py-2 text-sm text-led-dim hover:text-[#f5f5f5]"
-          >
-            <span className="text-led-faint">{el.icon}</span>
-            {el.label}
-          </Button>
-        ))}
+      {/* ── Secondary: decorative shapes (pinned bottom, compact) ────── */}
+      <div className="shrink-0 border-t border-led-line bg-led-black/40 px-2 py-2">
+        <div className="mb-1.5 flex items-baseline justify-between gap-2 px-0.5">
+          <h3 className="font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-led-faint/70">
+            Decor
+          </h3>
+          <span className="text-[9px] text-led-faint/50">lines · arrows · shapes</span>
+        </div>
+        <div className="grid grid-cols-5 gap-0.5">
+          {SHAPE_PRESETS.map((el) => (
+            <Button
+              key={el.key}
+              variant="ghost"
+              size="icon"
+              onClick={() => onAddElement(el.key)}
+              title={el.label}
+              aria-label={el.label}
+              className="h-8 w-full rounded-md text-led-faint hover:bg-white/5 hover:text-led-dim"
+            >
+              {el.icon}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );
