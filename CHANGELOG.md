@@ -5,6 +5,15 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.61] - 2026-08-01
+
+### Added
+- Layout designer **Duplicate** action — one click copies the current layout (including unsaved edits) as `Name (copy)` / `Name (copy 2)`, then focuses the title so you can rename immediately
+
+### Changed
+- Layout **rename** is clearer in the toolbar (document-title field with pencil affordance; Enter to save, Esc to cancel)
+- Property-panel name edits now persist correctly on blur
+
 ## [0.1.60] - 2026-07-31
 
 ### Added
