@@ -32,10 +32,8 @@ DATA_FILES = [
     "data/airlines.csv",
     "data/airports.csv",
     "data/routes.csv",
-    # Slim aircraft+routes DB. Prefer over full flights.db.
+    # Core localadsb DB (registry + fleets + routes). Not flights.db (log only).
     "data/localadsb/aircraft_routes.db",
-    # Legacy full DB kept for transition / devices that still have it.
-    "data/localadsb/flights.db",
     "data/localadsb/aircraft_type_names.json",
 ]
 
@@ -172,22 +170,14 @@ async def main():
 
     localadsb_script = Path(__file__).resolve().parent / "import_localadsb.py"
     aircraft_routes_db_local = settings.data_dir / "localadsb" / "aircraft_routes.db"
-    flights_db_local = settings.data_dir / "localadsb" / "flights.db"
-    source_db_local = (
-        aircraft_routes_db_local
-        if aircraft_routes_db_local.exists() and aircraft_routes_db_local.stat().st_size > 0
-        else flights_db_local
-    )
+    source_db_local = aircraft_routes_db_local
     aircraft_routes_db_rel = "data/localadsb/aircraft_routes.db"
-    flights_db_rel = "data/localadsb/flights.db"
     db_path = settings.db_path
     localadsb_outdated = source_db_local.exists() and (
         not db_path.exists()
         or db_path.stat().st_mtime < source_db_local.stat().st_mtime
     )
-    localadsb_source_changed = (
-        aircraft_routes_db_rel in updated or flights_db_rel in updated
-    )
+    localadsb_source_changed = aircraft_routes_db_rel in updated
     localadsb_updated = False
     if localadsb_script.exists() and source_db_local.exists() and (
         localadsb_source_changed or localadsb_outdated or args.force

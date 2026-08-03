@@ -36,33 +36,24 @@ jobs:
       - name: Copy data assets
         run: |
           mkdir -p data/localadsb
-          # Prefer slim aircraft_routes.db (aircraft + routes only). Fall back to
-          # full flights.db only if aircraft_routes.db has not been published yet.
-          if [ -s _localadsb/aircraft_routes.db ]; then
-            cp _localadsb/aircraft_routes.db data/localadsb/aircraft_routes.db
-            echo "Using aircraft_routes.db ($(wc -c < data/localadsb/aircraft_routes.db) bytes)"
-            # Drop legacy full DB from the tracked data tree so devices stop
-            # downloading the 50MB+ capture history.
-            rm -f data/localadsb/flights.db
-          elif [ -s _localadsb/flights.db ]; then
-            echo "WARNING: aircraft_routes.db missing; falling back to flights.db" >&2
-            cp _localadsb/flights.db data/localadsb/flights.db
-          else
-            echo "Aborting: neither aircraft_routes.db nor flights.db found in localadsb" >&2
+          # aircraft_routes.db is localadsb's core source of truth (not flights.db).
+          if [ ! -s _localadsb/aircraft_routes.db ]; then
+            echo "Aborting: localadsb aircraft_routes.db missing or empty" >&2
             exit 1
           fi
+          cp _localadsb/aircraft_routes.db data/localadsb/aircraft_routes.db
+          echo "Using aircraft_routes.db ($(wc -c < data/localadsb/aircraft_routes.db) bytes)"
+          # Never ship the capture log to devices.
+          rm -f data/localadsb/flights.db
           cp _localadsb/aircraft_type_names.json data/localadsb/aircraft_type_names.json
 
       - name: Verify source database
         run: |
-          if [ -s data/localadsb/aircraft_routes.db ]; then
-            echo "Source OK: aircraft_routes.db"
-          elif [ -s data/localadsb/flights.db ]; then
-            echo "Source OK: flights.db (legacy fallback)"
-          else
-            echo "Aborting: no usable localadsb source database" >&2
+          if [ ! -s data/localadsb/aircraft_routes.db ]; then
+            echo "Aborting: aircraft_routes.db missing or empty" >&2
             exit 1
           fi
+          echo "Source OK: aircraft_routes.db"
 
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0

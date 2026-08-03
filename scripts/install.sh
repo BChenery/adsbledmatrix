@@ -186,7 +186,7 @@ fi
 
 # Import localadsb databases if present (rego / airline / type / routes).
 # This is required for the matrix to show anything beyond raw ADS-B fields.
-# Prefer slim aircraft_routes.db; fall back to legacy flights.db.
+# Core localadsb DB: aircraft_routes.db (registry + fleets + routes).
 echo "[6.7/8] Importing localadsb aircraft and route databases..."
 if [ -f "${INSTALL_DIR}/data/localadsb/aircraft_routes.db" ] || [ -f "${INSTALL_DIR}/data/localadsb/flights.db" ]; then
   if ! python3 scripts/import_localadsb.py; then
@@ -201,7 +201,7 @@ if [ -f "${INSTALL_DIR}/data/localadsb/aircraft_routes.db" ] || [ -f "${INSTALL_
     exit 1
   fi
 else
-  echo "ERROR: data/localadsb/aircraft_routes.db (or legacy flights.db) missing from install tree — cannot seed aircraft DB"
+  echo "ERROR: data/localadsb/aircraft_routes.db missing from install tree — cannot seed aircraft DB"
   exit 1
 fi
 

@@ -5,11 +5,10 @@
 Flight route and aircraft data originates in the separate `localadsb`
 repository. That repo is private and maintains:
 
-- `flights.db` — operational DB (live capture history + reference tables)
-- `aircraft_routes.db` — **slim published export** (aircraft + routes only)
+- `aircraft_routes.db` — **core** source of truth (registry, fleets, routes)
+- `flights.db` — capture log only in localadsb (not mirrored here)
 
-The ADS-B LED Matrix project mirrors `aircraft_routes.db` into this repo so Pis do
-not have to download ~50 MB of flight-track history they never use.
+The ADS-B LED Matrix project mirrors `aircraft_routes.db` only.
 
 ## Architecture
 

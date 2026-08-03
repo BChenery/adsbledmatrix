@@ -317,7 +317,7 @@ main() {
             fi
         fi
     else
-        log "WARNING: data/localadsb/aircraft_routes.db (or legacy flights.db) missing — enrichment data will be empty"
+        log "WARNING: data/localadsb/aircraft_routes.db missing — enrichment data will be empty"
         if [ "$MODE" = "fresh" ]; then
             exit 1
         fi

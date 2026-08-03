@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Import aircraft and route data from data/localadsb/ into the app database.
 
-Sources (preferred first):
-  - aircraft_routes.db  (slim export from localadsb: aircraft + routes only)
-  - flights.db    (legacy full operational DB; kept as fallback during transition)
+Source of truth from localadsb:
+  - aircraft_routes.db  (core DB: registry, fleets, routes — required)
+  - flights.db          (legacy only; old capture DB, not used if core is present)
 
-Tables read from the source DB:
+Tables read from the core DB:
   - aircraft_registry (31k+ aircraft; seen traffic, sometimes stale type)
   - aero_fleet (curated fleet types — preferred when present)
   - australian_registry (CASA-style types for VH- regs)
@@ -34,17 +34,21 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 LOCALADSB_DIR = DATA_DIR / "localadsb"
 DB_PATH = DATA_DIR / "aircraft_db.sqlite3"
-# Prefer the slim aircraft_routes.db; fall back to legacy full flights.db.
+# Core DB from localadsb (registrations, fleets, routes).
 AIRCRAFT_ROUTES_DB = LOCALADSB_DIR / "aircraft_routes.db"
+# Legacy fallback only if an old install never received aircraft_routes.db.
 FLIGHTS_DB = LOCALADSB_DIR / "flights.db"
 TYPE_NAMES_PATH = LOCALADSB_DIR / "aircraft_type_names.json"
 
 
 def resolve_source_db() -> Optional[Path]:
-    """Return the best available localadsb source database path."""
+    """Return the localadsb core database path (aircraft_routes.db)."""
     if AIRCRAFT_ROUTES_DB.exists() and AIRCRAFT_ROUTES_DB.stat().st_size > 0:
         return AIRCRAFT_ROUTES_DB
     if FLIGHTS_DB.exists() and FLIGHTS_DB.stat().st_size > 0:
+        logger.warning(
+            "Using legacy flights.db — prefer aircraft_routes.db from localadsb"
+        )
         return FLIGHTS_DB
     return None
 
