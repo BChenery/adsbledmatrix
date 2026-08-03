@@ -300,7 +300,7 @@ main() {
     else
         PY="python3"
     fi
-    if [ -f "${INSTALL_DIR}/data/localadsb/flights.db" ]; then
+    if [ -f "${INSTALL_DIR}/data/localadsb/aircraft_routes.db" ] || [ -f "${INSTALL_DIR}/data/localadsb/flights.db" ]; then
         log "Importing localadsb aircraft/route data"
         if ! (cd "${INSTALL_DIR}" && "${PY}" scripts/import_localadsb.py); then
             log "ERROR: localadsb import failed"
@@ -317,7 +317,7 @@ main() {
             fi
         fi
     else
-        log "WARNING: data/localadsb/flights.db missing — enrichment data will be empty"
+        log "WARNING: data/localadsb/aircraft_routes.db (or legacy flights.db) missing — enrichment data will be empty"
         if [ "$MODE" = "fresh" ]; then
             exit 1
         fi

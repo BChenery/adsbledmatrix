@@ -32,6 +32,9 @@ DATA_FILES = [
     "data/airlines.csv",
     "data/airports.csv",
     "data/routes.csv",
+    # Slim aircraft+routes DB. Prefer over full flights.db.
+    "data/localadsb/aircraft_routes.db",
+    # Legacy full DB kept for transition / devices that still have it.
     "data/localadsb/flights.db",
     "data/localadsb/aircraft_type_names.json",
 ]
@@ -168,19 +171,29 @@ async def main():
         print("[4/5] Skipping logo refresh (--skip-logos)")
 
     localadsb_script = Path(__file__).resolve().parent / "import_localadsb.py"
+    aircraft_routes_db_local = settings.data_dir / "localadsb" / "aircraft_routes.db"
     flights_db_local = settings.data_dir / "localadsb" / "flights.db"
+    source_db_local = (
+        aircraft_routes_db_local
+        if aircraft_routes_db_local.exists() and aircraft_routes_db_local.stat().st_size > 0
+        else flights_db_local
+    )
+    aircraft_routes_db_rel = "data/localadsb/aircraft_routes.db"
     flights_db_rel = "data/localadsb/flights.db"
     db_path = settings.db_path
-    localadsb_outdated = (
+    localadsb_outdated = source_db_local.exists() and (
         not db_path.exists()
-        or db_path.stat().st_mtime < flights_db_local.stat().st_mtime
+        or db_path.stat().st_mtime < source_db_local.stat().st_mtime
+    )
+    localadsb_source_changed = (
+        aircraft_routes_db_rel in updated or flights_db_rel in updated
     )
     localadsb_updated = False
-    if localadsb_script.exists() and flights_db_local.exists() and (
-        flights_db_rel in updated or localadsb_outdated or args.force
+    if localadsb_script.exists() and source_db_local.exists() and (
+        localadsb_source_changed or localadsb_outdated or args.force
     ):
         print()
-        print("[5/5] Importing localadsb databases...")
+        print(f"[5/5] Importing localadsb databases (from {source_db_local.name})...")
         result = subprocess.run(
             [sys.executable, str(localadsb_script)],
             capture_output=True,

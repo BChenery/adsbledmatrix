@@ -17,7 +17,8 @@ Out of scope:
 
 | `localadsb` asset | Copied to | Consumed by | Purpose |
 |---|---|---|---|
-| `flights.db` | `data/localadsb/flights.db` | `scripts/import_localadsb.py` | Aircraft registry, route cache, aero fleet operator ICAOs |
+| `aircraft_routes.db` (preferred) | `data/localadsb/aircraft_routes.db` | `scripts/import_localadsb.py` | Slim aircraft + routes export (no live history) |
+| `flights.db` (legacy fallback) | `data/localadsb/flights.db` | `scripts/import_localadsb.py` | Full operational DB if aircraft_routes.db not yet published |
 | `aircraft_type_names.json` | `data/localadsb/aircraft_type_names.json` | `scripts/import_localadsb.py` | Maps type codes to model names |
 | `qantas_routes.json`, `acars_routes.json` | `data/localadsb/` (optional) | Future route enrichment | Additional route sources if needed |
 
@@ -44,7 +45,7 @@ Add `.github/workflows/sync-localadsb.yml` to `adsbledmatrix`.
 4. Set up Python and install backend dependencies.
 5. Run `python scripts/import_localadsb.py` to regenerate `data/aircraft_db.sqlite3`.
 6. Run a lightweight validation:
-   - `flights.db` is non-empty.
+   - `aircraft_routes.db` (or legacy `flights.db`) is non-empty.
    - `aircraft_db.sqlite3` has non-zero rows in `aircraft` and `routes`.
 7. Commit and push changes only if the data files or generated SQLite changed.
 
@@ -58,10 +59,10 @@ Add `.github/workflows/sync-localadsb.yml` to `adsbledmatrix`.
 The Pi already runs `scripts/sync_data.py` via the updater service. Extend it:
 
 1. Add these paths to `sync_data.py`’s `DATA_FILES` list:
-   - `data/localadsb/flights.db`
+   - `data/localadsb/aircraft_routes.db` (preferred slim DB)
+   - `data/localadsb/flights.db` (legacy fallback during transition)
    - `data/localadsb/aircraft_type_names.json`
-   - `data/aircraft_db.sqlite3`
-2. After downloading, if `data/localadsb/flights.db` changed, run `scripts/import_localadsb.py` to regenerate the local `data/aircraft_db.sqlite3` as a fallback.
+2. After downloading, if the source DB changed, run `scripts/import_localadsb.py` to regenerate the local `data/aircraft_db.sqlite3`.
 3. The Pi’s existing data-sync cadence then keeps it up to date automatically.
 
 ## Error handling

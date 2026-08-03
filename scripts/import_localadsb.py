@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Import aircraft and route data from data/localadsb/ into the app database.
 
-Sources:
-  - flights.db -> aircraft_registry (31k+ aircraft; seen traffic, sometimes stale type)
-  - flights.db -> aero_fleet (curated fleet types — preferred when present)
-  - flights.db -> australian_registry (CASA-style types for VH- regs)
-  - flights.db -> route_cache (2k+ routes)
+Sources (preferred first):
+  - aircraft_routes.db  (slim export from localadsb: aircraft + routes only)
+  - flights.db    (legacy full operational DB; kept as fallback during transition)
+
+Tables read from the source DB:
+  - aircraft_registry (31k+ aircraft; seen traffic, sometimes stale type)
+  - aero_fleet (curated fleet types — preferred when present)
+  - australian_registry (CASA-style types for VH- regs)
+  - route_cache (2k+ routes)
   - data/localadsb/aircraft_type_names.json (type code -> model name)
 
 Type resolution priority (first hit wins):
@@ -30,8 +34,19 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_ROOT / "data"
 LOCALADSB_DIR = DATA_DIR / "localadsb"
 DB_PATH = DATA_DIR / "aircraft_db.sqlite3"
+# Prefer the slim aircraft_routes.db; fall back to legacy full flights.db.
+AIRCRAFT_ROUTES_DB = LOCALADSB_DIR / "aircraft_routes.db"
 FLIGHTS_DB = LOCALADSB_DIR / "flights.db"
 TYPE_NAMES_PATH = LOCALADSB_DIR / "aircraft_type_names.json"
+
+
+def resolve_source_db() -> Optional[Path]:
+    """Return the best available localadsb source database path."""
+    if AIRCRAFT_ROUTES_DB.exists() and AIRCRAFT_ROUTES_DB.stat().st_size > 0:
+        return AIRCRAFT_ROUTES_DB
+    if FLIGHTS_DB.exists() and FLIGHTS_DB.stat().st_size > 0:
+        return FLIGHTS_DB
+    return None
 
 
 def _load_type_names() -> dict:
@@ -170,26 +185,34 @@ def _resolve_type_and_model(
     return type_code, model, manufacturer
 
 
-def _validate_source_db(conn: sqlite3.Connection) -> None:
-    """Abort if the source flights.db is missing required tables."""
+def _validate_source_db(conn: sqlite3.Connection, source_path: Path) -> None:
+    """Abort if the source database is missing required tables."""
     required = {"aircraft_registry", "aero_fleet", "route_cache"}
     cur = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
     found = {row[0] for row in cur.fetchall()}
     missing = required - found
     if missing:
-        raise RuntimeError(f"flights.db missing required tables: {sorted(missing)}")
+        raise RuntimeError(
+            f"{source_path.name} missing required tables: {sorted(missing)}"
+        )
 
 
 def import_aircraft() -> int:
-    if not FLIGHTS_DB.exists():
-        logger.error("flights.db not found at %s", FLIGHTS_DB)
+    source_db = resolve_source_db()
+    if source_db is None:
+        logger.error(
+            "No localadsb source DB found (looked for %s or %s)",
+            AIRCRAFT_ROUTES_DB,
+            FLIGHTS_DB,
+        )
         return 0
 
     type_names = _load_type_names()
+    logger.info("Importing aircraft from %s", source_db.name)
 
-    src = sqlite3.connect(FLIGHTS_DB)
+    src = sqlite3.connect(source_db)
     src.row_factory = sqlite3.Row
-    _validate_source_db(src)
+    _validate_source_db(src, source_db)
 
     dst = sqlite3.connect(DB_PATH)
     dst.row_factory = sqlite3.Row
@@ -307,11 +330,17 @@ def import_aircraft() -> int:
 
 
 def import_routes() -> int:
-    if not FLIGHTS_DB.exists():
-        logger.error("flights.db not found at %s", FLIGHTS_DB)
+    source_db = resolve_source_db()
+    if source_db is None:
+        logger.error(
+            "No localadsb source DB found (looked for %s or %s)",
+            AIRCRAFT_ROUTES_DB,
+            FLIGHTS_DB,
+        )
         return 0
 
-    src = sqlite3.connect(FLIGHTS_DB)
+    logger.info("Importing routes from %s", source_db.name)
+    src = sqlite3.connect(source_db)
     dst = sqlite3.connect(DB_PATH)
 
     dst.execute(
