@@ -5,6 +5,11 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.69] - 2026-08-15
+
+### Fixed
+- **Live page empty while the matrix showed aircraft** — the live tab now seeds from `/api/aircraft/live` and reconnects if the websocket drops; the server sends a snapshot on connect and no longer stalls the feed when a client disconnects mid-broadcast
+
 ## [0.1.65] - 2026-08-02
 
 ### Added

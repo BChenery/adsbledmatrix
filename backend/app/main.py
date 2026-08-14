@@ -4,8 +4,7 @@ import subprocess
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
-from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.responses import FileResponse, RedirectResponse
 from app.config import settings
 from app.lifespan import lifespan
 from app.api import config, layouts, aircraft, websocket, system, display
@@ -97,18 +96,20 @@ if _is_ap_mode():
         return RedirectResponse(url="http://192.168.4.1/", status_code=302)
 
 
-class SPAStaticFiles(StaticFiles):
-    """Serve index.html for any missing path so React Router works."""
-    async def get_response(self, path: str, scope):
-        try:
-            return await super().get_response(path, scope)
-        except StarletteHTTPException as exc:
-            if exc.status_code == 404:
-                return await super().get_response("index.html", scope)
-            raise
-
-
-# Static files (React frontend build) - must be LAST
+# Static files (React frontend build). Do not mount StaticFiles at "/":
+# Starlette Mount("/") also matches websocket scopes and can steal /ws/aircraft.
 static_dir = os.path.join(os.path.dirname(__file__), "static")
-if os.path.isdir(static_dir):
-    app.mount("/", SPAStaticFiles(directory=static_dir, html=True), name="static")
+_static_root = os.path.abspath(static_dir)
+_assets_dir = os.path.join(_static_root, "assets")
+if os.path.isdir(_assets_dir):
+    app.mount("/assets", StaticFiles(directory=_assets_dir), name="assets")
+
+
+@app.get("/{full_path:path}")
+async def spa_fallback(full_path: str):
+    """Serve built files, then index.html so React Router works."""
+    if full_path:
+        candidate = os.path.abspath(os.path.join(_static_root, full_path))
+        if candidate.startswith(_static_root + os.sep) and os.path.isfile(candidate):
+            return FileResponse(candidate)
+    return FileResponse(os.path.join(_static_root, "index.html"))
