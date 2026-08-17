@@ -386,8 +386,16 @@ class DisplayEngine:
             if not layout:
                 return
 
-            enriched = await db.enrich(aircraft.hex_code)
-            route = await route_service.lookup(aircraft.callsign) if aircraft.callsign else None
+            enriched = await db.enrich(aircraft.hex_code, callsign=aircraft.callsign)
+            route = (
+                await route_service.lookup(
+                    aircraft.callsign,
+                    registration=enriched.get("registration"),
+                    hex_code=aircraft.hex_code,
+                )
+                if aircraft.callsign
+                else None
+            )
 
             # Pre-fetch routes only when the layout has an aircraft_list (or cycle needs them).
             all_routes: Dict[str, Any] = {}
@@ -399,7 +407,12 @@ class DisplayEngine:
                 for ac in focus_pool[:prefetch_n]:
                     if not ac.callsign or ac.callsign in all_routes:
                         continue
-                    r = await route_service.lookup(ac.callsign)
+                    extra = await db.enrich(ac.hex_code, callsign=ac.callsign)
+                    r = await route_service.lookup(
+                        ac.callsign,
+                        registration=extra.get("registration"),
+                        hex_code=ac.hex_code,
+                    )
                     if r:
                         all_routes[ac.callsign] = r
 
@@ -624,6 +637,7 @@ class DisplayEngine:
                 registration,
                 type_code=type_code,
                 type_name=type_name,
+                hex_code=ctx.aircraft.hex_code if ctx.aircraft else None,
             )
             if logo_path and logo_path.exists():
                 path = str(logo_path)
@@ -999,6 +1013,7 @@ class DisplayEngine:
             callsign=callsign,
             registration=registration,
             operator_name=enriched.get("operator"),
+            hex_code=ac.hex_code if ac else None,
         )
 
         values.update({
@@ -1079,6 +1094,7 @@ class DisplayEngine:
                 registration,
                 type_code=type_code,
                 type_name=type_name,
+                hex_code=ctx.aircraft.hex_code if ctx.aircraft else None,
             )
             if logo_path and logo_path.exists():
                 return True

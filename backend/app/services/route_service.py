@@ -16,11 +16,23 @@ class RouteService:
     def __init__(self):
         self._cache: Dict[str, Optional[Route]] = {}
 
-    async def lookup(self, callsign: str) -> Optional[Route]:
+    async def lookup(
+        self,
+        callsign: str,
+        registration: Optional[str] = None,
+        hex_code: Optional[str] = None,
+    ) -> Optional[Route]:
         if not callsign:
             return None
         callsign = callsign.strip().upper()
         if not callsign:
+            return None
+        # Import locally to avoid a module-level cycle with logo_manager.
+        from app.services.logo_manager import logo_manager
+
+        if logo_manager.should_skip_scheduled_route(
+            callsign, registration=registration, hex_code=hex_code
+        ):
             return None
         if callsign in self._cache:
             return self._cache[callsign]

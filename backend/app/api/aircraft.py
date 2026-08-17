@@ -42,6 +42,7 @@ def _airline_for(ac, enriched: dict) -> Optional[str]:
         callsign=getattr(ac, "callsign", None),
         registration=enriched.get("registration"),
         operator_name=enriched.get("operator"),
+        hex_code=getattr(ac, "hex_code", None),
     )
 
 
@@ -77,7 +78,7 @@ async def get_live_aircraft():
     all_ac = receiver.get_all()
     result = []
     for ac in all_ac:
-        enriched = await db.enrich(ac.hex_code)
+        enriched = await db.enrich(ac.hex_code, callsign=ac.callsign)
         result.append(_aircraft_response(ac, enriched))
     return result
 
@@ -88,7 +89,7 @@ async def get_closest_aircraft():
     if not closest:
         return {"message": "No aircraft in range"}
     ac = closest[0]
-    enriched = await db.enrich(ac.hex_code)
+    enriched = await db.enrich(ac.hex_code, callsign=ac.callsign)
     return _aircraft_response(ac, enriched)
 
 

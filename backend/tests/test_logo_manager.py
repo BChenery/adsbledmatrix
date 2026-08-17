@@ -249,3 +249,69 @@ def test_airline_display_name_voz_wet_lease():
 def test_resolve_airline_icao_keeps_qlk_for_names_but_aliases_for_logos():
     assert logo_manager.resolve_airline_icao("UTY", "QLK1", for_logo=False) == "QLK"
     assert logo_manager.resolve_airline_icao("UTY", "QLK1", for_logo=True) == "QFA"
+
+
+def test_af4_tail_on_vh_af4_is_not_air_france(fake_logos_dir):
+    """VH-AF4 squawking AF4 is Angel Flight, not Air France flight 4."""
+    _make_logo(fake_logos_dir, "AFR")
+    _make_logo(fake_logos_dir, "UNKNOWN_PROP")
+
+    path = logo_manager.logo_path_for_aircraft(
+        None,
+        "AF4",
+        "VH-AF4",
+        type_code="C414",
+        type_name="Cessna 414 Chancellor",
+        hex_code="7C00D2",
+    )
+
+    assert path == fake_logos_dir / "UNKNOWN_PROP.png"
+
+
+def test_af4_on_australian_hex_without_registration_is_not_air_france(fake_logos_dir):
+    """Even before CASA enrichment, a 7C hex + AF4 is not Air France."""
+    _make_logo(fake_logos_dir, "AFR")
+    _make_logo(fake_logos_dir, "UNKNOWN_PROP")
+
+    path = logo_manager.logo_path_for_aircraft(
+        None, "AF4", None, type_code="C414", hex_code="7C00D2"
+    )
+
+    assert path == fake_logos_dir / "UNKNOWN_PROP.png"
+
+
+def test_real_air_france_af4_still_uses_air_france_logo(fake_logos_dir):
+    _make_logo(fake_logos_dir, "AFR")
+
+    path = logo_manager.logo_path_for_aircraft(
+        None, "AF4", "F-GSQB", hex_code="394C19"
+    )
+
+    assert path == fake_logos_dir / "AFR.png"
+
+
+def test_qf12_on_vh_registration_still_uses_qantas_logo(fake_logos_dir):
+    _make_logo(fake_logos_dir, "QFA")
+
+    path = logo_manager.logo_path_for_aircraft(
+        None, "QF12", "VH-OJA", hex_code="7C43D4"
+    )
+
+    assert path == fake_logos_dir / "QFA.png"
+
+
+def test_airline_display_name_af4_tail_is_not_air_france():
+    name = logo_manager.airline_display_name(
+        callsign="AF4",
+        registration="VH-AF4",
+        operator_name="Angel Flight Australia",
+        hex_code="7C00D2",
+    )
+    assert name == "Angel Flight Australia"
+
+
+def test_should_skip_scheduled_route_for_vh_af4_but_not_real_af4():
+    assert logo_manager.should_skip_scheduled_route("AF4", "VH-AF4", "7C00D2")
+    assert logo_manager.should_skip_scheduled_route("AF4", None, "7C00D2")
+    assert not logo_manager.should_skip_scheduled_route("AF4", "F-GSQB", "394C19")
+    assert not logo_manager.should_skip_scheduled_route("QF12", "VH-OJA", "7C43D4")

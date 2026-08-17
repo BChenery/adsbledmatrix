@@ -42,14 +42,18 @@ async def serialize_live_aircraft(limit: int = 20) -> List[Dict[str, Any]]:
     data: List[Dict[str, Any]] = []
     for ac in receiver.get_recent(n=limit):
         try:
-            enriched = await db.enrich(ac.hex_code)
+            enriched = await db.enrich(ac.hex_code, callsign=ac.callsign)
         except Exception:
             logger.exception("Failed to enrich %s for live feed", ac.hex_code)
             enriched = {}
         route = None
         if ac.callsign:
             try:
-                route = await route_service.lookup(ac.callsign)
+                route = await route_service.lookup(
+                    ac.callsign,
+                    registration=enriched.get("registration"),
+                    hex_code=ac.hex_code,
+                )
             except Exception:
                 logger.exception("Failed to look up route for %s", ac.callsign)
         airline = logo_manager.airline_display_name(
@@ -57,6 +61,7 @@ async def serialize_live_aircraft(limit: int = 20) -> List[Dict[str, Any]]:
             callsign=ac.callsign,
             registration=enriched.get("registration"),
             operator_name=enriched.get("operator"),
+            hex_code=ac.hex_code,
         )
         origin = getattr(route, "origin", None) if route is not None else None
         destination = getattr(route, "destination", None) if route is not None else None

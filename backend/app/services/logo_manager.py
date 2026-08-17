@@ -232,6 +232,7 @@ class LogoManager:
         registration: Optional[str] = None,
         type_code: Optional[str] = None,
         type_name: Optional[str] = None,
+        hex_code: Optional[str] = None,
     ) -> Optional[Path]:
         """Return the local logo path for an aircraft, using the callsign prefix first.
 
@@ -247,7 +248,9 @@ class LogoManager:
         # Callsign brand wins for logos (wet-lease / codeshare). Return early
         # when a logo exists so a foreign marketing callsign can still render.
         if callsign:
-            prefix_icao = self._callsign_prefix_to_icao(callsign, registration)
+            prefix_icao = self._callsign_prefix_to_icao(
+                callsign, registration, hex_code=hex_code
+            )
             if prefix_icao:
                 callsign_brand = (
                     _LOGO_DISPLAY_ALIASES.get(prefix_icao)
@@ -292,6 +295,7 @@ class LogoManager:
         registration: Optional[str] = None,
         *,
         for_logo: bool = False,
+        hex_code: Optional[str] = None,
     ) -> Optional[str]:
         """Resolve the brand ICAO for an aircraft.
 
@@ -301,7 +305,9 @@ class LogoManager:
         QantasLink stays QantasLink.
         """
         if callsign:
-            prefix_icao = self._callsign_prefix_to_icao(callsign, registration)
+            prefix_icao = self._callsign_prefix_to_icao(
+                callsign, registration, hex_code=hex_code
+            )
             if prefix_icao:
                 if for_logo:
                     return (
@@ -325,6 +331,7 @@ class LogoManager:
         callsign: Optional[str] = None,
         registration: Optional[str] = None,
         operator_name: Optional[str] = None,
+        hex_code: Optional[str] = None,
     ) -> Optional[str]:
         """Return a short airline brand name for LED / designer display.
 
@@ -339,6 +346,7 @@ class LogoManager:
             callsign=callsign,
             registration=registration,
             for_logo=False,
+            hex_code=hex_code,
         )
         if brand_icao:
             short = _AIRLINE_DISPLAY_NAMES.get(brand_icao)
@@ -370,8 +378,71 @@ class LogoManager:
             cleaned = next_val
         return cleaned or None
 
+    @staticmethod
+    def _normalise_ident(value: Optional[str]) -> str:
+        """Uppercase A-Z/0-9 only, dropping hyphens and spaces."""
+        if not value:
+            return ""
+        return re.sub(r"[^A-Z0-9]", "", value.strip().upper())
+
+    def callsign_is_registration(
+        self, callsign: Optional[str], registration: Optional[str]
+    ) -> bool:
+        """True when the Mode-S flight ID is the tail, not a flight number.
+
+        GA transponders often broadcast the registration (VH-AF4 → AF4 or
+        VHAF4). That must not be treated as Air France flight AF4.
+        """
+        cs = self._normalise_ident(callsign)
+        reg = self._normalise_ident(registration)
+        if not cs or not reg:
+            return False
+        if cs == reg:
+            return True
+        # Common country prefixes whose remaining suffix is the tail mark.
+        for prefix in ("VH", "ZK", "P2", "DQ"):
+            if reg.startswith(prefix) and cs == reg[len(prefix) :]:
+                return True
+        return False
+
+    @staticmethod
+    def is_australian_aircraft(
+        registration: Optional[str] = None, hex_code: Optional[str] = None
+    ) -> bool:
+        """True for VH- registrations or Australian-allocated ICAO hex (7Cxxxx)."""
+        if registration and registration.upper().strip().startswith("VH-"):
+            return True
+        if hex_code and hex_code.upper().strip().startswith("7C"):
+            return True
+        return False
+
+    def should_skip_scheduled_route(
+        self,
+        callsign: Optional[str],
+        registration: Optional[str] = None,
+        hex_code: Optional[str] = None,
+    ) -> bool:
+        """True when a callsign must not be looked up as a scheduled airline route.
+
+        Air France AF4 (LFPG-KJFK) is a real route cache entry. An Australian
+        Cessna whose transponder says AF4 is not that flight.
+        """
+        if not callsign:
+            return False
+        if self.callsign_is_registration(callsign, registration):
+            return True
+        if not self.is_australian_aircraft(registration, hex_code):
+            return False
+        prefix_icao = self._callsign_prefix_to_icao(
+            callsign, registration, hex_code=hex_code
+        )
+        return prefix_icao is None
+
     def _callsign_prefix_to_icao(
-        self, callsign: str, registration: Optional[str] = None
+        self,
+        callsign: str,
+        registration: Optional[str] = None,
+        hex_code: Optional[str] = None,
     ) -> Optional[str]:
         """Extract the airline code from a callsign and normalise it to ICAO.
 
@@ -381,7 +452,13 @@ class LogoManager:
         The FD prefix is ambiguous: Thai AirAsia uses FD callsigns with HS-
         registrations, while the Royal Flying Doctor Service uses FD callsigns on
         VH- registered aircraft.
+
+        A callsign that is the aircraft's own tail number is not an airline
+        flight. Australian-registered / 7C-hex aircraft also ignore foreign
+        IATA prefixes (AF4 is not Air France when the metal is VH-AF4).
         """
+        if self.callsign_is_registration(callsign, registration):
+            return None
         match = re.match(r"^([A-Z]{2,3})", callsign.upper().strip())
         if not match:
             return None
@@ -393,7 +470,15 @@ class LogoManager:
             if reg.startswith("VH-") or not reg:
                 return "RFDS"
         # IATA codes are two letters; ICAO codes are three letters.
-        return self._iata_to_icao.get(prefix, prefix)
+        resolved = self._iata_to_icao.get(prefix, prefix)
+        if self.is_australian_aircraft(registration, hex_code):
+            brand = (
+                _LOGO_DISPLAY_ALIASES.get(resolved)
+                or _LOGO_ICAO_OVERRIDES.get(resolved, resolved)
+            )
+            if brand not in _AUSTRALIAN_OPERATOR_ICAOS:
+                return None
+        return resolved
 
     async def _download_logo(self, icao: str, dest: Path) -> Optional[Path]:
         """Attempt to download logo from multiple sources, resize, and save."""
