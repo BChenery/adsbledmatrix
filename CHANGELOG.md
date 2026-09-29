@@ -5,6 +5,11 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.71] - 2026-09-29
+
+### Fixed
+- **Padded flight callsigns missed their route** — a live callsign such as VOZ045 now matches the stored route VOZ45 or VOZ0045. Only leading zeros are ignored, so VOZ45 and VOZ450 stay different flights.
+
 ## [0.1.69] - 2026-08-15
 
 ### Fixed
