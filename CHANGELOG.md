@@ -5,6 +5,11 @@ All notable user-facing changes to ADS-B LED Display.
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 Versions follow the `VERSION` file and GitHub releases.
 
+## [0.1.72] - 2026-10-05
+
+### Added
+- **Hong Kong Air Cargo (HKC)** name and logo, so flight numbers beginning with HKC show the carrier instead of a generic silhouette.
+
 ## [0.1.71] - 2026-09-29
 
 ### Fixed
