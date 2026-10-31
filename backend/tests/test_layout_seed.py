@@ -172,6 +172,54 @@ def test_default_world_weather_includes_weather_icon():
 
 
 @pytest.mark.asyncio
+async def test_merge_seeds_new_world_weather_without_lazy_io(db_session):
+    """Fresh installs create World Weather and then read its elements."""
+    defaults = [
+        {
+            "name": "World Weather",
+            "description": "shipped",
+            "width": 256,
+            "height": 128,
+            "is_default": False,
+            "elements": [
+                {
+                    "element_type": "text",
+                    "x": 0,
+                    "y": 0,
+                    "z_index": 0,
+                    "format_str": "WX",
+                },
+                {
+                    "element_type": "weather_icon",
+                    "x": 200,
+                    "y": 28,
+                    "width": 48,
+                    "height": 48,
+                    "z_index": 1,
+                    "color": "#ffffff",
+                },
+            ],
+        }
+    ]
+
+    added, total, _, _ = await merge_default_layouts(db_session, defaults)
+    await db_session.commit()
+
+    assert added == 1
+    assert total == 1
+    result = await db_session.execute(
+        select(Layout)
+        .where(Layout.name == "World Weather")
+        .options(selectinload(Layout.elements))
+    )
+    loaded = result.scalar_one()
+    assert {element.element_type for element in loaded.elements} >= {
+        "text",
+        "weather_icon",
+    }
+
+
+@pytest.mark.asyncio
 async def test_merge_appends_weather_icon_to_existing_world_weather(db_session):
     layout = Layout(
         name="World Weather",

@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import attributes, selectinload
 
 from app.models import Layout, LayoutElement
 
@@ -105,6 +105,12 @@ async def _ensure_system_elements(session: AsyncSession, layout: Layout) -> None
     guarantees = _SYSTEM_ELEMENT_GUARANTEES.get(layout.name)
     if not guarantees:
         return
+
+    # Seeded layouts insert elements by foreign key, so the collection can still
+    # be unloaded. Load it in the async session. A sync lazy SELECT raises
+    # MissingGreenlet and aborts startup.
+    if "elements" in attributes.instance_state(layout).unloaded:
+        await session.refresh(layout, attribute_names=["elements"])
 
     # Must attach via the relationship collection — layouts use
     # cascade delete-orphan, so orphaned LayoutElement rows are dropped on flush.
